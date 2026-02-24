@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Feedback - University Feedback Portal</title>
+    <link rel="icon" type="image/x-icon" href="../../../public/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -342,22 +343,7 @@
             </button>
         </div>
 
-        <!-- Login Prompt (shown when not logged in) -->
-        <div id="login-prompt"
-            class="hidden bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
-            <div class="flex items-center">
-                <div class="flex-shrink-0">
-                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
-                </div>
-                <div class="ml-3">
-                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                        Please <a href="/src/components/pages/login.html"
-                            class="font-medium underline text-yellow-700 dark:text-yellow-200 hover:text-yellow-600">login</a>
-                        to view your feedback history automatically, or use the guest tracking below.
-                    </p>
-                </div>
-            </div>
-        </div>
+
 
         <!-- Guest Tracking Form (shown when not logged in) -->
         <div id="guest-tracking-section"
@@ -365,15 +351,15 @@
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex-1">
                     <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Track Guest Feedback</h2>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm">Didn't sign up? No problem. Enter the email
-                        address you used when submitting your feedback to track its status and see responses.</p>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Enter the email address or Reference Number
+                        (e.g., REF-ABC12345) used when submitting your feedback.</p>
                 </div>
                 <div class="flex-1 max-w-md w-full">
                     <div class="flex gap-2">
                         <div class="relative flex-grow">
-                            <input type="email" id="guest-email-input" placeholder="Enter your email"
+                            <input type="text" id="guest-tracking-input" placeholder="Email or Reference Number"
                                 class="w-full px-4 py-2 pl-10 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 transition-all text-sm">
-                            <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                         </div>
                         <button onclick="trackGuestFeedback()"
                             class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center whitespace-nowrap">
@@ -866,18 +852,12 @@
 
         // Track Guest Feedback (without login)
         async function trackGuestFeedback() {
-            const emailInput = document.getElementById('guest-email-input');
-            const email = emailInput.value.trim();
+            const trackingInput = document.getElementById('guest-tracking-input');
+            const inputValue = trackingInput.value.trim();
             const errorElement = document.getElementById('guest-tracking-error');
 
-            if (!email) {
-                errorElement.textContent = 'Please enter your email address.';
-                errorElement.classList.remove('hidden');
-                return;
-            }
-
-            if (!email.includes('@')) {
-                errorElement.textContent = 'Please enter a valid email address.';
+            if (!inputValue) {
+                errorElement.textContent = 'Please enter your email or Reference Number.';
                 errorElement.classList.remove('hidden');
                 return;
             }
@@ -899,17 +879,20 @@
             searchSection.classList.add('hidden');
             statsCards.classList.add('hidden');
 
-            userGreeting.textContent = `Showing feedback for: ${email}`;
+            userGreeting.textContent = `Searching for: ${inputValue}`;
 
             try {
-                console.log('Tracking guest feedback for:', email);
+                const isTrackingId = inputValue.toUpperCase().startsWith('REF-');
+                const payload = isTrackingId ? { tracking_id: inputValue } : { email: inputValue };
+
+                console.log('Tracking guest feedback for:', inputValue);
                 const response = await fetch('http://localhost:8000/api/feedback/track', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({ email: email })
+                    body: JSON.stringify(payload)
                 });
 
                 if (!response.ok) {
@@ -926,8 +909,8 @@
                 if (userFeedback.length === 0) {
                     noFeedbackState.classList.remove('hidden');
                     noFeedbackState.querySelector('h3').textContent = 'No Feedback Found';
-                    noFeedbackState.querySelector('p').textContent = `We couldn't find any feedback entries for ${email}.`;
-                    showNotification('No feedback found for this email', 'info');
+                    noFeedbackState.querySelector('p').textContent = `We couldn't find any feedback for "${inputValue}".`;
+                    showNotification('No feedback found', 'info');
                 } else {
                     filterSection.classList.remove('hidden');
                     searchSection.classList.remove('hidden');

@@ -25,7 +25,30 @@ async function loadComponent(elementId, filePath) {
         const response = await fetch(fullPath);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const html = await response.text();
-        document.getElementById(elementId).innerHTML = html;
+        
+        // Fix relative links in the injected HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        const links = tempDiv.querySelectorAll('a');
+        links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('/')) {
+                // Prepend basePath to relative links
+                link.setAttribute('href', basePath + href);
+            }
+        });
+        
+        // Fix image sources too
+        const images = tempDiv.querySelectorAll('img');
+        images.forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && !src.startsWith('http') && !src.startsWith('/')) {
+                img.setAttribute('src', basePath + src);
+            }
+        });
+
+        document.getElementById(elementId).innerHTML = tempDiv.innerHTML;
         
         // Re-initialize any components that need it
         if (window.feedbackPortal) {

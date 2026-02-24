@@ -40,6 +40,7 @@ class Feedback(Base):
     office = Column(String(100))
     message = Column(Text)
     anonymous = Column(String(5), default="false")  # 'true' or 'false'
+    tracking_id = Column(String(20), unique=True, index=True, nullable=True)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     rating = Column(String(10), nullable=True)

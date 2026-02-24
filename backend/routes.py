@@ -135,12 +135,19 @@ def submit_feedback(feedback: FeedbackCreate, db: Session = Depends(get_db),
         feedback_dict['replied_at'] = None
         feedback_dict['reply_message'] = None
         
+        # Generate a unique tracking ID
+        import secrets
+        import string
+        alphabet = string.ascii_uppercase + string.digits
+        tracking_id = ''.join(secrets.choice(alphabet) for _ in range(10))
+        feedback_dict['tracking_id'] = f"REF-{tracking_id}"
+        
         db_feedback = Feedback(**feedback_dict)
         db.add(db_feedback)
         db.commit()
         db.refresh(db_feedback)
         
-        logger.info(f"Feedback submitted: ID {db_feedback.id}")
+        logger.info(f"Feedback submitted: ID {db_feedback.id}, Tracking ID {db_feedback.tracking_id}")
         return db_feedback
         
     except SQLAlchemyError as e:
@@ -317,13 +324,22 @@ def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depend
         logger.error(f"Database error in get_user_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
 
-# 👤 Anonymous Route – Track Feedback by Email
+# 👤 Anonymous Route – Track Feedback by Email or Tracking ID
 @router.post("/feedback/track", response_model=List[FeedbackOut])
 def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db)):
     try:
-        logger.info(f"Tracking feedback for email: {request.email}")
-        feedback = db.query(Feedback).filter(Feedback.email == request.email).order_by(Feedback.created_at.desc()).all()
-        logger.info(f"Returning {len(feedback)} feedback entries for email {request.email}")
+        if not request.email and not request.tracking_id:
+            raise HTTPException(status_code=400, detail="Email or Tracking ID required")
+            
+        query = db.query(Feedback)
+        if request.tracking_id:
+            logger.info(f"Tracking feedback for ID: {request.tracking_id}")
+            feedback = query.filter(Feedback.tracking_id == request.tracking_id).all()
+        else:
+            logger.info(f"Tracking feedback for email: {request.email}")
+            feedback = query.filter(Feedback.email == request.email).order_by(Feedback.created_at.desc()).all()
+            
+        logger.info(f"Returning {len(feedback)} feedback entries")
         return feedback
         
     except SQLAlchemyError as e:

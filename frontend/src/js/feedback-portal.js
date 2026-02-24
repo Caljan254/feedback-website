@@ -280,7 +280,8 @@ class FeedbackPortal {
         if (!container) return null;
         
         const notification = document.createElement('div');
-        notification.className = `notification ${type}`;
+        notification.className = `notification ${type} pointer-events-auto`;
+        notification.style.pointerEvents = 'auto'; // Explicitly set to override container
 
         let icon = '';
         if (type === 'success') icon = '<i class="fas fa-check-circle notification-icon"></i>';
@@ -387,18 +388,43 @@ class FeedbackPortal {
             loadingNotification?.remove();
 
             if (res.ok) {
-                this.showNotification('✅ Feedback submitted successfully! Thank you.', 'success');
+                const result = await res.json();
+                const trackingId = result.tracking_id || 'N/A';
+                
+                // Show persistent success notification with copy button
+                this.showNotification(`
+                    <div class="flex flex-col gap-3 pointer-events-auto">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle mr-2 text-xl"></i>
+                            <span class="font-bold">Feedback Submitted!</span>
+                        </div>
+                        <p class="text-sm opacity-90">Your Reference Number is:</p>
+                        <div class="flex items-center bg-white/20 p-2 rounded border border-white/30 gap-2">
+                            <code class="text-lg font-mono flex-1 text-white">${trackingId}</code>
+                            <button onclick="window.feedbackPortal.copyToClipboard('${trackingId}')" 
+                                    class="bg-white text-green-600 px-3 py-1.5 rounded text-xs font-bold hover:bg-green-50 transition-colors shadow-sm">
+                                <i class="fas fa-copy mr-1"></i> COPY
+                            </button>
+                        </div>
+                        <p class="text-xs italic opacity-80">Please save this number to track your feedback later.</p>
+                        <div class="flex gap-2 mt-2">
+                            <button onclick="const isDept = window.location.pathname.includes('/public/departments/'); window.location.href = isDept ? '../../src/components/pages/home.html' : 'home.html';"
+                                    class="flex-1 bg-green-700 hover:bg-green-800 text-white py-2.5 rounded text-sm font-bold transition-all border border-green-400 shadow-md">
+                                <i class="fas fa-home mr-2"></i> Return Home
+                            </button>
+                            <button onclick="this.closest('.notification').remove()" 
+                                    class="bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded text-sm font-medium transition-all border border-white/30">
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                `, 'success', 0); // 0 duration means it stays until clicked/dismissed
+                
                 form.reset();
                 
                 // Clear session storage after successful submission
                 sessionStorage.removeItem('feedbackUserInfo');
                 sessionStorage.removeItem('selectedOffice');
-                
-                // Redirect back to home after 2 seconds
-                setTimeout(() => {
-                    const isDept = window.location.pathname.includes('/public/departments/');
-                    window.location.href = isDept ? '../../src/components/pages/home.html' : 'home.html';
-                }, 2000);
             } else {
                 let errorMessage = 'Failed to submit feedback';
                 try {
@@ -581,6 +607,38 @@ class FeedbackPortal {
             clearTimeout(timeout);
             timeout = setTimeout(() => func.apply(this, args), wait);
         };
+    }
+
+    // Copy text to clipboard with fallback
+    copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(() => {
+                this.showNotification('Reference Number copied to clipboard!', 'info');
+            }).catch(err => {
+                this.fallbackCopyToClipboard(text);
+            });
+        } else {
+            this.fallbackCopyToClipboard(text);
+        }
+    }
+
+    fallbackCopyToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            this.showNotification('Reference Number copied to clipboard!', 'info');
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+            this.showNotification('Could not copy automatically. Please select the text manually.', 'warning');
+        }
+        document.body.removeChild(textArea);
     }
 }
 

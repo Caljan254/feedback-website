@@ -1,8 +1,8 @@
 <header
     class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between z-50">
     <!-- Logo -->
-    <a href="home.html" class="flex items-center space-x-3">
-        <img src="../../../public/uploads/logo.png" alt="University Logo"
+    <a href="src/components/pages/home.html" class="flex items-center space-x-3">
+        <img src="public/uploads/logo.png" alt="University Logo"
             class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow" />
     </a>
 
@@ -23,18 +23,23 @@
 
     <!-- Desktop Menu -->
     <nav class="hidden md:flex ml-auto space-x-2 sm:space-x-4 items-center">
-        <a href="home.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Home</a>
-        <a href="about.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">About</a>
-        <a href="submit-feedback.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Submit
+        <a href="src/components/pages/home.html"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Home</a>
+        <a href="src/components/pages/about.html"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">About</a>
+        <a href="src/components/pages/submit-feedback.html"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Submit
             Feedback</a>
-        <a href="my-feedback.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">My
+        <a href="src/components/pages/my-feedback.html"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">My
             Feedback</a>
-        <a href="contact.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Contact</a>
-        <a href="admin.html" data-auth="admin" style="display:none"
+        <a href="src/components/pages/contact.html"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Contact</a>
+        <a href="src/components/pages/admin.html" data-auth="admin" style="display:none"
             class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Admin Panel</a>
-        <a href="login.html" data-auth="guest"
+        <a href="src/components/pages/login.html" data-auth="guest"
             class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Login</a>
-        <a href="signup.html" data-auth="guest"
+        <a href="src/components/pages/signup.html" data-auth="guest"
             class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Sign Up</a>
         <a href="#" data-auth="user" data-action="logout" style="display:none"
             class="nav-link hover:text-red-700 dark:hover:text-red-400 px-2 py-1 font-bold">Logout</a>
@@ -63,35 +68,35 @@
 
         <!-- Menu Items -->
         <div style="padding: 16px;">
-            <a href="home.html"
+            <a href="src/components/pages/home.html"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-home" style="width: 24px; color: #059669; margin-right: 12px;"></i>
                 <span>Home</span>
             </a>
 
-            <a href="about.html"
+            <a href="src/components/pages/about.html"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-info-circle" style="width: 24px; color: #059669; margin-right: 12px;"></i>
                 <span>About</span>
             </a>
 
-            <a href="submit-feedback.html"
+            <a href="src/components/pages/submit-feedback.html"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-edit" style="width: 24px; color: #059669; margin-right: 12px;"></i>
                 <span>Submit Feedback</span>
             </a>
 
-            <a href="my-feedback.html"
+            <a href="src/components/pages/my-feedback.html"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-list" style="width: 24px; color: #059669; margin-right: 12px;"></i>
                 <span>My Feedback</span>
             </a>
 
-            <a href="contact.html"
+            <a href="src/components/pages/contact.html"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-envelope" style="width: 24px; color: #059669; margin-right: 12px;"></i>
@@ -100,14 +105,14 @@
 
             <div style="height: 1px; background-color: #e5e7eb; margin: 16px 0;"></div>
 
-            <a href="login.html" data-auth="guest"
+            <a href="src/components/pages/login.html" data-auth="guest"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-sign-in-alt" style="width: 24px; color: #059669; margin-right: 12px;"></i>
                 <span>Login</span>
             </a>
 
-            <a href="signup.html" data-auth="guest"
+            <a href="src/components/pages/signup.html" data-auth="guest"
                 onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
                 style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
                 <i class="fas fa-user-plus" style="width: 24px; color: #059669; margin-right: 12px;"></i>

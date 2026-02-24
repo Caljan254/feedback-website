@@ -80,6 +80,7 @@ class FeedbackOut(BaseModel):
     read_at: Optional[datetime] = None
     replied_at: Optional[datetime] = None
     reply_message: Optional[str] = None
+    tracking_id: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -109,4 +110,5 @@ class FeedbackStats(BaseModel):
 
 # Anonymous feedback tracking
 class FeedbackTrackRequest(BaseModel):
-    email: str
+    email: Optional[str] = None
+    tracking_id: Optional[str] = None
