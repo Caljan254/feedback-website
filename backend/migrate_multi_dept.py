@@ -30,9 +30,35 @@ def migrate_and_seed():
         Base.metadata.create_all(bind=engine)
         
         departments_list = [
-            "Administration", "Library", "Finance", "Admissions", 
-            "ICT", "Security", "Catering", "Registry", 
-            "Health Unit", "Games & Sports", "Hostel", "Dean of Students"
+            "Vice Chancellor's Office", "DVC (Academic, Research & Student Affairs)",
+            "DVC (Administration, Finance & Planning)", "Registrar (Academic Affairs)",
+            "Registrar (Administration & Human Resource)", "University Council Office",
+            "Legal Services Office", "Corporate Communications / PR",
+            "Admissions Office", "Academic Registry", "Examinations Office",
+            "Timetabling Office", "Research, Innovation & Postgraduate Studies",
+            "Quality Assurance Office", "Industrial Attachment & Career Services",
+            "e-Learning / ODL Office", "Dean, School of Science and Computing",
+            "Department of Mathematics", "Department of Computing & IT",
+            "Department of Physical Sciences", "Department of Biological Sciences",
+            "Dean, School of Engineering", "Department of Civil Engineering",
+            "Department of Electrical & Electronic Engineering", "Department of Mechanical Engineering",
+            "Dean, School of Business", "Department of Business Administration",
+            "Department of Accounting & Finance", "Department of Economics",
+            "Dean, School of Education", "Department of Educational Studies",
+            "Department of Social Sciences", "Department of Humanities",
+            "Dean, School of Agriculture", "Department of Environmental Science",
+            "Department of Agricultural Sciences", "Dean of Students Office",
+            "Student Affairs Office", "Counselling Services", "Chaplaincy / Spiritual Services",
+            "Career Guidance Office", "Games and Sports Office",
+            "Student Clubs & Associations Office", "Finance Department", "Fees Office",
+            "Accounts Office", "Procurement Office", "Internal Audit Office",
+            "Human Resource Office", "Staff Welfare Office", "Training & Development Office",
+            "Library Services", "ICT Services", "Health Unit / Clinic",
+            "Accommodation / Hostel Office", "Catering Services",
+            "Estate / Maintenance Department", "Transport Office",
+            "Security Department", "Grounds & Cleaning Services",
+            "Research Directorate", "Innovation & Tech Transfer Office",
+            "Community Outreach & Extension"
         ]
         
         print(f"Seeding {len(departments_list)} departments...")

@@ -84,6 +84,179 @@ class FeedbackPortal {
         
         // Set up form submission handler
         this.setupDepartmentFormSubmission();
+        
+        // Update page title and heading
+        if (office) {
+            const officeName = this.getOfficeName(office);
+            document.title = `${officeName} Feedback - University Feedback Portal`;
+            const titleEl = document.getElementById('department-title');
+            if (titleEl) titleEl.textContent = `${officeName} Feedback`;
+            
+            this.injectQuestions(office);
+        }
+    }
+
+    // Inject department-specific questions
+    injectQuestions(officeId) {
+        const questionsContainer = document.getElementById('dynamic-questions');
+        if (!questionsContainer) return;
+
+        const questions = this.getDepartmentQuestions(officeId);
+        let html = '';
+
+        questions.forEach((qObj, index) => {
+            const name = `q_${index}`;
+            const question = typeof qObj === 'string' ? qObj : qObj.q;
+            const options = typeof qObj === 'string' ? ["Yes", "No"] : (qObj.options || ["Yes", "No"]);
+            
+            html += `
+                <div class="space-y-3">
+                    <p class="text-gray-700 dark:text-gray-300 font-medium">${question}</p>
+                    <div class="flex items-center space-x-6">
+                        ${options.map(opt => `
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio" name="${name}" value="${opt}" required class="mr-2 form-radio text-green-600"> 
+                                <span class="text-gray-700 dark:text-gray-300">${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        });
+
+        questionsContainer.innerHTML = html;
+    }
+
+    // Get questions based on office category
+    getDepartmentQuestions(officeId) {
+        // Category mapping
+        const categories = {
+            'management': ['vc-office', 'dvc-academic', 'dvc-admin', 'registrar-academic', 'registrar-admin', 'council-office', 'legal-services', 'corp-comm'],
+            'academic': ['admissions', 'academic-registry', 'exams-office', 'timetabling', 'research-postgrad', 'quality-assurance', 'industrial-attachment', 'elearning'],
+            'schools': ['ssc-dean', 'dept-math', 'dept-ict', 'dept-physical', 'dept-biological', 'set-dean', 'dept-civil', 'dept-elec', 'dept-mech', 'sbe-dean', 'dept-admin', 'dept-accounting', 'dept-economics', 'seh-dean', 'dept-edu', 'dept-social', 'dept-humanities', 'sanr-dean', 'dept-env', 'dept-agri'],
+            'student-affairs': ['dean-students', 'student-affairs', 'counselling', 'chaplaincy', 'career-guidance', 'games', 'student-clubs'],
+            'finance-hr': ['finance', 'fees-office', 'accounts-office', 'procurement', 'internal-audit', 'hr-office', 'staff-welfare', 'training-dev'],
+            'support': ['library', 'ict-services', 'health-unit', 'hostel', 'catering', 'estate', 'transport', 'security', 'grounds'],
+            'research-outreach': ['research-dir', 'innovation-office', 'community-outreach']
+        };
+
+        const questionSets = {
+            'management': [
+                { q: "Was the office environment professional?", options: ["Yes", "No"] },
+                { q: "Did you receive timely assistance?", options: ["Yes", "No"] }
+            ],
+            'academic': [
+                { q: "Were the academic guidelines clearly explained?", options: ["Yes", "No"] },
+                { q: "Is the service delivery efficient?", options: ["Good", "Poor"] }
+            ],
+            'schools': [
+                { q: "Is the academic support adequate?", options: ["Yes", "No"] },
+                { q: "Were your departmental inquiries handled well?", options: ["Good", "Poor"] }
+            ],
+            'student-affairs': [
+                { q: "Are the welfare services meeting your needs?", options: ["Yes", "No"] },
+                { q: "Did you feel supported by the office?", options: ["Yes", "No"] }
+            ],
+            'finance-hr': [
+                { q: "Was the transaction processed accurately?", options: ["Yes", "No"] },
+                { q: "Was the staff helpful with your request?", options: ["Yes", "No"] }
+            ],
+            'support': [
+                { q: "Are the facilities/services well-maintained?", options: ["Yes", "No"] },
+                { q: "In your opinion, is the service reliable?", options: ["Yes", "No"] }
+            ],
+            'research-outreach': [
+                { q: "Did you receive relevant information/support?", options: ["Yes", "No"] },
+                { q: "Was the engagement productive?", options: ["Yes", "No"] }
+            ]
+        };
+
+        // Specific overrides for legacy feel
+        if (officeId === 'library') {
+            return [
+                { q: "Were the resources sufficient?", options: ["Yes", "No"] },
+                { q: "How was the librarian's assistance?", options: ["Good", "Poor"] }
+            ];
+        }
+
+        for (const [cat, ids] of Object.entries(categories)) {
+            if (ids.includes(officeId)) return questionSets[cat];
+        }
+
+        return [
+            { q: "Was the staff helpful?", options: ["Yes", "No"] },
+            { q: "Was your issue resolved efficiently?", options: ["Yes", "No"] }
+        ]; // Default
+    }
+
+    // Get human-readable office name
+    getOfficeName(officeId) {
+        const offices = {
+            'vc-office': "Vice Chancellor's Office",
+            'dvc-academic': "DVC (Academic, Research & Student Affairs)",
+            'dvc-admin': "DVC (Administration, Finance & Planning)",
+            'registrar-academic': "Registrar (Academic Affairs)",
+            'registrar-admin': "Registrar (Administration & Human Resource)",
+            'council-office': "University Council Office",
+            'legal-services': "Legal Services Office",
+            'corp-comm': "Corporate Communications / PR",
+            'admissions': "Admissions Office",
+            'academic-registry': "Academic Registry",
+            'exams-office': "Examinations Office",
+            'timetabling': "Timetabling Office",
+            'research-postgrad': "Research, Innovation & Postgraduate Studies",
+            'quality-assurance': "Quality Assurance Office",
+            'industrial-attachment': "Industrial Attachment & Career Services",
+            'elearning': "e-Learning / ODL Office",
+            'ssc-dean': "Dean, School of Science and Computing",
+            'dept-math': "Department of Mathematics",
+            'dept-ict': "Department of Computing & IT",
+            'dept-physical': "Department of Physical Sciences",
+            'dept-biological': "Department of Biological Sciences",
+            'set-dean': "Dean, School of Engineering",
+            'dept-civil': "Department of Civil Engineering",
+            'dept-elec': "Department of Electrical & Electronic Engineering",
+            'dept-mech': "Department of Mechanical Engineering",
+            'sbe-dean': "Dean, School of Business",
+            'dept-admin': "Department of Business Administration",
+            'dept-accounting': "Department of Accounting & Finance",
+            'dept-economics': "Department of Economics",
+            'seh-dean': "Dean, School of Education",
+            'dept-edu': "Department of Educational Studies",
+            'dept-social': "Department of Social Sciences",
+            'dept-humanities': "Department of Humanities",
+            'sanr-dean': "Dean, School of Agriculture",
+            'dept-env': "Department of Environmental Science",
+            'dept-agri': "Department of Agricultural Sciences",
+            'dean-students': "Dean of Students Office",
+            'student-affairs': "Student Affairs Office",
+            'counselling': "Counselling Services",
+            'chaplaincy': "Chaplaincy / Spiritual Services",
+            'career-guidance': "Career Guidance Office",
+            'games': "Games and Sports Office",
+            'student-clubs': "Student Clubs & Associations Office",
+            'finance': "Finance Department",
+            'fees-office': "Fees Office",
+            'accounts-office': "Accounts Office",
+            'procurement': "Procurement Office",
+            'internal-audit': "Internal Audit Office",
+            'hr-office': "Human Resource Office",
+            'staff-welfare': "Staff Welfare Office",
+            'training-dev': "Training & Development Office",
+            'library': "Library Services",
+            'ict-services': "ICT Services",
+            'health-unit': "Health Unit / Clinic",
+            'hostel': "Accommodation / Hostel Office",
+            'catering': "Catering Services",
+            'estate': "Estate / Maintenance Department",
+            'transport': "Transport Office",
+            'security': "Security Department",
+            'grounds': "Grounds & Cleaning Services",
+            'research-dir': "Research Directorate",
+            'innovation-office': "Innovation & Tech Transfer Office",
+            'community-outreach': "Community Outreach & Extension"
+        };
+        return offices[officeId] || officeId.charAt(0).toUpperCase() + officeId.slice(1).replace(/-/g, ' ');
     }
 
     // ===== DARK MODE FUNCTIONALITY =====
@@ -535,14 +708,9 @@ class FeedbackPortal {
         };
 
         // Redirect to department page in public/departments/
-        const departmentFile = officeFiles[office];
-        if (departmentFile) {
-            const isPages = window.location.pathname.includes('/src/components/pages/');
-            const relPath = isPages ? `../../../public/departments/${departmentFile}?office=${office}` : `public/departments/${departmentFile}?office=${office}`;
-            window.location.href = relPath;
-        } else {
-            this.showNotification('Department page not found', 'error');
-        }
+        const isPages = window.location.pathname.includes('/src/components/pages/');
+        const relPath = isPages ? `../../../public/departments/generic-feedback.html?office=${office}` : `public/departments/generic-feedback.html?office=${office}`;
+        window.location.href = relPath;
     }
 
     // ===== EVENT LISTENERS =====

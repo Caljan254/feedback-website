@@ -341,12 +341,171 @@
             </button>
 
             <div x-show="open" @click.away="open = false"
-                class="mt-2 w-full bg-white dark:bg-gray-600 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-500 max-h-60 overflow-y-auto office-dropdown"
+                class="mt-2 w-full bg-white dark:bg-gray-600 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-500 max-h-96 overflow-y-auto office-dropdown"
                 x-transition:enter="dropdown-enter-active" x-transition:leave="dropdown-leave-active">
-                <template x-for="office in offices" :key="office.value">
+
+                <!-- UNIVERSITY MANAGEMENT OFFICES -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Management Offices</div>
+                <template x-for="office in [
+                    { value: 'vc-office', name: 'Vice Chancellor\'s Office' },
+                    { value: 'dvc-academic', name: 'DVC (Academic, Research & Student Affairs)' },
+                    { value: 'dvc-admin', name: 'DVC (Administration, Finance & Planning)' },
+                    { value: 'registrar-academic', name: 'Registrar (Academic Affairs)' },
+                    { value: 'registrar-admin', name: 'Registrar (Administration & Human Resource)' },
+                    { value: 'council-office', name: 'University Council Office' },
+                    { value: 'legal-services', name: 'Legal Services Office' },
+                    { value: 'corp-comm', name: 'Corporate Communications / PR' }
+                ]" :key="office.value">
                     <button
                         @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
-                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm sm:text-base">
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+
+                <!-- ACADEMIC AFFAIRS & TEACHING SUPPORT -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Academic Affairs</div>
+                <template x-for="office in [
+                    { value: 'admissions', name: 'Admissions Office' },
+                    { value: 'academic-registry', name: 'Academic Registry' },
+                    { value: 'exams-office', name: 'Examinations Office' },
+                    { value: 'timetabling', name: 'Timetabling Office' },
+                    { value: 'research-postgrad', name: 'Research, Innovation & Postgraduate Studies' },
+                    { value: 'quality-assurance', name: 'Quality Assurance Office' },
+                    { value: 'industrial-attachment', name: 'Industrial Attachment & Career Services' },
+                    { value: 'elearning', name: 'e-Learning / ODL Office' }
+                ]" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+
+                <!-- SCHOOLS -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Schools & Departments</div>
+                <template x-for="office in [
+                    { value: 'ssc-dean', name: 'Dean, School of Science and Computing' },
+                    { value: 'dept-math', name: 'Department of Mathematics' },
+                    { value: 'dept-ict', name: 'Department of Computing & IT' },
+                    { value: 'dept-physical', name: 'Department of Physical Sciences' },
+                    { value: 'dept-biological', name: 'Department of Biological Sciences' },
+                    { value: 'set-dean', name: 'Dean, School of Engineering' },
+                    { value: 'dept-civil', name: 'Department of Civil Engineering' },
+                    { value: 'dept-elec', name: 'Department of Electrical Engineering' },
+                    { value: 'dept-mech', name: 'Department of Mechanical Engineering' },
+                    { value: 'sbe-dean', name: 'Dean, School of Business' },
+                    { value: 'dept-admin', name: 'Department of Business Administration' },
+                    { value: 'dept-accounting', name: 'Department of Accounting & Finance' },
+                    { value: 'dept-economics', name: 'Department of Economics' },
+                    { value: 'seh-dean', name: 'Dean, School of Education' },
+                    { value: 'dept-edu', name: 'Department of Educational Studies' },
+                    { value: 'dept-social', name: 'Department of Social Sciences' },
+                    { value: 'dept-humanities', name: 'Department of Humanities' },
+                    { value: 'sanr-dean', name: 'Dean, School of Agriculture' },
+                    { value: 'dept-env', name: 'Department of Environmental Science' },
+                    { value: 'dept-agri', name: 'Department of Agricultural Sciences' }
+                ]" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+
+                <!-- STUDENT AFFAIRS -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Student Affairs</div>
+                <template x-for="office in [
+                    { value: 'dean-students', name: 'Dean of Students Office' },
+                    { value: 'student-affairs', name: 'Student Affairs Office' },
+                    { value: 'counselling', name: 'Counselling Services' },
+                    { value: 'chaplaincy', name: 'Chaplaincy / Spiritual Services' },
+                    { value: 'career-guidance', name: 'Career Guidance Office' },
+                    { value: 'games', name: 'Games and Sports Office' },
+                    { value: 'student-clubs', name: 'Student Clubs & Associations' }
+                ]" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+
+                <!-- FINANCE & HR -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Finance & HR</div>
+                <template x-for="office in [
+                    { value: 'finance', name: 'Finance Department' },
+                    { value: 'fees-office', name: 'Fees Office' },
+                    { value: 'accounts-office', name: 'Accounts Office' },
+                    { value: 'procurement', name: 'Procurement Office' },
+                    { value: 'internal-audit', name: 'Internal Audit Office' },
+                    { value: 'hr-office', name: 'Human Resource Office' },
+                    { value: 'staff-welfare', name: 'Staff Welfare Office' },
+                    { value: 'training-dev', name: 'Training & Development' }
+                ]" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+
+                <!-- SUPPORT SERVICES -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Support Services</div>
+                <template x-for="office in [
+                    { value: 'library', name: 'Library Services' },
+                    { value: 'ict-services', name: 'ICT Services' },
+                    { value: 'health-unit', name: 'Health Unit / Clinic' },
+                    { value: 'hostel', name: 'Accommodation / Hostel Office' },
+                    { value: 'catering', name: 'Catering Services' },
+                    { value: 'estate', name: 'Estate / Maintenance Department' },
+                    { value: 'transport', name: 'Transport Office' },
+                    { value: 'security', name: 'Security Department' },
+                    { value: 'grounds', name: 'Grounds & Cleaning Services' }
+                ]" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+
+                <!-- RESEARCH & OUTREACH -->
+                <div
+                    class="px-3 py-2 bg-gray-50 dark:bg-gray-700 font-bold text-xs uppercase text-gray-500 tracking-wider">
+                    Research & Outreach</div>
+                <template x-for="office in [
+                     { value: 'research-dir', name: 'Research Directorate' },
+                     { value: 'innovation-office', name: 'Innovation & Tech Transfer' },
+                     { value: 'community-outreach', name: 'Community Outreach & Extension' }
+                 ]" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm">
                         <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
                         <i x-show="selectedOffice && selectedOffice.value === office.value"
                             class="fas fa-check text-green-500 ml-2"></i>

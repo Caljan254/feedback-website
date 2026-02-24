@@ -343,7 +343,22 @@
             </button>
         </div>
 
-
+        Login Prompt (shown when not logged in)
+        <div id="login-prompt"
+            class="hidden bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                        Please <a href="/src/components/pages/login.html"
+                            class="font-medium underline text-yellow-700 dark:text-yellow-200 hover:text-yellow-600">login</a>
+                        to view your feedback history automatically, or use the guest tracking below.
+                    </p>
+                </div>
+            </div>
+        </div>
 
         <!-- Guest Tracking Form (shown when not logged in) -->
         <div id="guest-tracking-section"
@@ -413,18 +428,80 @@
                     <select id="office-filter"
                         class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-48">
                         <option value="all">All Offices</option>
-                        <option value="admin">Administration</option>
-                        <option value="library">Library</option>
-                        <option value="finance">Finance</option>
-                        <option value="admissions">Admissions</option>
-                        <option value="ict">ICT</option>
-                        <option value="security">Security</option>
-                        <option value="catering">Catering</option>
-                        <option value="registry">Registry</option>
-                        <option value="health">Health Unit</option>
-                        <option value="games">Games & Sports</option>
-                        <option value="hostel">Hostel</option>
-                        <option value="dean">Dean of Students</option>
+
+                        <!-- Management -->
+                        <optgroup label="Management">
+                            <option value="vc-office">VC's Office</option>
+                            <option value="dvc-academic">DVC Academic</option>
+                            <option value="dvc-admin">DVC Admin</option>
+                            <option value="registrar-academic">Registrar Academic</option>
+                            <option value="registrar-admin">Registrar Admin</option>
+                            <option value="council-office">Council Office</option>
+                            <option value="legal-services">Legal Services</option>
+                            <option value="corp-comm">Corp Comm / PR</option>
+                        </optgroup>
+
+                        <!-- Academic -->
+                        <optgroup label="Academic Affairs">
+                            <option value="admissions">Admissions</option>
+                            <option value="academic-registry">Registry</option>
+                            <option value="exams-office">Exams Office</option>
+                            <option value="timetabling">Timetabling</option>
+                            <option value="research-postgrad">Research/Postgrad</option>
+                            <option value="quality-assurance">Quality Assurance</option>
+                            <option value="industrial-attachment">Attachment Office</option>
+                            <option value="elearning">e-Learning</option>
+                        </optgroup>
+
+                        <!-- Schools -->
+                        <optgroup label="Schools & Departments">
+                            <option value="ssc-dean">Dean, SSC</option>
+                            <option value="dept-math">Math Dept</option>
+                            <option value="dept-ict">ICT Dept</option>
+                            <option value="dept-physical">Physical Sciences</option>
+                            <option value="dept-biological">Biological Sciences</option>
+                            <option value="set-dean">Dean, Engineering</option>
+                            <option value="dept-civil">Civil Eng</option>
+                            <option value="dept-elec">Electrical Eng</option>
+                            <option value="dept-mech">Mechanical Eng</option>
+                            <option value="sbe-dean">Dean, Business</option>
+                            <option value="dept-admin">Business Admin</option>
+                            <option value="dept-accounting">Accounting & Finance</option>
+                            <option value="dept-economics">Economics Dept</option>
+                            <option value="seh-dean">Dean, Education</option>
+                            <option value="dept-edu">Education Studies</option>
+                            <option value="dept-social">Social Sciences</option>
+                            <option value="dept-humanities">Humanities Dept</option>
+                            <option value="sanr-dean">Dean, Agriculture</option>
+                            <option value="dept-env">Environmental Science</option>
+                            <option value="dept-agri">Agricultural Sciences</option>
+                        </optgroup>
+
+                        <!-- Student Affairs -->
+                        <optgroup label="Student Affairs">
+                            <option value="dean-students">Dean of Students</option>
+                            <option value="student-affairs">Student Affairs</option>
+                            <option value="counselling">Counselling</option>
+                            <option value="chaplaincy">Chaplaincy</option>
+                            <option value="career-guidance">Career Guidance</option>
+                            <option value="games">Games & Sports</option>
+                            <option value="student-clubs">Student Clubs</option>
+                        </optgroup>
+
+                        <!-- Finance & Support -->
+                        <optgroup label="Finance & Support">
+                            <option value="finance">Finance</option>
+                            <option value="fees-office">Fees Office</option>
+                            <option value="accounts-office">Accounts Office</option>
+                            <option value="procurement">Procurement</option>
+                            <option value="hr-office">HR Office</option>
+                            <option value="library">Library</option>
+                            <option value="ict-services">ICT Services</option>
+                            <option value="health-unit">Health Unit</option>
+                            <option value="hostel">Hostel</option>
+                            <option value="catering">Catering</option>
+                            <option value="security">Security</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -639,24 +716,77 @@
             }
         }
 
-        function formatOfficeName(office) {
-            if (!office) return 'Unknown';
-            const cleanOffice = office.replace('-q', '');
-            const officeNames = {
-                'admin': 'Administration',
-                'library': 'Library',
-                'finance': 'Finance',
-                'admissions': 'Admissions',
-                'ict': 'ICT',
-                'security': 'Security',
-                'catering': 'Catering',
-                'registry': 'Registry',
-                'health': 'Health Unit',
-                'games': 'Games & Sports',
-                'hostel': 'Hostel',
-                'dean': 'Dean of Students'
+        function formatOfficeName(officeId) {
+            if (!officeId) return 'Unknown';
+            const cleanOffice = officeId.replace('-q', '');
+
+            const offices = {
+                'vc-office': "Vice Chancellor's Office",
+                'dvc-academic': "DVC (Academic, Research & AR)",
+                'dvc-admin': "DVC (Admin, Finance & Planning)",
+                'registrar-academic': "Registrar (Academic Affairs)",
+                'registrar-admin': "Registrar (AA & HR)",
+                'council-office': "University Council Office",
+                'legal-services': "Legal Services Office",
+                'corp-comm': "Corporate Communications / PR",
+                'admissions': "Admissions Office",
+                'academic-registry': "Academic Registry",
+                'exams-office': "Examinations Office",
+                'timetabling': "Timetabling Office",
+                'research-postgrad': "Research & Postgraduate",
+                'quality-assurance': "Quality Assurance Office",
+                'industrial-attachment': "Industrial Attachment Office",
+                'elearning': "e-Learning / ODL Office",
+                'ssc-dean': "Dean, School of Sci & Comp",
+                'dept-math': "Department of Mathematics",
+                'dept-ict': "Dept of Computing & IT",
+                'dept-physical': "Dept of Physical Sciences",
+                'dept-biological': "Dept of Biological Sciences",
+                'set-dean': "Dean, School of Engineering",
+                'dept-civil': "Dept of Civil Engineering",
+                'dept-elec': "Dept of Electrical Eng",
+                'dept-mech': "Dept of Mechanical Eng",
+                'sbe-dean': "Dean, School of Business",
+                'dept-admin': "Dept of Business Admin",
+                'dept-accounting': "Dept of Accounting & Finance",
+                'dept-economics': "Dept of Economics",
+                'seh-dean': "Dean, School of Education",
+                'dept-edu': "Dept of Educational Studies",
+                'dept-social': "Dept of Social Sciences",
+                'dept-humanities': "Dept of Humanities",
+                'sanr-dean': "Dean, School of Agriculture",
+                'dept-env': "Dept of Environmental Science",
+                'dept-agri': "Dept of Agricultural Sciences",
+                'dean-students': "Dean of Students Office",
+                'student-affairs': "Student Affairs Office",
+                'counselling': "Counselling Services",
+                'chaplaincy': "Chaplaincy / Spiritual Services",
+                'career-guidance': "Career Guidance Office",
+                'games': "Games and Sports Office",
+                'student-clubs': "Student Clubs & Associations",
+                'finance': "Finance Department",
+                'fees-office': "Fees Office",
+                'accounts-office': "Accounts Office",
+                'procurement': "Procurement Office",
+                'internal-audit': "Internal Audit Office",
+                'hr-office': "Human Resource Office",
+                'staff-welfare': "Staff Welfare Office",
+                'training-dev': "Training & Development",
+                'library': "Library Services",
+                'ict-services': "ICT Services",
+                'health-unit': "Health Unit / Clinic",
+                'hostel': "Accommodation / Hostel",
+                'catering': "Catering Services",
+                'estate': "Estate / Maintenance",
+                'transport': "Transport Office",
+                'security': "Security Department",
+                'grounds': "Grounds & Cleaning Services",
+                'research-dir': "Research Directorate",
+                'innovation-office': "Innovation & Tech Transfer",
+                'community-outreach': "Community Outreach"
             };
-            return officeNames[cleanOffice] || cleanOffice.split('_').map(word =>
+
+            return offices[cleanOffice] || cleanOffice.split('-').map(word =>
                 word.charAt(0).toUpperCase() + word.slice(1)
             ).join(' ');
         }
