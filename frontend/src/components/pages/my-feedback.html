@@ -353,8 +353,34 @@
                     <p class="text-sm text-yellow-700 dark:text-yellow-200">
                         Please <a href="/src/components/pages/login.html"
                             class="font-medium underline text-yellow-700 dark:text-yellow-200 hover:text-yellow-600">login</a>
-                        to view your feedback history.
+                        to view your feedback history automatically, or use the guest tracking below.
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Guest Tracking Form (shown when not logged in) -->
+        <div id="guest-tracking-section"
+            class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border-t-4 border-green-500">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Track Guest Feedback</h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Didn't sign up? No problem. Enter the email
+                        address you used when submitting your feedback to track its status and see responses.</p>
+                </div>
+                <div class="flex-1 max-w-md w-full">
+                    <div class="flex gap-2">
+                        <div class="relative flex-grow">
+                            <input type="email" id="guest-email-input" placeholder="Enter your email"
+                                class="w-full px-4 py-2 pl-10 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 transition-all text-sm">
+                            <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button onclick="trackGuestFeedback()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center whitespace-nowrap">
+                            <i class="fas fa-search mr-2"></i> Track
+                        </button>
+                    </div>
+                    <p id="guest-tracking-error" class="text-red-500 text-xs mt-2 hidden"></p>
                 </div>
             </div>
         </div>
@@ -719,11 +745,13 @@
             const searchSection = document.getElementById('search-section');
             const statsCards = document.getElementById('stats-cards');
             const loginPrompt = document.getElementById('login-prompt');
+            const guestTrackingSection = document.getElementById('guest-tracking-section');
             const userGreeting = document.getElementById('user-greeting');
 
             // Check login status
             if (!isUserLoggedIn()) {
                 loginPrompt.classList.remove('hidden');
+                guestTrackingSection.classList.remove('hidden');
                 filterSection.classList.add('hidden');
                 searchSection.classList.add('hidden');
                 statsCards.classList.add('hidden');
@@ -740,8 +768,9 @@
                 userGreeting.textContent = `Welcome back, ${userEmail.split('@')[0]}! Here's your feedback history.`;
             }
 
-            // Hide login prompt, show loading
+            // Hide login prompt and guest tracking, show loading
             loginPrompt.classList.add('hidden');
+            guestTrackingSection.classList.add('hidden');
             loadingState.classList.remove('hidden');
             feedbackList.classList.add('hidden');
             noFeedbackState.classList.add('hidden');
@@ -832,6 +861,88 @@
 
             } finally {
                 if (refreshIcon) refreshIcon.classList.remove('refresh-spinner');
+            }
+        }
+
+        // Track Guest Feedback (without login)
+        async function trackGuestFeedback() {
+            const emailInput = document.getElementById('guest-email-input');
+            const email = emailInput.value.trim();
+            const errorElement = document.getElementById('guest-tracking-error');
+
+            if (!email) {
+                errorElement.textContent = 'Please enter your email address.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            if (!email.includes('@')) {
+                errorElement.textContent = 'Please enter a valid email address.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            errorElement.classList.add('hidden');
+
+            const loadingState = document.getElementById('loading-state');
+            const feedbackList = document.getElementById('feedback-list');
+            const noFeedbackState = document.getElementById('no-feedback-state');
+            const filterSection = document.getElementById('filter-section');
+            const searchSection = document.getElementById('search-section');
+            const statsCards = document.getElementById('stats-cards');
+            const userGreeting = document.getElementById('user-greeting');
+
+            loadingState.classList.remove('hidden');
+            feedbackList.classList.add('hidden');
+            noFeedbackState.classList.add('hidden');
+            filterSection.classList.add('hidden');
+            searchSection.classList.add('hidden');
+            statsCards.classList.add('hidden');
+
+            userGreeting.textContent = `Showing feedback for: ${email}`;
+
+            try {
+                console.log('Tracking guest feedback for:', email);
+                const response = await fetch('http://localhost:8000/api/feedback/track', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                userFeedback = data;
+                userFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                filteredFeedback = [...userFeedback];
+
+                loadingState.classList.add('hidden');
+
+                if (userFeedback.length === 0) {
+                    noFeedbackState.classList.remove('hidden');
+                    noFeedbackState.querySelector('h3').textContent = 'No Feedback Found';
+                    noFeedbackState.querySelector('p').textContent = `We couldn't find any feedback entries for ${email}.`;
+                    showNotification('No feedback found for this email', 'info');
+                } else {
+                    filterSection.classList.remove('hidden');
+                    searchSection.classList.remove('hidden');
+                    statsCards.classList.remove('hidden');
+
+                    updateStats();
+                    renderFeedback();
+                    showNotification(`Found ${userFeedback.length} feedback entries`, 'success');
+                }
+            } catch (error) {
+                console.error('Error tracking guest feedback:', error);
+                loadingState.classList.add('hidden');
+                showNotification('Failed to track feedback. Please try again.', 'error');
+                errorElement.textContent = 'Failed to connect to the server.';
+                errorElement.classList.remove('hidden');
             }
         }
 

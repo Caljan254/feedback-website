@@ -106,3 +106,7 @@ class FeedbackStats(BaseModel):
     read: int
     replied: int
     today: int
+
+# Anonymous feedback tracking
+class FeedbackTrackRequest(BaseModel):
+    email: str

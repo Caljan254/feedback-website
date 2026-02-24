@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from models import Feedback, User, Department, ActivityLog
 from schemas import (
     FeedbackCreate, FeedbackOut, UserCreate, UserOut, 
-    LoginRequest, Token
+    LoginRequest, Token, FeedbackTrackRequest
 )
 from auth import authenticate_user, create_access_token, get_current_user, get_password_hash
 from database import get_db
@@ -315,6 +315,19 @@ def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depend
         
     except SQLAlchemyError as e:
         logger.error(f"Database error in get_user_feedback: {str(e)}")
+        raise HTTPException(status_code=500, detail="Database error")
+
+# 👤 Anonymous Route – Track Feedback by Email
+@router.post("/feedback/track", response_model=List[FeedbackOut])
+def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db)):
+    try:
+        logger.info(f"Tracking feedback for email: {request.email}")
+        feedback = db.query(Feedback).filter(Feedback.email == request.email).order_by(Feedback.created_at.desc()).all()
+        logger.info(f"Returning {len(feedback)} feedback entries for email {request.email}")
+        return feedback
+        
+    except SQLAlchemyError as e:
+        logger.error(f"Database error in track_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
 
 # 👤 Get single feedback
