@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Submit Feedback - University Feedback Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .notification-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .notification-close {
+            margin-left: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .form-input {
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #10B981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        .office-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-enter-active {
+            transition: all 0.2s ease-out;
+        }
+
+        .dropdown-leave-active {
+            transition: all 0.15s ease-in;
+        }
+
+        .dropdown-enter-from,
+        .dropdown-leave-to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper max-w-4xl mx-auto px-4 py-8">
+        <!-- Notification Container -->
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+
+        <!-- Page Title -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">Submit Feedback</h1>
+            <p class="text-gray-600 dark:text-gray-300">Select the office you were served by and share your experience
+            </p>
+        </div>
+
+        <!-- OFFICE SELECTION SECTION -->
+        <section id="office-section" class="bg-white dark:bg-gray-700 rounded-xl shadow p-4 sm:p-6 mb-6 sm:mb-8" x-data="{
+            open: false,
+            selectedOffice: null,
+            offices: [
+                { value: 'admin', name: 'Administration' },
+                { value: 'library', name: 'Library' },
+                { value: 'finance', name: 'Finance' },
+                { value: 'admissions', name: 'Admissions' },
+                { value: 'ict', name: 'ICT' },
+                { value: 'security', name: 'Security' },
+                { value: 'catering', name: 'Catering' },
+                { value: 'registry', name: 'Registry' },
+                { value: 'health', name: 'Health Unit' },
+                { value: 'games', name: 'Games & Sports' },
+                { value: 'hostel', name: 'Hostel' },
+                { value: 'dean', name: 'Dean of Students' }
+            ]
+        }">
+            <h2 class="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-3 sm:mb-4">Select the
+                Office You Were Served By</h2>
+
+            <button @click="open = !open"
+                class="w-full flex justify-between items-center bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200">
+                <span x-text="selectedOffice ? selectedOffice.name : 'Select an office'"
+                    class="text-gray-800 dark:text-gray-200 text-sm sm:text-base"></span>
+                <i :class="{'transform rotate-180': open}"
+                    class="fas fa-chevron-down text-gray-600 dark:text-gray-300 transition-transform duration-200"></i>
+            </button>
+
+            <div x-show="open" @click.away="open = false"
+                class="mt-2 w-full bg-white dark:bg-gray-600 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-500 max-h-60 overflow-y-auto office-dropdown"
+                x-transition:enter="dropdown-enter-active" x-transition:leave="dropdown-leave-active">
+                <template x-for="office in offices" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm sm:text-base">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+            </div>
+
+            <div class="mt-3 sm:mt-4">
+                <button id="continue-to-user-info"
+                    class="hidden bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 w-full transition-colors duration-200"
+                    onclick="showUserInfoForm()">Continue</button>
+            </div>
+        </section>
+
+        <!-- USER INFO FORM -->
+        <section id="user-info-section"
+            class="hidden bg-white dark:bg-gray-700 rounded-xl shadow p-4 sm:p-6 mb-6 sm:mb-8">
+            <div class="back-arrow mb-4 cursor-pointer" onclick="goBackToOfficeSelection()">
+                <i class="fas fa-arrow-left text-green-600 dark:text-green-400 text-xl"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-semibold text-green-700 dark:text-green-400 mb-4 sm:mb-6 text-center">
+                Please Enter Your Information Before Giving Feedback
+            </h2>
+            <form id="user-info-form" class="space-y-4 sm:space-y-6">
+                <div>
+                    <label for="name"
+                        class="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base">Name:</label>
+                    <input id="name" name="name" type="text" required
+                        class="form-input w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base" />
+                </div>
+                <div>
+                    <label for="email"
+                        class="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base">Email:</label>
+                    <input id="email" name="email" type="email" required
+                        class="form-input w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base" />
+                </div>
+                <div>
+                    <label for="category"
+                        class="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base">Category:</label>
+                    <select id="category" name="category" required
+                        class="form-input w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
+                        <option value="" disabled selected>Select your category</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Student">Student</option>
+                        <option value="Visitor">Visitor</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="anonymous" name="anonymous" class="h-4 w-4" />
+                    <label for="anonymous" class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">Submit
+                        Anonymously (skip name, email, category)</label>
+                </div>
+                <button type="submit"
+                    class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 w-full transition-colors duration-200 text-sm sm:text-base">Start
+                    Feedback</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Make selectedOfficeValue available globally for feedback-portal.js
+        window.selectedOfficeValue = null;
+    </script>
+</body>
+
+</html>

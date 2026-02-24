@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - University Feedback Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <style>
+        /* Copy necessary styles from home.html or include a common stylesheet */
+        .section-container {
+            min-height: calc(100vh - 4rem);
+            padding: 2rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .section-container {
+                padding: 6rem 2rem 4rem;
+            }
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .about-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .back-arrow {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div id="header-placeholder"></div>
+
+    <div class="content-wrapper">
+        <section
+            class="section-container bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
+            <div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+                <!-- Back Arrow (goes to home) -->
+                <div class="back-arrow fixed top-20 left-4 cursor-pointer p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg z-50"
+                    onclick="window.location.href='home.html'">
+                    <i class="fas fa-arrow-left text-green-600 dark:text-green-400 text-xl"></i>
+                </div>
+
+                <h1
+                    class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 sm:mb-12">
+                    About University Feedback Portal
+                </h1>
+
+                <div class="about-grid">
+                    <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
+                        <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-white">Our Purpose
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+                            The University Feedback Portal is designed to bridge the communication gap between the
+                            university
+                            administration and its community. We provide a transparent, secure, and efficient platform
+                            for students,
+                            staff, and visitors to share their experiences.
+                        </p>
+                    </div>
+                    <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
+                        <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-white">
+                            Confidentiality</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+                            All feedback is treated with the utmost confidentiality. Anonymous submissions are
+                            respected, and
+                            personal information is protected according to our strict privacy policy and data protection
+                            regulations.
+                        </p>
+                    </div>
+                    <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
+                        <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-white">Impact</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+                            Your feedback directly contributes to continuous improvement across all university
+                            departments. We
+                            analyze trends and implement changes based on community input to enhance the university
+                            experience for
+                            everyone.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-8 sm:mt-12 bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 sm:p-8">
+                    <h2
+                        class="text-2xl sm:text-3xl font-bold text-center text-green-700 dark:text-green-400 mb-4 sm:mb-6">
+                        Our Process</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                        <div class="text-center">
+                            <div
+                                class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
+                                1</div>
+                            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Submit Feedback</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">Share your experience through
+                                our secure portal</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
+                                2</div>
+                            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Review</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">Our team analyzes and
+                                categorizes your feedback</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
+                                3</div>
+                            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Action</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">Relevant departments
+                                implement improvements</p>
+                        </div>
+                        <div class="text-center">
+                            <div
+                                class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
+                                4</div>
+                            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Follow-up</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">We monitor changes and may
+                                request additional input</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+</body>
+
+</html>

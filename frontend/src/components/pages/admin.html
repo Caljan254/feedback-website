@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Department Admin Panel - University Feedback</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        .message-preview {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background-color: rgba(243, 244, 246, 0.5);
+            border-radius: 0.375rem;
+        }
+
+        .dark .message-preview {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-unread {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .dark .status-unread {
+            background-color: #78350f;
+            color: #fcd34d;
+        }
+
+        .status-read {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .dark .status-read {
+            background-color: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .status-replied {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .dark .status-replied {
+            background-color: #064e3b;
+            color: #a7f3d0;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .refresh-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white min-h-screen transition-colors duration-200">
+
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="w-full max-w-7xl mx-auto pt-24 px-4 pb-10">
+        <div
+            class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-8 border-green-600">
+            <div>
+                <div class="flex items-center space-x-3 text-green-700 dark:text-green-400 mb-1">
+                    <i class="fas fa-building text-2xl"></i>
+                    <h2 class="text-3xl font-extrabold" id="dept-title">Department Admin</h2>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Welcome back, <span id="admin-name" class="font-bold text-gray-800 dark:text-white">Admin</span>.
+                    Manage your department's feedback and activity.
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0 flex space-x-3">
+                <button onclick="viewActivityLogs()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-history mr-2"></i>Logs
+                </button>
+                <button onclick="loadFeedback()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div
+                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-blue-500 transform transition hover:scale-105">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-inbox mr-2"></i>Total Messages
+                </h3>
+                <p id="total-feedback" class="text-4xl font-bold text-blue-600 mt-2">0</p>
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-yellow-500 transform transition hover:scale-105">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-clock mr-2"></i>Pending Read
+                </h3>
+                <p id="unread-feedback" class="text-4xl font-bold text-yellow-600 mt-2">0</p>
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-green-500 transform transition hover:scale-105">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-check-double mr-2"></i>Replied
+                </h3>
+                <p id="replied-feedback" class="text-4xl font-bold text-green-600 mt-2">0</p>
+            </div>
+            <div
+                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-purple-500 transform transition hover:scale-105">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-calendar-day mr-2"></i>New Today
+                </h3>
+                <p id="today-feedback" class="text-4xl font-bold text-purple-600 mt-2">0</p>
+            </div>
+        </div>
+
+        <!-- Search & Actions -->
+        <div class="mb-6 flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative flex-grow w-full">
+                <input type="text" id="search-input" placeholder="Search by name, email, or message contents..."
+                    class="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border border-transparent focus:border-green-500 rounded-xl shadow-sm focus:ring-2 focus:ring-green-500 transition-all outline-none">
+                <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+            </div>
+            <div class="flex space-x-2 w-full md:w-auto">
+                <select id="filter-status" onchange="applyFilters()"
+                    class="bg-white dark:bg-gray-800 border border-transparent rounded-xl px-4 py-3 shadow-sm outline-none focus:ring-2 focus:ring-green-500 w-1/2 md:w-40">
+                    <option value="">All Status</option>
+                    <option value="unread">🟡 Unread</option>
+                    <option value="read">🔵 Read</option>
+                    <option value="replied">🟢 Replied</option>
+                </select>
+                <button onclick="exportToCSV()"
+                    class="bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center w-1/2 md:w-auto">
+                    <i class="fas fa-file-csv mr-2 text-green-400"></i>Export
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Table -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
+                            <th class="px-6 py-4">Sender</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Category</th>
+                            <th class="px-6 py-4">Office/Area</th>
+                            <th class="px-6 py-4">Date Submitted</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedback-body" class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                        <!-- Content loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 flex justify-between items-center">
+                <p id="page-info" class="text-sm text-gray-500 dark:text-gray-400 italic">Showing 0 of 0 entries</p>
+                <div class="flex space-x-2">
+                    <button onclick="prevPage()" id="prev-btn"
+                        class="p-2 px-4 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600 disabled:opacity-50 hover:bg-gray-50 transition"><i
+                            class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextPage()" id="next-btn"
+                        class="p-2 px-4 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600 disabled:opacity-50 hover:bg-gray-50 transition"><i
+                            class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALS (Reply, Details, Logs) -->
+    <!-- [Modals remain similar to previous but with streamlined UI] -->
+    <div id="reply-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in">
+            <div class="bg-green-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-xl"><i class="fas fa-reply mr-2"></i>Send Official Reply</h3>
+                <button onclick="closeReplyModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <form id="reply-form" class="p-6 space-y-4">
+                <input type="hidden" id="reply-id">
+                <input type="hidden" id="reply-email">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Recipient Name</label>
+                    <input id="reply-name-display" disabled
+                        class="w-full bg-gray-100 dark:bg-gray-700 p-2 rounded border-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Subject</label>
+                    <input id="reply-subject" required
+                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Message Body</label>
+                    <textarea id="reply-message" rows="8" required
+                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="closeReplyModal()"
+                        class="px-6 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition font-medium">Cancel</button>
+                    <button type="submit" id="send-btn"
+                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md font-bold transition">Send
+                        Response</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="logs-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in max-h-[80vh]">
+            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-xl"><i class="fas fa-history mr-2"></i>Activity Log</h3>
+                <button onclick="closeLogsModal()" class="text-2xl hover:text-blue-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto" id="logs-content">
+                <p class="text-center text-gray-400 py-10">Loading logs...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MESSAGE DETAILS MODAL -->
+    <div id="details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in max-h-[90vh]">
+            <div class="border-b dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+                <h3 class="font-bold text-xl" id="details-title">Message Details</h3>
+                <button onclick="closeDetailsModal()"
+                    class="text-gray-400 hover:text-gray-600 text-2xl transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto" id="details-content">
+                <!-- Loaded via JS -->
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end">
+                <button onclick="closeDetailsModal()"
+                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        let allFeedback = [];
+        let filteredFeedback = [];
+        let currentPage = 1;
+        const itemsPerPage = 8;
+        const token = localStorage.getItem("token");
+        const deptId = localStorage.getItem("deptId");
+
+        // Auth Check & Session Handle
+        if (!token || !deptId) {
+            window.location.href = "admin-login.html";
+        }
+
+        async function init() {
+            document.getElementById("admin-name").textContent = localStorage.getItem("userFullname") || "Admin";
+
+            // Fetch department name
+            try {
+                const res = await fetch("http://localhost:8000/api/departments");
+                const depts = await res.json();
+                const myDept = depts.find(d => d.id == deptId);
+                if (myDept) document.getElementById("dept-title").textContent = myDept.name + " Panel";
+            } catch (e) { console.error(e); }
+
+            await loadFeedback();
+
+            // Session Timer (30 mins activity check)
+            let lastInteraction = Date.now();
+            document.addEventListener('mousemove', () => lastInteraction = Date.now());
+            setInterval(() => {
+                if (Date.now() - lastInteraction > 30 * 60 * 1000) {
+                    alert("Session expired due to inactivity.");
+                    localStorage.clear();
+                    window.location.href = "admin-login.html";
+                }
+            }, 60000);
+        }
+
+        async function loadFeedback() {
+            const spin = document.getElementById("refresh-icon");
+            spin.classList.add("refresh-spinner");
+
+            try {
+                const res = await fetch("http://localhost:8000/api/admin/feedback", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    allFeedback = await res.json();
+                    applyFilters();
+                    updateStats();
+                } else if (res.status === 401) {
+                    localStorage.clear();
+                    window.location.href = "admin-login.html";
+                }
+            } catch (e) { console.error(e); }
+            finally { spin.classList.remove("refresh-spinner"); }
+        }
+
+        function updateStats() {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            document.getElementById("total-feedback").textContent = allFeedback.length;
+            document.getElementById("unread-feedback").textContent = allFeedback.filter(f => !f.is_read).length;
+            document.getElementById("replied-feedback").textContent = allFeedback.filter(f => f.replied_at).length;
+            document.getElementById("today-feedback").textContent = allFeedback.filter(f => new Date(f.created_at) >= now).length;
+        }
+
+        function applyFilters() {
+            const query = document.getElementById("search-input").value.toLowerCase();
+            const status = document.getElementById("filter-status").value;
+
+            filteredFeedback = allFeedback.filter(f => {
+                const matchesSearch = !query ||
+                    (f.name && f.name.toLowerCase().includes(query)) ||
+                    (f.message && f.message.toLowerCase().includes(query)) ||
+                    (f.email && f.email.toLowerCase().includes(query));
+
+                let matchesStatus = true;
+                if (status === 'unread') matchesStatus = !f.is_read;
+                if (status === 'read') matchesStatus = f.is_read && !f.replied_at;
+                if (status === 'replied') matchesStatus = !!f.replied_at;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const body = document.getElementById("feedback-body");
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = filteredFeedback.slice(start, start + itemsPerPage);
+
+            body.innerHTML = pageData.map(f => `
+                <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-900 dark:text-white">${f.anonymous === "true" ? '<span class="text-gray-400 italic">Anonymous</span>' : (f.name || 'Anonymous')}</div>
+                        <div class="text-xs text-gray-500">${f.anonymous === "true" ? '-' : (f.email || 'No email')}</div>
+                    </td>
+                    <td class="px-6 py-4">${getStatusBadge(f)}</td>
+                    <td class="px-6 py-4 text-sm">${f.category}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-green-600 dark:text-green-400">${f.office || 'General'}</td>
+                    <td class="px-6 py-4 text-xs text-gray-500">
+                        ${new Date(f.created_at).toLocaleDateString()}<br>
+                        ${new Date(f.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center space-x-2">
+                            <button onclick="viewDetails(${f.id})" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="View"><i class="fas fa-eye"></i></button>
+                            ${!f.replied_at ? `<button onclick="openReply(${f.id})" class="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition" title="Reply"><i class="fas fa-reply"></i></button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('') || `<tr><td colspan="6" class="py-20 text-center text-gray-500"><i class="fas fa-scroll text-5xl mb-4 block opacity-20"></i>No records found matching filters.</td></tr>`;
+
+            document.getElementById("page-info").textContent = `Showing ${filteredFeedback.length > 0 ? start + 1 : 0} to ${Math.min(start + itemsPerPage, filteredFeedback.length)} of ${filteredFeedback.length} entries`;
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage >= Math.ceil(filteredFeedback.length / itemsPerPage);
+        }
+
+        function getStatusBadge(f) {
+            if (f.replied_at) return '<span class="status-badge status-replied"><i class="fas fa-check-circle mr-1"></i>Replied</span>';
+            if (f.is_read) return '<span class="status-badge status-read"><i class="fas fa-eye mr-1"></i>Read</span>';
+            return '<span class="status-badge status-unread"><i class="fas fa-bell mr-1 animate-pulse"></i>New</span>';
+        }
+
+        async function viewDetails(id) {
+            const f = allFeedback.find(item => item.id == id);
+            if (!f) return;
+
+            // Mark as read in backend
+            if (!f.is_read) {
+                fetch(`http://localhost:8000/api/admin/feedback/${id}/read`, {
+                    method: 'POST',
+                    headers: { "Authorization": `Bearer ${token}` }
+                }).then(() => { f.is_read = true; updateStats(); renderTable(); });
+            }
+
+            const content = document.getElementById("details-content");
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Sender Type</label>
+                            <p class="font-bold">${f.category}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Rating Provided</label>
+                            <p class="font-bold text-yellow-500">${f.rating || 'No rating'}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">Detailed Feedback Message</label>
+                        <div class="mt-2 message-preview bg-gray-50 dark:bg-gray-900/50 p-4 border dark:border-gray-700 rounded-xl">
+                            ${f.message}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.getElementById("details-modal").classList.remove("hidden");
+        }
+
+        function openReply(id) {
+            const f = allFeedback.find(item => item.id == id);
+            document.getElementById("reply-id").value = id;
+            document.getElementById("reply-email").value = f.email || "";
+            document.getElementById("reply-name-display").value = f.anonymous === "true" ? "Anonymous User" : (f.name || "User");
+            document.getElementById("reply-subject").value = `RE: Feedback regarding ${f.office || 'University Services'}`;
+            document.getElementById("reply-message").value = `Dear ${f.name || 'User'},\n\nThank you for reaching out to the ${document.getElementById("dept-title").textContent.replace(' Panel', '')}. We have received your feedback and wanted to inform you that...\n\nBest Regards,\n${localStorage.getItem("userFullname")}`;
+            document.getElementById("reply-modal").classList.remove("hidden");
+        }
+
+        document.getElementById("reply-form").onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("send-btn");
+            btn.disabled = true;
+            btn.textContent = "Sending...";
+
+            try {
+                const res = await fetch("http://localhost:8000/api/send-reply", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                    body: JSON.stringify({
+                        feedback_id: document.getElementById("reply-id").value,
+                        email: document.getElementById("reply-email").value,
+                        subject: document.getElementById("reply-subject").value,
+                        message: document.getElementById("reply-message").value
+                    })
+                });
+                if (res.ok) {
+                    alert("Reply sent successfully!");
+                    closeReplyModal();
+                    loadFeedback();
+                }
+            } catch (e) { alert("Failed to send reply"); }
+            finally { btn.disabled = false; btn.textContent = "Send Response"; }
+        };
+
+        async function viewActivityLogs() {
+            document.getElementById("logs-modal").classList.remove("hidden");
+            try {
+                const res = await fetch("http://localhost:8000/api/admin/activity-logs", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                const logs = await res.json();
+                document.getElementById("logs-content").innerHTML = `
+                    <div class="space-y-4">
+                        ${logs.map(log => `
+                            <div class="flex items-start space-x-3 border-b dark:border-gray-700 pb-3">
+                                <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-1">
+                                    <i class="fas ${log.action === 'reply_message' ? 'fa-reply text-green-500' : 'fa-eye text-blue-500'}"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between">
+                                        <p class="font-bold text-sm">${log.action.replace('_', ' ').toUpperCase()}</p>
+                                        <p class="text-[10px] text-gray-500">${new Date(log.timestamp).toLocaleString()}</p>
+                                    </div>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400">${log.details}</p>
+                                </div>
+                            </div>
+                        `).join('') || '<p class="text-center py-10">No activities recorded yet.</p>'}
+                    </div>
+                `;
+            } catch (e) {
+                document.getElementById("logs-content").innerHTML = '<p class="text-center text-red-500">Failed to load logs.</p>';
+            }
+        }
+
+        function exportToCSV() {
+            window.location.href = `http://localhost:8000/api/admin/export-csv?access_token=${token}`;
+        }
+
+        function closeReplyModal() { document.getElementById("reply-modal").classList.add("hidden"); }
+        function closeDetailsModal() { document.getElementById("details-modal").classList.add("hidden"); }
+        function closeLogsModal() { document.getElementById("logs-modal").classList.add("hidden"); }
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(filteredFeedback.length / itemsPerPage)) { currentPage++; renderTable(); } }
+
+        document.getElementById("search-input").addEventListener("input", applyFilters);
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+
+</html>

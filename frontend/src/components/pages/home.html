@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>University Feedback Portal - Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        #carousel {
+            position: relative;
+            z-index: 1;
+        }
+
+        #mobileMenu {
+            z-index: 10000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .notification-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .notification-close {
+            margin-left: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .dropdown-enter-active {
+            transition: all 0.2s ease-out;
+        }
+
+        .dropdown-leave-active {
+            transition: all 0.15s ease-in;
+        }
+
+        .dropdown-enter-from,
+        .dropdown-leave-to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        .section-container {
+            min-height: calc(100vh - 4rem);
+            padding: 2rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .section-container {
+                padding: 6rem 2rem 4rem;
+            }
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .about-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .nav-link.active {
+            color: #10B981;
+            font-weight: bold;
+        }
+
+        .nav-link.active.dark {
+            color: #34D399;
+        }
+
+        .office-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .form-input {
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: #10B981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <!-- Notification Container -->
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+
+        <!-- HOME SECTION -->
+        <section id="home-section" class="w-full pt-16">
+            <div id="carousel" class="relative w-full h-[30vh] sm:h-[40vh] overflow-hidden shadow-lg">
+                <img src="../../../public/uploads/slide1.jpg" alt="University Campus" class="w-full h-full object-cover"
+                    loading="eager" />
+            </div>
+
+            <main class="flex-grow w-full max-w-6xl mx-auto px-4">
+                <div class="w-full flex justify-center my-6 pt-8 sm:pt-20">
+                    <div
+                        class="bg-yellow-100 dark:bg-yellow-900 p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-2xl animate-pulse ring-2 sm:ring-4 ring-yellow-300 dark:ring-yellow-500">
+                        <button onclick="startFeedbackProcess()"
+                            class="text-green-700 dark:text-green-100 text-xl sm:text-3xl font-extrabold hover:underline cursor-pointer block text-center hover:text-green-800 transition duration-300 w-full">
+                            ✨ Click Here to Give Your Feedback ✨
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <section class="max-w-4xl mx-auto px-4 py-6 sm:py-8">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-6">Frequently
+                        Asked Questions</h2>
+                    <div class="mb-4 sm:mb-6">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">Can I submit
+                            feedback anonymously?</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">Yes, you can choose to
+                            submit your feedback anonymously. However, we won't be able to follow up with you directly.
+                        </p>
+                    </div>
+                    <div class="mb-4 sm:mb-6">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">Who reviews my
+                            feedback?</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">The Director of Human
+                            Resources and relevant department heads.</p>
+                    </div>
+                    <div class="mb-4 sm:mb-6">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">Is my feedback
+                            confidential?</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">Yes, all feedback is
+                            treated confidentially and is only shared with relevant personnel for resolution purposes.
+                        </p>
+                    </div>
+                    <div class="mb-4 sm:mb-6">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">How long does it
+                            take to get a response?</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">We aim to respond to all
+                            feedback within 3-5 business days. Urgent matters are addressed within 24 hours.</p>
+                    </div>
+                </section>
+            </main>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about-section"
+            class="hidden section-container bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
+            <div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+                <div class="back-arrow fixed top-20 left-4 cursor-pointer p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg z-50"
+                    onclick="goBackToOfficeSelection()">
+                    <i class="fas fa-arrow-left text-green-600 dark:text-green-400 text-xl"></i>
+                </div>
+                <h1
+                    class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 sm:mb-12">
+                    About University Feedback Portal
+                </h1>
+                <div class="about-grid">
+                    <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
+                        <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4"><i
+                                class="fas fa-bullhorn"></i></div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-white">Our Purpose
+                        </h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">The University Feedback Portal
+                            is designed to bridge the communication gap between the university administration and its
+                            community.</p>
+                    </div>
+                    <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
+                        <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4"><i
+                                class="fas fa-shield-alt"></i></div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-white">
+                            Confidentiality</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">All feedback is treated with
+                            the utmost confidentiality. Anonymous submissions are respected.</p>
+                    </div>
+                    <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
+                        <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4"><i
+                                class="fas fa-chart-line"></i></div>
+                        <h3 class="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800 dark:text-white">Impact</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Your feedback directly
+                            contributes to continuous improvement across all university departments.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact-section"
+            class="hidden section-container bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-800 dark:to-gray-900">
+            <div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+                <div class="back-arrow fixed top-20 left-4 cursor-pointer p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg z-50"
+                    onclick="goBackToOfficeSelection()">
+                    <i class="fas fa-arrow-left text-green-600 dark:text-green-400 text-xl"></i>
+                </div>
+                <h1
+                    class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 sm:mb-12">
+                    Contact Us
+                </h1>
+                <div class="contact-container">
+                    <div class="contact-card bg-white dark:bg-gray-700 shadow-lg">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-gray-800 dark:text-white">Get In
+                            Touch</h2>
+                        <div class="space-y-3 sm:space-y-4">
+                            <div class="flex items-start">
+                                <div class="text-green-600 dark:text-green-400 mr-3 sm:mr-4 mt-1"><i
+                                        class="fas fa-envelope"></i></div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200">Email</h3>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">
+                                        feedback@university.edu</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- OFFICE SELECTION SECTION -->
+        <section id="office-section"
+            class="hidden bg-white dark:bg-gray-700 rounded-xl shadow p-4 sm:p-6 mb-6 sm:mb-8 max-w-2xl mx-auto mt-16"
+            x-data="{
+            open: false,
+            selectedOffice: null,
+            offices: [
+                { value: 'admin', name: 'Administration' },
+                { value: 'library', name: 'Library' },
+                { value: 'finance', name: 'Finance' },
+                { value: 'admissions', name: 'Admissions' },
+                { value: 'ict', name: 'ICT' },
+                { value: 'security', name: 'Security' },
+                { value: 'catering', name: 'Catering' },
+                { value: 'registry', name: 'Registry' },
+                { value: 'health', name: 'Health Unit' },
+                { value: 'games', name: 'Games & Sports' },
+                { value: 'hostel', name: 'Hostel' },
+                { value: 'dean', name: 'Dean of Students' }
+            ]
+        }">
+            <h2 class="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-3 sm:mb-4">Select the
+                Office You Were Served By</h2>
+
+            <button @click="open = !open"
+                class="w-full flex justify-between items-center bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200">
+                <span x-text="selectedOffice ? selectedOffice.name : 'Select an office'"
+                    class="text-gray-800 dark:text-gray-200 text-sm sm:text-base"></span>
+                <i :class="{'transform rotate-180': open}"
+                    class="fas fa-chevron-down text-gray-600 dark:text-gray-300 transition-transform duration-200"></i>
+            </button>
+
+            <div x-show="open" @click.away="open = false"
+                class="mt-2 w-full bg-white dark:bg-gray-600 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-500 max-h-60 overflow-y-auto office-dropdown"
+                x-transition:enter="dropdown-enter-active" x-transition:leave="dropdown-leave-active">
+                <template x-for="office in offices" :key="office.value">
+                    <button
+                        @click="selectedOffice = office; document.getElementById('continue-to-user-info').classList.remove('hidden'); window.selectedOfficeValue = office.value; open = false"
+                        class="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-500 transition-colors duration-200 flex items-center text-sm sm:text-base">
+                        <span class="flex-grow text-gray-800 dark:text-gray-200" x-text="office.name"></span>
+                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                            class="fas fa-check text-green-500 ml-2"></i>
+                    </button>
+                </template>
+            </div>
+
+            <div class="mt-3 sm:mt-4">
+                <button id="continue-to-user-info"
+                    class="hidden bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 w-full transition-colors duration-200"
+                    onclick="showUserInfoForm()">Continue</button>
+            </div>
+        </section>
+
+        <!-- USER INFO FORM -->
+        <section id="user-info-section"
+            class="hidden bg-white dark:bg-gray-700 rounded-xl shadow p-4 sm:p-6 mb-6 sm:mb-8 max-w-2xl mx-auto mt-16">
+            <div class="back-arrow mb-4 cursor-pointer" onclick="goBackToOfficeSelection()">
+                <i class="fas fa-arrow-left text-green-600 dark:text-green-400 text-xl"></i>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-semibold text-green-700 dark:text-green-400 mb-4 sm:mb-6 text-center">
+                Please Enter Your Information Before Giving Feedback
+            </h2>
+            <form id="user-info-form" class="space-y-4 sm:space-y-6">
+                <div>
+                    <label for="name"
+                        class="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base">Name:</label>
+                    <input id="name" name="name" type="text" required
+                        class="form-input w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base" />
+                </div>
+                <div>
+                    <label for="email"
+                        class="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base">Email:</label>
+                    <input id="email" name="email" type="email" required
+                        class="form-input w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base" />
+                </div>
+                <div>
+                    <label for="category"
+                        class="block text-gray-700 dark:text-gray-300 font-medium mb-1 sm:mb-2 text-sm sm:text-base">Category:</label>
+                    <select id="category" name="category" required
+                        class="form-input w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 sm:px-4 py-2 sm:py-3 bg-white dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base">
+                        <option value="" disabled selected>Select your category</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Student">Student</option>
+                        <option value="Visitor">Visitor</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="anonymous" name="anonymous" class="h-4 w-4" />
+                    <label for="anonymous" class="text-gray-700 dark:text-gray-300 text-sm sm:text-base">Submit
+                        Anonymously (skip name, email, category)</label>
+                </div>
+                <button type="submit"
+                    class="bg-green-600 text-white px-4 py-2 rounded shadow hover:bg-green-700 w-full transition-colors duration-200 text-sm sm:text-base">Start
+                    Feedback</button>
+            </form>
+        </section>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Make selectedOfficeValue available globally
+        window.selectedOfficeValue = null;
+    </script>
+</body>
+
+</html>

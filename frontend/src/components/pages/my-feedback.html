@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Feedback - University Feedback Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .notification-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .notification-close {
+            margin-left: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .feedback-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-card.unread {
+            border-left-color: #3B82F6;
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .feedback-card.read {
+            border-left-color: #10B981;
+        }
+
+        .feedback-card.answered {
+            border-left-color: #8B5CF6;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-answered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .dark .status-answered {
+            background-color: #064e3b;
+            color: #a7f3d0;
+        }
+
+        .status-unanswered {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .dark .status-unanswered {
+            background-color: #78350f;
+            color: #fcd34d;
+        }
+
+        .status-read {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .dark .status-read {
+            background-color: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .status-unread {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .dark .status-unread {
+            background-color: #374151;
+            color: #d1d5db;
+        }
+
+        .reply-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .reply-badge.has-reply {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .dark .reply-badge.has-reply {
+            background-color: #0c4a6e;
+            color: #bae6fd;
+        }
+
+        .message-preview {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: rgba(243, 244, 246, 0.5);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .dark .message-preview {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+
+        .reply-section {
+            background-color: #f0fdf4;
+            border-left: 3px solid #10B981;
+        }
+
+        .dark .reply-section {
+            background-color: #064e3b;
+            border-left-color: #34d399;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #10B981;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        .refresh-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Custom scrollbar for better visibility */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #10B981;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #059669;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #374151;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #10B981;
+        }
+
+        /* Ensure modal content is properly contained */
+        #feedback-modal .flex.flex-col {
+            max-height: 90vh;
+        }
+
+        /* Smooth scrolling */
+        .custom-scrollbar {
+            scroll-behavior: smooth;
+        }
+
+        /* Ensure long words break and don't overflow */
+        .break-words {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .whitespace-pre-wrap {
+            white-space: pre-wrap;
+        }
+
+        /* Message preview in modal */
+        .message-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            #feedback-modal .flex.flex-col {
+                max-height: 95vh;
+            }
+
+            .custom-scrollbar {
+                max-height: calc(95vh - 150px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper max-w-6xl mx-auto px-4 py-8">
+        <!-- Notification Container -->
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+
+        <!-- Page Title with Refresh Button -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-bold text-green-700 dark:text-green-400 mb-2">My Feedback History
+                </h1>
+                <p id="user-greeting" class="text-gray-600 dark:text-gray-400">Track your feedback and see admin
+                    responses</p>
+            </div>
+            <button onclick="loadUserFeedback()"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Login Prompt (shown when not logged in) -->
+        <div id="login-prompt"
+            class="hidden bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                        Please <a href="/src/components/pages/login.html"
+                            class="font-medium underline text-yellow-700 dark:text-yellow-200 hover:text-yellow-600">login</a>
+                        to view your feedback history.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards (shown when logged in) -->
+        <div id="stats-cards" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-blue-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Feedback</h3>
+                <p id="user-total-feedback" class="text-3xl font-bold text-blue-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-yellow-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Unread</h3>
+                <p id="user-unread-feedback" class="text-3xl font-bold text-yellow-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-green-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Answered</h3>
+                <p id="user-answered-feedback" class="text-3xl font-bold text-green-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-purple-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Read</h3>
+                <p id="user-read-feedback" class="text-3xl font-bold text-purple-600">0</p>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div id="filter-section" class="hidden mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex flex-wrap gap-4 items-center">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by
+                        Status</label>
+                    <select id="status-filter"
+                        class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-40">
+                        <option value="all">All</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                        <option value="unanswered">Pending Reply</option>
+                        <option value="answered">Replied</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by
+                        Office</label>
+                    <select id="office-filter"
+                        class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-48">
+                        <option value="all">All Offices</option>
+                        <option value="admin">Administration</option>
+                        <option value="library">Library</option>
+                        <option value="finance">Finance</option>
+                        <option value="admissions">Admissions</option>
+                        <option value="ict">ICT</option>
+                        <option value="security">Security</option>
+                        <option value="catering">Catering</option>
+                        <option value="registry">Registry</option>
+                        <option value="health">Health Unit</option>
+                        <option value="games">Games & Sports</option>
+                        <option value="hostel">Hostel</option>
+                        <option value="dean">Dean of Students</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end space-x-2">
+                    <button onclick="applyFilters()"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow transition h-10">
+                        <i class="fas fa-filter mr-2"></i>Apply
+                    </button>
+                    <button onclick="clearFilters()"
+                        class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded shadow transition h-10">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </button>
+                </div>
+
+                <div class="flex items-end ml-auto">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <span id="filter-count">Showing all feedback</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Box -->
+        <div id="search-section" class="hidden mb-6">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search by office, message, or rating..."
+                    class="w-full px-4 py-3 pl-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <button onclick="clearSearch()"
+                    class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden flex justify-center items-center py-12">
+            <div class="loading-spinner"></div>
+            <span class="ml-3 text-gray-600 dark:text-gray-400">Loading your feedback...</span>
+        </div>
+
+        <!-- No Feedback State -->
+        <div id="no-feedback-state" class="hidden text-center py-12">
+            <div class="text-gray-400 text-6xl mb-4">
+                <i class="fas fa-comment-slash"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Feedback Found</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">You haven't submitted any feedback yet.</p>
+            <a href="/src/components/pages/submit-feedback.html"
+                class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>Submit Your First Feedback
+            </a>
+        </div>
+
+        <!-- Feedback List -->
+        <div id="feedback-list" class="hidden space-y-4">
+            <!-- Feedback items will be dynamically inserted here -->
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="hidden flex justify-center items-center space-x-4 mt-8">
+            <button id="prev-page"
+                class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                <i class="fas fa-chevron-left mr-2"></i>Previous
+            </button>
+            <span id="page-info" class="text-gray-600 dark:text-gray-400">Page 1 of 1</span>
+            <button id="next-page"
+                class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                Next<i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Feedback Details Modal - IMPROVED SCROLLABLE VERSION -->
+    <div id="feedback-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl transform transition-all fade-in flex flex-col max-h-[90vh]">
+            <!-- Fixed Header -->
+            <div class="flex justify-between items-center border-b dark:border-gray-700 p-6 flex-shrink-0">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Feedback Details</h3>
+                <button onclick="closeFeedbackModal()"
+                    class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <div id="feedback-details-content" class="p-6 overflow-y-auto custom-scrollbar"
+                style="max-height: calc(90vh - 180px);">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- Fixed Footer -->
+            <div class="border-t dark:border-gray-700 p-4 flex justify-end flex-shrink-0">
+                <button onclick="closeFeedbackModal()"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Item Template (hidden) -->
+    <template id="feedback-item-template">
+        <div class="feedback-card bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-all">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span
+                            class="department-badge px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm font-medium"></span>
+                        <span class="status-badge read-status-badge"></span>
+                        <span class="status-badge reply-status-badge"></span>
+                        <span class="reply-badge has-reply-badge hidden">
+                            <i class="fas fa-check-circle mr-1"></i>Has Reply
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="flex items-center mb-2">
+                            <span class="rating-display text-yellow-500 font-semibold mr-2"></span>
+                            <span class="rating-text text-gray-700 dark:text-gray-300"></span>
+                        </div>
+                        <p class="message-preview text-gray-800 dark:text-gray-200 mb-3"></p>
+                    </div>
+
+                    <div class="feedback-details text-sm text-gray-500 dark:text-gray-400 space-y-1">
+                        <div class="feedback-date">
+                            <i class="far fa-calendar mr-1"></i>
+                            <span class="date-text"></span>
+                        </div>
+                        <div class="feedback-category">
+                            <i class="far fa-user mr-1"></i>
+                            <span class="category-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2">
+                    <button
+                        class="view-details-btn px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors text-sm flex items-center justify-center">
+                        <i class="fas fa-eye mr-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reply Preview (if exists) -->
+            <div class="reply-preview hidden mt-4 pt-4 border-t dark:border-gray-700">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <div
+                            class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                            <i class="fas fa-reply text-green-600 dark:text-green-400 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admin Response:</p>
+                        <p class="reply-preview-text text-sm text-gray-600 dark:text-gray-400 line-clamp-2"></p>
+                        <p class="reply-date-text text-xs text-gray-400 dark:text-gray-500 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Global variables
+        let userEmail = null;
+        let userFeedback = [];
+        let filteredFeedback = [];
+        let currentPage = 1;
+        const itemsPerPage = 5;
+
+        // Helper functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / (1000 * 60));
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+                if (diffMins < 1) return 'Just now';
+                if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+                if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+                if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+
+                return date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch {
+                return dateString || 'Unknown date';
+            }
+        }
+
+        function formatOfficeName(office) {
+            if (!office) return 'Unknown';
+            const cleanOffice = office.replace('-q', '');
+            const officeNames = {
+                'admin': 'Administration',
+                'library': 'Library',
+                'finance': 'Finance',
+                'admissions': 'Admissions',
+                'ict': 'ICT',
+                'security': 'Security',
+                'catering': 'Catering',
+                'registry': 'Registry',
+                'health': 'Health Unit',
+                'games': 'Games & Sports',
+                'hostel': 'Hostel',
+                'dean': 'Dean of Students'
+            };
+            return officeNames[cleanOffice] || cleanOffice.split('_').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function getRatingStars(rating) {
+            if (!rating) return '';
+            const stars = {
+                'Poor': '★☆☆☆☆',
+                'Fair': '★★☆☆☆',
+                'Good': '★★★☆☆',
+                'Very Good': '★★★★☆',
+                'Excellent': '★★★★★'
+            };
+            return stars[rating] || '';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success', duration = 5000) {
+            if (window.feedbackPortal && typeof window.feedbackPortal.showNotification === 'function') {
+                window.feedbackPortal.showNotification(message, type, duration);
+            } else {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+
+                let icon = '';
+                if (type === 'success') icon = '<i class="fas fa-check-circle notification-icon"></i>';
+                else if (type === 'error') icon = '<i class="fas fa-exclamation-circle notification-icon"></i>';
+                else if (type === 'warning') icon = '<i class="fas fa-exclamation-triangle notification-icon"></i>';
+                else icon = '<i class="fas fa-info-circle notification-icon"></i>';
+
+                notification.innerHTML = `${icon}<div class="notification-content">${message}</div><div class="notification-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></div>`;
+
+                container.appendChild(notification);
+                setTimeout(() => notification.classList.add('show'), 10);
+
+                if (duration > 0) {
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    }, duration);
+                }
+            }
+        }
+
+        // Check if user is logged in
+        function isUserLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+
+        // Get user email
+        function getUserEmail() {
+            return localStorage.getItem('userEmail');
+        }
+
+        // Get auth token
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // Load user's feedback from API
+        async function loadUserFeedback() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('refresh-spinner');
+
+            const loadingState = document.getElementById('loading-state');
+            const feedbackList = document.getElementById('feedback-list');
+            const noFeedbackState = document.getElementById('no-feedback-state');
+            const filterSection = document.getElementById('filter-section');
+            const searchSection = document.getElementById('search-section');
+            const statsCards = document.getElementById('stats-cards');
+            const loginPrompt = document.getElementById('login-prompt');
+            const userGreeting = document.getElementById('user-greeting');
+
+            // Check login status
+            if (!isUserLoggedIn()) {
+                loginPrompt.classList.remove('hidden');
+                filterSection.classList.add('hidden');
+                searchSection.classList.add('hidden');
+                statsCards.classList.add('hidden');
+                feedbackList.classList.add('hidden');
+                noFeedbackState.classList.add('hidden');
+                loadingState.classList.add('hidden');
+                if (refreshIcon) refreshIcon.classList.remove('refresh-spinner');
+                return;
+            }
+
+            // Get user email
+            userEmail = getUserEmail();
+            if (userEmail) {
+                userGreeting.textContent = `Welcome back, ${userEmail.split('@')[0]}! Here's your feedback history.`;
+            }
+
+            // Hide login prompt, show loading
+            loginPrompt.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            feedbackList.classList.add('hidden');
+            noFeedbackState.classList.add('hidden');
+            filterSection.classList.add('hidden');
+            searchSection.classList.add('hidden');
+            statsCards.classList.add('hidden');
+
+            const token = getToken();
+
+            try {
+                console.log('Fetching user feedback from API...');
+
+                // Use the new user-specific endpoint
+                const response = await fetch('http://localhost:8000/api/user/feedback', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.status === 401) {
+                    showNotification('Session expired. Please login again.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/src/components/pages/login.html';
+                    }, 2000);
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Data received:', data);
+
+                if (!Array.isArray(data)) {
+                    console.log('Data is not an array:', data);
+                    throw new Error('Invalid response format');
+                }
+
+                userFeedback = data;
+
+                // Sort by date (newest first) - just in case API doesn't sort
+                userFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                filteredFeedback = [...userFeedback];
+
+                // Update UI based on results
+                loadingState.classList.add('hidden');
+
+                if (userFeedback.length === 0) {
+                    noFeedbackState.classList.remove('hidden');
+                    filterSection.classList.add('hidden');
+                    searchSection.classList.add('hidden');
+                    statsCards.classList.add('hidden');
+                    showNotification('No feedback found', 'info');
+                } else {
+                    filterSection.classList.remove('hidden');
+                    searchSection.classList.remove('hidden');
+                    statsCards.classList.remove('hidden');
+
+                    updateStats();
+                    renderFeedback();
+                    showNotification(`Loaded ${userFeedback.length} feedback entries`, 'success');
+                }
+
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+                loadingState.classList.add('hidden');
+
+                showNotification('Failed to load feedback. Please try again.', 'error');
+
+                // Show error state
+                noFeedbackState.classList.remove('hidden');
+                noFeedbackState.querySelector('h3').textContent = 'Error Loading Feedback';
+                noFeedbackState.querySelector('p').textContent = 'Please refresh the page to try again.';
+
+                // Add retry button
+                const retryBtn = document.createElement('button');
+                retryBtn.onclick = loadUserFeedback;
+                retryBtn.className = 'mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition';
+                retryBtn.innerHTML = '<i class="fas fa-redo mr-2"></i>Retry';
+                noFeedbackState.appendChild(retryBtn);
+
+            } finally {
+                if (refreshIcon) refreshIcon.classList.remove('refresh-spinner');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = userFeedback.length;
+            const unread = userFeedback.filter(f => !f.is_read).length;
+            const answered = userFeedback.filter(f => f.replied_at).length;
+            const read = userFeedback.filter(f => f.is_read).length;
+
+            document.getElementById('user-total-feedback').textContent = total;
+            document.getElementById('user-unread-feedback').textContent = unread;
+            document.getElementById('user-answered-feedback').textContent = answered;
+            document.getElementById('user-read-feedback').textContent = read;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const officeFilter = document.getElementById('office-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+
+            filteredFeedback = userFeedback.filter(item => {
+                // Status filter
+                if (statusFilter === 'unread' && item.is_read) return false;
+                if (statusFilter === 'read' && !item.is_read) return false;
+                if (statusFilter === 'unanswered' && item.replied_at) return false;
+                if (statusFilter === 'answered' && !item.replied_at) return false;
+
+                // Office filter
+                if (officeFilter !== 'all' && item.office !== officeFilter && item.office !== officeFilter + '-q') {
+                    return false;
+                }
+
+                // Search filter
+                if (searchQuery) {
+                    const searchableText = [
+                        formatOfficeName(item.office),
+                        item.message || '',
+                        item.rating || '',
+                        item.category || ''
+                    ].join(' ').toLowerCase();
+                    if (!searchableText.includes(searchQuery)) return false;
+                }
+
+                return true;
+            });
+
+            document.getElementById('filter-count').textContent =
+                `Showing ${filteredFeedback.length} of ${userFeedback.length} feedback`;
+
+            currentPage = 1;
+            renderFeedback();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('status-filter').value = 'all';
+            document.getElementById('office-filter').value = 'all';
+            document.getElementById('search-input').value = '';
+            filteredFeedback = [...userFeedback];
+            document.getElementById('filter-count').textContent = `Showing all ${userFeedback.length} feedback`;
+            currentPage = 1;
+            renderFeedback();
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            applyFilters();
+        }
+
+        // Render feedback items
+        function renderFeedback() {
+            const feedbackList = document.getElementById('feedback-list');
+            const pagination = document.getElementById('pagination');
+            const noFeedbackState = document.getElementById('no-feedback-state');
+
+            if (filteredFeedback.length === 0) {
+                feedbackList.classList.add('hidden');
+                pagination.classList.add('hidden');
+                noFeedbackState.classList.remove('hidden');
+                noFeedbackState.querySelector('h3').textContent = 'No Matching Feedback';
+                noFeedbackState.querySelector('p').textContent = 'Try adjusting your filters.';
+                return;
+            }
+
+            noFeedbackState.classList.add('hidden');
+            feedbackList.classList.remove('hidden');
+
+            // Calculate pagination
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedFeedback = filteredFeedback.slice(start, end);
+
+            // Update page info
+            const totalPages = Math.ceil(filteredFeedback.length / itemsPerPage);
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages;
+            pagination.classList.remove('hidden');
+
+            // Clear and render
+            feedbackList.innerHTML = '';
+
+            paginatedFeedback.forEach(item => {
+                const template = document.getElementById('feedback-item-template');
+                const clone = template.content.cloneNode(true);
+                const card = clone.querySelector('.feedback-card');
+
+                // Set classes based on status
+                if (!item.is_read) card.classList.add('unread');
+                if (item.is_read) card.classList.add('read');
+                if (item.replied_at) card.classList.add('answered');
+
+                // Department badge
+                const deptBadge = clone.querySelector('.department-badge');
+                deptBadge.textContent = formatOfficeName(item.office);
+
+                // Read status badge
+                const readBadge = clone.querySelector('.read-status-badge');
+                if (item.is_read) {
+                    readBadge.className = 'status-badge status-read';
+                    readBadge.innerHTML = '<i class="fas fa-eye mr-1"></i>Read';
+                } else {
+                    readBadge.className = 'status-badge status-unread';
+                    readBadge.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Unread';
+                }
+
+                // Reply status badge
+                const replyBadge = clone.querySelector('.reply-status-badge');
+                if (item.replied_at) {
+                    replyBadge.className = 'status-badge status-answered';
+                    replyBadge.innerHTML = '<i class="fas fa-check-circle mr-1"></i>Answered';
+
+                    // Show has-reply badge
+                    const hasReplyBadge = clone.querySelector('.has-reply-badge');
+                    hasReplyBadge.classList.remove('hidden');
+                    hasReplyBadge.className = 'reply-badge has-reply';
+                } else {
+                    replyBadge.className = 'status-badge status-unanswered';
+                    replyBadge.innerHTML = '<i class="fas fa-clock mr-1"></i>Pending';
+                }
+
+                // Rating
+                const ratingDisplay = clone.querySelector('.rating-display');
+                const ratingText = clone.querySelector('.rating-text');
+                if (item.rating) {
+                    ratingDisplay.textContent = getRatingStars(item.rating);
+                    ratingText.textContent = item.rating;
+                } else {
+                    ratingDisplay.innerHTML = '';
+                    ratingText.textContent = 'No rating';
+                }
+
+                // Message preview
+                const messagePreview = clone.querySelector('.message-preview');
+                messagePreview.textContent = item.message || 'No message provided';
+                if (item.message && item.message.length > 200) {
+                    messagePreview.textContent = item.message.substring(0, 200) + '...';
+                }
+
+                // Date
+                const dateSpan = clone.querySelector('.date-text');
+                dateSpan.textContent = formatDate(item.created_at);
+
+                // Category
+                const categorySpan = clone.querySelector('.category-text');
+                categorySpan.textContent = item.category || 'Anonymous';
+
+                // Reply preview (if exists)
+                if (item.replied_at) {
+                    const replyPreview = clone.querySelector('.reply-preview');
+                    replyPreview.classList.remove('hidden');
+
+                    const replyText = clone.querySelector('.reply-preview-text');
+                    replyText.textContent = item.reply_message || 'No reply message';
+
+                    const replyDate = clone.querySelector('.reply-date-text');
+                    replyDate.textContent = `Replied ${formatDate(item.replied_at)}`;
+                }
+
+                // View details button
+                const viewBtn = clone.querySelector('.view-details-btn');
+                viewBtn.addEventListener('click', () => showFeedbackDetails(item));
+
+                feedbackList.appendChild(clone);
+            });
+        }
+
+        // Show feedback details modal - IMPROVED WITH BETTER FORMATTING
+        function showFeedbackDetails(item) {
+            const modal = document.getElementById('feedback-modal');
+            const content = document.getElementById('feedback-details-content');
+
+            const standardFields = ['id', 'name', 'email', 'category', 'office', 'rating', 'message',
+                'created_at', 'timestamp', 'anonymous', 'replied_at', 'reply_message',
+                'is_read', 'read_at'];
+
+            const questionFields = Object.keys(item)
+                .filter(key => !standardFields.includes(key) && item[key] !== null && item[key] !== '')
+                .map(key => ({ key, value: item[key] }));
+
+            let detailsHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>Status
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Read Status</p>
+                                    ${item.is_read ?
+                    '<span class="status-badge status-read"><i class="fas fa-eye mr-1"></i>Read</span>' :
+                    '<span class="status-badge status-unread"><i class="fas fa-eye-slash mr-1"></i>Unread</span>'}
+                                    ${item.read_at ?
+                    `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Read on: ${new Date(item.read_at).toLocaleString()}
+                                        </p>` : ''}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Reply Status</p>
+                                    ${item.replied_at ?
+                    '<span class="status-badge status-answered"><i class="fas fa-check-circle mr-1"></i>Answered</span>' :
+                    '<span class="status-badge status-unanswered"><i class="fas fa-clock mr-1"></i>Pending</span>'}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Office</p>
+                                    <p class="text-gray-900 dark:text-white font-medium">${formatOfficeName(item.office)}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Submitted</p>
+                                    <p class="text-gray-900 dark:text-white">${new Date(item.created_at).toLocaleString()}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-user-circle mr-2 text-green-500"></i>Your Information
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Name</p>
+                                    <p class="text-gray-900 dark:text-white">
+                                        ${item.anonymous === "true" || !item.name ? 'Anonymous' : escapeHtml(item.name)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                                    <p class="text-gray-900 dark:text-white">
+                                        ${item.anonymous === "true" || !item.email ? 'N/A' : escapeHtml(item.email)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Category</p>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                        ${item.category === 'Staff' ? 'bg-blue-100 text-blue-800' :
+                    item.category === 'Student' ? 'bg-green-100 text-green-800' :
+                        item.category === 'Visitor' ? 'bg-purple-100 text-purple-800' :
+                            'bg-gray-100 text-gray-800'}">
+                                        ${item.category || 'Anonymous'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        ${item.rating ? `
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-star mr-2 text-yellow-500"></i>Rating
+                            </h4>
+                            <div class="flex items-center">
+                                <span class="text-2xl text-yellow-500 mr-2">${getRatingStars(item.rating)}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">${item.rating}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${questionFields.length > 0 ? `
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-question-circle mr-2 text-purple-500"></i>Your Responses
+                            </h4>
+                            <div class="space-y-3">
+                                ${questionFields.map(({ key, value }) => `
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            ${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                                        </p>
+                                        <p class="text-gray-900 dark:text-white break-words">${escapeHtml(value)}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-comment mr-2 text-green-500"></i>Your Message
+                            </h4>
+                            <div class="message-preview break-words whitespace-pre-wrap">
+                                ${escapeHtml(item.message || 'No message provided.').replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add admin reply section if exists - with improved formatting
+            if (item.replied_at && item.reply_message) {
+                detailsHTML += `
+                    <div class="mt-6 bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                        <h4 class="text-lg font-semibold text-green-800 dark:text-green-300 mb-4 flex items-center">
+                            <i class="fas fa-reply mr-2"></i>Admin Response
+                        </h4>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Replied on</p>
+                            <p class="text-gray-900 dark:text-white font-medium">
+                                ${new Date(item.replied_at).toLocaleString()}
+                            </p>
+                        </div>
+                        <div class="message-preview bg-white dark:bg-green-900/30 break-words whitespace-pre-wrap">
+                            ${escapeHtml(item.reply_message).replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = detailsHTML;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Pagination functions
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderFeedback();
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredFeedback.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderFeedback();
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check dark mode preference
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'true' ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches && darkModePreference === null)) {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Load user feedback
+            loadUserFeedback();
+
+            // Event listeners
+            document.getElementById('status-filter').addEventListener('change', applyFilters);
+            document.getElementById('office-filter').addEventListener('change', applyFilters);
+            document.getElementById('search-input').addEventListener('keyup', function (e) {
+                if (e.key === 'Enter') applyFilters();
+            });
+
+            // Pagination buttons
+            document.getElementById('prev-page').addEventListener('click', prevPage);
+            document.getElementById('next-page').addEventListener('click', nextPage);
+
+            // Close modal on escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeFeedbackModal();
+                }
+            });
+
+            // Close modal when clicking backdrop
+            document.getElementById('feedback-modal').addEventListener('click', function (e) {
+                if (e.target === this) closeFeedbackModal();
+            });
+        });
+    </script>
+</body>
+
+</html>

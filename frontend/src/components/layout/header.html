@@ -1,0 +1,215 @@
+<header
+    class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between z-50">
+    <!-- Logo -->
+    <a href="home.html" class="flex items-center space-x-3">
+        <img src="../../../public/uploads/logo.png" alt="University Logo"
+            class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow" />
+    </a>
+
+    <!-- Welcome Text -->
+    <div class="text-center flex-1 px-2">
+        <span class="font-bold text-green-700 dark:text-green-400 text-sm sm:text-lg">Welcome to University Feedback
+            Portal</span>
+    </div>
+
+    <!-- Hamburger Button - Using inline onclick for reliability -->
+    <button id="hamburgerBtn" class="md:hidden flex flex-col space-y-1.5 z-50"
+        onclick="document.getElementById('mobileMenu').style.display = 'block'; document.getElementById('mobileMenuOverlay').style.display = 'block'; document.body.style.overflow = 'hidden'; this.setAttribute('aria-expanded', 'true');"
+        aria-label="Toggle menu" aria-expanded="false">
+        <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
+        <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
+        <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
+    </button>
+
+    <!-- Desktop Menu -->
+    <nav class="hidden md:flex ml-auto space-x-2 sm:space-x-4 items-center">
+        <a href="home.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Home</a>
+        <a href="about.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">About</a>
+        <a href="submit-feedback.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Submit
+            Feedback</a>
+        <a href="my-feedback.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">My
+            Feedback</a>
+        <a href="contact.html" class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Contact</a>
+        <a href="admin.html" data-auth="admin" style="display:none"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Admin Panel</a>
+        <a href="login.html" data-auth="guest"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Login</a>
+        <a href="signup.html" data-auth="guest"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Sign Up</a>
+        <a href="#" data-auth="user" data-action="logout" style="display:none"
+            class="nav-link hover:text-red-700 dark:hover:text-red-400 px-2 py-1 font-bold">Logout</a>
+    </nav>
+
+    <!-- Overlay -->
+    <div id="mobileMenuOverlay"
+        onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9998;">
+    </div>
+
+    <!-- MOBILE MENU - Using inline styles for guaranteed visibility -->
+    <div id="mobileMenu"
+        style="display: none; position: fixed; top: 0; right: 0; width: 80%; max-width: 300px; height: 100%; background-color: white; z-index: 9999; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.1);">
+
+        <!-- Header with Close Button -->
+        <div
+            style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: white; position: sticky; top: 0;">
+            <span style="font-weight: bold; color: #059669;">Menu</span>
+            <button
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
+                style="padding: 8px; border-radius: 50%; border: none; background: transparent; cursor: pointer;">
+                <i class="fas fa-times" style="font-size: 24px; color: #4b5563;"></i>
+            </button>
+        </div>
+
+        <!-- Menu Items -->
+        <div style="padding: 16px;">
+            <a href="home.html"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-home" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="about.html"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-info-circle" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>About</span>
+            </a>
+
+            <a href="submit-feedback.html"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-edit" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Submit Feedback</span>
+            </a>
+
+            <a href="my-feedback.html"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-list" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>My Feedback</span>
+            </a>
+
+            <a href="contact.html"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-envelope" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Contact</span>
+            </a>
+
+            <div style="height: 1px; background-color: #e5e7eb; margin: 16px 0;"></div>
+
+            <a href="login.html" data-auth="guest"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-sign-in-alt" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Login</span>
+            </a>
+
+            <a href="signup.html" data-auth="guest"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-user-plus" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Sign Up</span>
+            </a>
+
+            <a href="admin.html" data-auth="admin"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-user-shield" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Admin Panel</span>
+            </a>
+
+            <a href="#" data-auth="user" data-action="logout"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #b91c1c; border-radius: 8px; background: white; font-size: 16px; font-weight: bold;">
+                <i class="fas fa-sign-out-alt" style="width: 24px; color: #b91c1c; margin-right: 12px;"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Dark mode support -->
+<style>
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+        .dark #mobileMenu {
+            background-color: #111827 !important;
+        }
+
+        .dark #mobileMenu a {
+            color: #e5e7eb !important;
+            background-color: #111827 !important;
+        }
+
+        .dark #mobileMenu a:hover {
+            background-color: #1f2937 !important;
+        }
+
+        .dark #mobileMenu .fa-times {
+            color: #9ca3af !important;
+        }
+    }
+
+    /* Hover effects for better UX */
+    #mobileMenu a:hover {
+        background-color: #f3f4f6 !important;
+    }
+
+    /* Ensure proper scrolling */
+    #mobileMenu {
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Active Nav Link Highlighting */
+    .nav-link.active {
+        color: #059669 !important;
+        /* text-green-600 */
+        font-weight: 700 !important;
+        border-bottom: 2px solid #059669;
+    }
+
+    .dark .nav-link.active {
+        color: #34d399 !important;
+        /* text-green-400 */
+        border-bottom-color: #34d399;
+    }
+</style>
+
+<script>
+    // Fix any links with typos when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('a[href*="submit-fedback.html"]').forEach(link => {
+            link.href = link.href.replace('submit-fedback.html', 'submit-feedback.html');
+        });
+
+        // Add compatibility with your existing feedbackPortal object
+        window.feedbackPortal = window.feedbackPortal || {};
+        window.feedbackPortal.toggleMobileMenu = function () {
+            const menu = document.getElementById('mobileMenu');
+            const overlay = document.getElementById('mobileMenuOverlay');
+            const btn = document.getElementById('hamburgerBtn');
+
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                menu.style.display = 'block';
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                btn.setAttribute('aria-expanded', 'true');
+            } else {
+                menu.style.display = 'none';
+                overlay.style.display = 'none';
+                document.body.style.overflow = '';
+                btn.setAttribute('aria-expanded', 'false');
+            }
+        };
+
+        window.feedbackPortal.closeMobileMenu = function () {
+            document.getElementById('mobileMenu').style.display = 'none';
+            document.getElementById('mobileMenuOverlay').style.display = 'none';
+            document.body.style.overflow = '';
+            document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');
+        };
+    });
+</script>

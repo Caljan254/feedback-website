@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hostel Feedback - University Feedback Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: #fff
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: #fff
+        }
+
+        .notification.warning {
+            background-color: #F59E0B;
+            color: #fff
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: #fff
+        }
+
+        .notification-icon {
+            margin-right: .75rem;
+            font-size: 1.1rem
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: .95rem
+        }
+
+        .notification-close {
+            margin-left: .75rem;
+            cursor: pointer;
+            opacity: .8
+        }
+
+        .notification-close:hover {
+            opacity: 1
+        }
+
+        .form-input:focus {
+            border-color: #10B981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2)
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto
+        }
+
+        footer {
+            flex-shrink: 0
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div id="header-placeholder"></div>
+    <div class="content-wrapper max-w-4xl mx-auto px-4 py-8">
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+        <div class="mb-6"><button onclick="goBack()"
+                class="flex items-center text-pink-600 hover:text-pink-700 transition-colors"><i
+                    class="fas fa-arrow-left mr-2"></i> ← Back to Office Selection</button></div>
+        <div id="user-info-display"
+            class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6 text-gray-800 dark:text-gray-200"></div>
+        <section class="bg-pink-50 dark:bg-pink-900 p-6 rounded-lg shadow-lg">
+            <h3 class="text-2xl font-bold text-pink-800 dark:text-pink-300 mb-6">Hostel Feedback</h3>
+            <form class="department-feedback-form space-y-6">
+                <div class="space-y-3">
+                    <p class="text-gray-700 dark:text-gray-300 font-medium">Was your hostel clean and secure?</p>
+                    <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer"><input
+                                type="radio" name="clean_hostel" value="Yes" required
+                                class="mr-2 form-radio text-pink-600"> <span
+                                class="text-gray-700 dark:text-gray-300">Yes</span></label><label
+                            class="flex items-center cursor-pointer"><input type="radio" name="clean_hostel" value="No"
+                                required class="mr-2 form-radio text-pink-600"> <span
+                                class="text-gray-700 dark:text-gray-300">No</span></label></div>
+                </div>
+                <div class="space-y-3">
+                    <p class="text-gray-700 dark:text-gray-300 font-medium">Were maintenance issues resolved on time?
+                    </p>
+                    <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer"><input
+                                type="radio" name="maintenance" value="Yes" required
+                                class="mr-2 form-radio text-pink-600"> <span
+                                class="text-gray-700 dark:text-gray-300">Yes</span></label><label
+                            class="flex items-center cursor-pointer"><input type="radio" name="maintenance" value="No"
+                                required class="mr-2 form-radio text-pink-600"> <span
+                                class="text-gray-700 dark:text-gray-300">No</span></label></div>
+                </div>
+                <div class="space-y-3">
+                    <p class="text-gray-700 dark:text-gray-300 font-medium">Rate your experience:</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center"><input type="radio" id="rating-poor" name="rating" value="Poor"
+                                required class="mr-2 form-radio text-pink-600"><label for="rating-poor"
+                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Poor</label></div>
+                        <div class="flex items-center"><input type="radio" id="rating-good" name="rating" value="Good"
+                                required class="mr-2 form-radio text-pink-600"><label for="rating-good"
+                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Good</label></div>
+                        <div class="flex items-center"><input type="radio" id="rating-excellent" name="rating"
+                                value="Excellent" required class="mr-2 form-radio text-pink-600"><label
+                                for="rating-excellent"
+                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Excellent</label></div>
+                    </div>
+                </div>
+                <div><label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">General Comment
+                        (optional):</label><textarea name="comment" rows="4"
+                        class="w-full rounded-md border-gray-300 shadow-sm focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-800 dark:text-white p-3"
+                        placeholder="Write your feedback here..."></textarea></div>
+                <button type="submit"
+                    class="bg-pink-600 text-white px-6 py-3 rounded-lg shadow hover:bg-pink-700 w-full transition-colors duration-200 text-lg font-medium">Submit
+                    Feedback</button>
+            </form>
+        </section>
+    </div>
+    <div id="footer-placeholder"></div>
+    <script src="../../src/js/load-components.js"></script>
+    <script src="../../src/js/feedback-portal.js"></script>
+</body>
+
+</html>
