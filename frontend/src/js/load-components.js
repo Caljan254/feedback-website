@@ -22,7 +22,7 @@ async function loadComponent(elementId, filePath) {
             fullPath = basePath + filePath;
         }
         
-        const response = await fetch(fullPath);
+        const response = await fetch(fullPath + '?v=' + new Date().getTime());
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const html = await response.text();
         

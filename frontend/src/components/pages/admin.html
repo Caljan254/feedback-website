@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Department Admin Panel - University Feedback</title>
+    <title>South Eastern Kenya University (SEKU) Feedback System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -455,6 +455,7 @@
 
             currentPage = 1;
             renderTable();
+            if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
         }
 
         function renderTable() {
@@ -472,8 +473,9 @@
                     <td class="px-6 py-4 text-sm">${f.category}</td>
                     <td class="px-6 py-4 text-sm font-medium text-green-600 dark:text-green-400">${f.office || 'General'}</td>
                     <td class="px-6 py-4 text-xs text-gray-500">
-                        ${new Date(f.created_at).toLocaleDateString()}<br>
-                        ${new Date(f.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        <span data-timestamp="${f.created_at}">
+                            ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(f.created_at) : new Date(f.created_at).toLocaleDateString()}
+                        </span>
                     </td>
                     <td class="px-6 py-4 text-center">
                         <div class="flex items-center justify-center space-x-2">
@@ -487,6 +489,8 @@
             document.getElementById("page-info").textContent = `Showing ${filteredFeedback.length > 0 ? start + 1 : 0} to ${Math.min(start + itemsPerPage, filteredFeedback.length)} of ${filteredFeedback.length} entries`;
             document.getElementById("prev-btn").disabled = currentPage === 1;
             document.getElementById("next-btn").disabled = currentPage >= Math.ceil(filteredFeedback.length / itemsPerPage);
+
+            if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
         }
 
         function getStatusBadge(f) {
@@ -562,7 +566,7 @@
                     <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
                         <div class="flex justify-between items-center mb-2">
                             <span class="text-xs font-bold text-green-600 uppercase">Official Response</span>
-                            <span class="text-[10px] text-gray-400">${new Date(f.replied_at).toLocaleString()}</span>
+                            <span class="text-[10px] text-gray-400" data-timestamp="${f.replied_at}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(f.replied_at) : new Date(f.replied_at).toLocaleString()}</span>
                         </div>
                         <p class="text-sm italic">"${f.reply_message || 'N/A'}"</p>
                     </div>
@@ -625,7 +629,7 @@
                                 <div class="flex-grow">
                                     <div class="flex justify-between">
                                         <p class="font-bold text-sm">${log.action.replace('_', ' ').toUpperCase()}</p>
-                                        <p class="text-[10px] text-gray-500">${new Date(log.timestamp).toLocaleString()}</p>
+                                        <p class="text-[10px] text-gray-500" data-timestamp="${log.timestamp}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(log.timestamp) : new Date(log.timestamp).toLocaleString()}</p>
                                     </div>
                                     <p class="text-xs text-gray-600 dark:text-gray-400">${log.details}</p>
                                 </div>
@@ -633,6 +637,7 @@
                         `).join('') || '<p class="text-center py-10">No activities recorded yet.</p>'}
                     </div>
                 `;
+                if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
             } catch (e) {
                 document.getElementById("logs-content").innerHTML = '<p class="text-center text-red-500">Failed to load logs.</p>';
             }

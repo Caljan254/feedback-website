@@ -50,9 +50,9 @@ def get_password_hash(password: str) -> str:
 def authenticate_user(db: Session, email: Optional[str] = None, username: Optional[str] = None, password: str = None, department_id: Optional[int] = None):
     query = db.query(User)
     if email:
-        user = query.filter(User.email == email).first()
+        user = query.filter(User.email.ilike(email)).first()
     elif username:
-        user = query.filter(User.username == username).first()
+        user = query.filter(User.username.ilike(username)).first()
     else:
         return False
 
@@ -82,8 +82,12 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 
 async def get_current_user(
     token: str = Depends(oauth2_scheme),
+    access_token: Optional[str] = None,
     db: Session = Depends(get_db)
 ):
+    # Support token from query parameter (useful for CSV exports)
+    token = token or access_token
+    
     if not token:
         return None  # Allow anonymous access for some endpoints
     

@@ -14,6 +14,8 @@ class FeedbackPortal {
         this.initializeNotificationContainer();
         this.initializePageSpecificFunctions();
         this.highlightActiveNavLink();
+        this.hidePublicNavLinks();
+        this.startTimestampUpdater();
         console.log('Feedback Portal initialized');
     }
 
@@ -23,6 +25,8 @@ class FeedbackPortal {
         this.initializeAuthentication();
         this.initializePageSpecificFunctions();
         this.highlightActiveNavLink();
+        this.hidePublicNavLinks();
+        this.updateAllTimestamps();
     }
 
     // Initialize functions specific to current page
@@ -593,6 +597,9 @@ class FeedbackPortal {
                     </div>
                 `, 'success', 0); // 0 duration means it stays until clicked/dismissed
                 
+                // Save to history
+                this.saveTrackingIdToHistory(trackingId, office);
+                
                 form.reset();
                 
                 // Clear session storage after successful submission
@@ -807,6 +814,113 @@ class FeedbackPortal {
             this.showNotification('Could not copy automatically. Please select the text manually.', 'warning');
         }
         document.body.removeChild(textArea);
+    }
+
+    // Save tracking ID to localStorage history
+    saveTrackingIdToHistory(id, office) {
+        try {
+            let history = JSON.parse(localStorage.getItem('feedback_history') || '[]');
+            // Remove if already exists (to move to top)
+            history = history.filter(item => item.id !== id);
+            // Add to top
+            history.unshift({
+                id: id,
+                office: office,
+                officeName: this.getOfficeName(office),
+                date: new Date().toISOString()
+            });
+            // Keep only last 10
+            history = history.slice(0, 10);
+            localStorage.setItem('feedback_history', JSON.stringify(history));
+        } catch (e) {
+            console.error('Failed to save tracking history:', e);
+        }
+    }
+
+    // Get tracking history
+    getTrackingHistory() {
+        try {
+            return JSON.parse(localStorage.getItem('feedback_history') || '[]');
+        } catch (e) {
+            return [];
+        }
+    }
+
+    // Hide public navigation links in admin panel
+    hidePublicNavLinks() {
+        const currentPath = window.location.pathname;
+        const isAdminPage = currentPath.includes('/admin.html') || currentPath.includes('/admin-panel/');
+        const isAdmin = this.getUserRole() === 'admin';
+
+        if (isAdminPage || isAdmin) {
+            const publicLinks = document.querySelectorAll('[data-nav="public"]');
+            publicLinks.forEach(link => {
+                link.style.setProperty('display', 'none', 'important');
+            });
+
+            // Update welcome text for admin panel
+            const welcomeText = document.getElementById('header-welcome-text');
+            if (welcomeText) {
+                welcomeText.innerText = 'Welcome to admin panel, university feedback system';
+            }
+        }
+    }
+
+    // ===== REAL-TIME TIMESTAMPS =====
+    
+    formatRelativeTime(timestamp) {
+        if (!timestamp) return 'Unknown';
+        try {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffSecs = Math.floor(diffMs / 1000);
+            const diffMins = Math.floor(diffSecs / 60);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffSecs < 60) return 'Just now';
+            if (diffMins < 60) return `${diffMins} min${diffMins === 1 ? '' : 's'} ago`;
+            if (diffHours < 24) return `${diffHours} hr${diffHours === 1 ? '' : 's'} ago`;
+            if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+
+            return date.toLocaleDateString(undefined, { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        } catch (e) {
+            return 'Invalid date';
+        }
+    }
+
+    updateAllTimestamps() {
+        const timeElements = document.querySelectorAll('[data-timestamp]');
+        timeElements.forEach(el => {
+            const timestamp = el.getAttribute('data-timestamp');
+            if (timestamp) {
+                el.innerText = this.formatRelativeTime(timestamp);
+                // Optional: add title with full date
+                if (!el.getAttribute('title')) {
+                    el.setAttribute('title', new Date(timestamp).toLocaleString());
+                }
+            }
+        });
+    }
+
+    startTimestampUpdater() {
+        // Update immediately
+        this.updateAllTimestamps();
+        
+        // Clear existing interval if any
+        if (this.timeUpdateInterval) {
+            clearInterval(this.timeUpdateInterval);
+        }
+        
+        // Update every 60 seconds
+        this.timeUpdateInterval = setInterval(() => {
+            this.updateAllTimestamps();
+        }, 60000);
     }
 }
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Feedback - University Feedback Portal</title>
+    <title>South Eastern Kenya University (SEKU) Feedback System</title>
     <link rel="icon" type="image/x-icon" href="../../../public/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
@@ -323,7 +323,7 @@
     <div id="header-placeholder"></div>
 
     <!-- Content Wrapper -->
-    <div class="content-wrapper max-w-6xl mx-auto px-4 py-8">
+    <div class="content-wrapper max-w-6xl mx-auto px-4 pt-24 pb-8">
         <!-- Notification Container -->
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
@@ -383,6 +383,18 @@
                     </div>
                     <p id="guest-tracking-error" class="text-red-500 text-xs mt-2 hidden"></p>
                 </div>
+            </div>
+
+            <!-- Recent Tracking IDs (Help for users who forgot to save them) -->
+            <div id="recent-tracking-ids" class="mt-6 pt-6 border-t dark:border-gray-700 hidden">
+                <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                    <i class="fas fa-history mr-2"></i>Recent Reference Numbers (Autosaved)
+                </h3>
+                <div id="recent-ids-container" class="flex flex-wrap gap-2">
+                    <!-- Loaded via JS -->
+                </div>
+                <p class="text-[10px] text-gray-400 mt-2 italic">These are saved locally on this browser to help you
+                    find IDs you might have forgotten to copy.</p>
             </div>
         </div>
 
@@ -1048,6 +1060,7 @@
 
                     updateStats();
                     renderFeedback();
+                    if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
                     showNotification(`Found ${userFeedback.length} feedback entries`, 'success');
                 }
             } catch (error) {
@@ -1220,7 +1233,8 @@
 
                 // Date
                 const dateSpan = clone.querySelector('.date-text');
-                dateSpan.textContent = formatDate(item.created_at);
+                dateSpan.setAttribute('data-timestamp', item.created_at);
+                dateSpan.textContent = window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.created_at) : formatDate(item.created_at);
 
                 // Category
                 const categorySpan = clone.querySelector('.category-text');
@@ -1235,7 +1249,8 @@
                     replyText.textContent = item.reply_message || 'No reply message';
 
                     const replyDate = clone.querySelector('.reply-date-text');
-                    replyDate.textContent = `Replied ${formatDate(item.replied_at)}`;
+                    replyDate.setAttribute('data-timestamp', item.replied_at);
+                    replyDate.textContent = `Replied ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.replied_at) : formatDate(item.replied_at)}`;
                 }
 
                 // View details button
@@ -1244,6 +1259,8 @@
 
                 feedbackList.appendChild(clone);
             });
+
+            if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
         }
 
         // Show feedback details modal - IMPROVED WITH BETTER FORMATTING
@@ -1274,7 +1291,7 @@
                     '<span class="status-badge status-unread"><i class="fas fa-eye-slash mr-1"></i>Unread</span>'}
                                     ${item.read_at ?
                     `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                            Read on: ${new Date(item.read_at).toLocaleString()}
+                                            Read <span data-timestamp="${item.read_at}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.read_at) : new Date(item.read_at).toLocaleString()}</span>
                                         </p>` : ''}
                                 </div>
                                 <div>
@@ -1289,7 +1306,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Submitted</p>
-                                    <p class="text-gray-900 dark:text-white">${new Date(item.created_at).toLocaleString()}</p>
+                                    <p class="text-gray-900 dark:text-white" data-timestamp="${item.created_at}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.created_at) : new Date(item.created_at).toLocaleString()}</p>
                                 </div>
                             </div>
                         </div>
@@ -1377,8 +1394,8 @@
                         </h4>
                         <div class="mb-4">
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Replied on</p>
-                            <p class="text-gray-900 dark:text-white font-medium">
-                                ${new Date(item.replied_at).toLocaleString()}
+                            <p class="text-gray-900 dark:text-white font-medium" data-timestamp="${item.replied_at}">
+                                ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.replied_at) : new Date(item.replied_at).toLocaleString()}
                             </p>
                         </div>
                         <div class="message-preview bg-white dark:bg-green-900/30 break-words whitespace-pre-wrap">
@@ -1425,6 +1442,9 @@
                 document.documentElement.classList.add('dark');
             }
 
+            // Load recent tracking history for guest users
+            loadRecentTrackingIds();
+
             // Load user feedback
             loadUserFeedback();
 
@@ -1451,6 +1471,40 @@
                 if (e.target === this) closeFeedbackModal();
             });
         });
+
+        function loadRecentTrackingIds() {
+            if (window.feedbackPortal) {
+                const history = window.feedbackPortal.getTrackingHistory();
+                const container = document.getElementById('recent-ids-container');
+                const section = document.getElementById('recent-tracking-ids');
+
+                if (history && history.length > 0 && container && section) {
+                    section.classList.remove('hidden');
+                    container.innerHTML = history.map(item => `
+                        <button onclick="trackRecentId('${item.id}')" 
+                                class="flex items-center gap-2 bg-gray-100 hover:bg-green-50 dark:bg-gray-700 dark:hover:bg-green-900/30 border border-gray-200 dark:border-gray-600 px-3 py-2 rounded-lg transition-all group">
+                            <i class="fas fa-ticket-alt text-green-600 dark:text-green-400 opacity-60 group-hover:opacity-100"></i>
+                            <div class="text-left">
+                                <div class="text-xs font-bold font-mono text-gray-800 dark:text-gray-200">${item.id}</div>
+                                <div class="flex justify-between items-center gap-2">
+                                    <div class="text-[10px] text-gray-400 truncate max-w-[80px]">${item.officeName || 'Office'}</div>
+                                    <div class="text-[9px] text-gray-500 whitespace-nowrap" data-timestamp="${item.date || ''}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.date) : ''}</div>
+                                </div>
+                            </div>
+                        </button>
+                    `).join('');
+                    if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+                }
+            }
+        }
+
+        function trackRecentId(id) {
+            const input = document.getElementById('guest-tracking-input');
+            if (input) {
+                input.value = id;
+                trackGuestFeedback();
+            }
+        }
     </script>
 </body>
 
