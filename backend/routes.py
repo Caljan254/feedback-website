@@ -11,6 +11,7 @@ from database import get_db
 from datetime import datetime
 from typing import List
 import logging
+from email_service import email_service
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -119,74 +120,83 @@ def submit_feedback(feedback: FeedbackCreate, db: Session = Depends(get_db),
             office_val = feedback_dict['office'].lower()
             # Mapping frontend slugs to DB names
             slug_map = {
-                'vc-office': "Vice Chancellor's Office",
-                'dvc-academic': "DVC (Academic, Research & Student Affairs)",
-                'dvc-admin': "DVC (Administration, Finance & Planning)",
+                'vc-office': "Vice Chancellor’s Office",
+                'dvc-academic': "Deputy Vice Chancellor (Academic)",
+                'dvc-admin': "Deputy Vice Chancellor (Administration)",
                 'registrar-academic': "Registrar (Academic Affairs)",
-                'registrar-admin': "Registrar (Administration & Human Resource)",
+                'registrar-admin': "Registrar (Administration & HR)",
                 'council-office': "University Council Office",
                 'legal-services': "Legal Services Office",
-                'corp-comm': "Corporate Communications / PR",
+                'corp-comm': "Corporate Communications",
                 'admissions': "Admissions Office",
                 'academic-registry': "Academic Registry",
                 'exams-office': "Examinations Office",
                 'timetabling': "Timetabling Office",
-                'research-postgrad': "Research, Innovation & Postgraduate Studies",
-                'quality-assurance': "Quality Assurance Office",
-                'industrial-attachment': "Industrial Attachment & Career Services",
-                'elearning': "e-Learning / ODL Office",
-                'ssc-dean': "Dean, School of Science and Computing",
-                'dept-math': "Department of Mathematics",
-                'dept-ict': "Department of Computing & IT",
-                'dept-physical': "Department of Physical Sciences",
-                'dept-biological': "Department of Biological Sciences",
-                'set-dean': "Dean, School of Engineering",
-                'dept-civil': "Department of Civil Engineering",
-                'dept-elec': "Department of Electrical & Electronic Engineering",
-                'dept-mech': "Department of Mechanical Engineering",
-                'sbe-dean': "Dean, School of Business",
-                'dept-admin': "Department of Business Administration",
-                'dept-accounting': "Department of Accounting & Finance",
-                'dept-economics': "Department of Economics",
-                'seh-dean': "Dean, School of Education",
-                'dept-edu': "Department of Educational Studies",
-                'dept-social': "Department of Social Sciences",
-                'dept-humanities': "Department of Humanities",
-                'sanr-dean': "Dean, School of Agriculture",
-                'dept-env': "Department of Environmental Science",
-                'dept-agri': "Department of Agricultural Sciences",
-                'dean-students': "Dean of Students Office",
-                'student-affairs': "Student Affairs Office",
+                'research-postgrad': "Research Directorate",
+                'quality-assurance': "Quality Assurance",
+                'industrial-attachment': "Attachment & Career Services",
+                'elearning': "e-Learning Office",
+                'ssc-dean': "School of Science & Computing - Dean’s Office",
+                'dept-math': "Mathematics Department (Chairperson)",
+                'dept-ict': "Computing & IT Department",
+                'dept-physical': "Physical Sciences",
+                'dept-biological': "Biological Sciences",
+                'set-dean': "School of Engineering - Dean’s Office",
+                'dept-civil': "Civil Engineering",
+                'dept-elec': "Electrical Engineering",
+                'dept-mech': "Mechanical Engineering",
+                'sbe-dean': "School of Business - Dean’s Office",
+                'dept-admin': "Business Administration",
+                'dept-accounting': "Accounting & Finance",
+                'dept-economics': "Economics",
+                'seh-dean': "School of Education & Social Sciences - Dean’s Office",
+                'dept-edu': "Educational Studies",
+                'dept-social': "Social Sciences",
+                'dept-humanities': "Humanities",
+                'sanr-dean': "School of Agriculture & Environment - Dean’s Office",
+                'dept-env': "Environmental Science",
+                'dept-agri': "Agricultural Sciences",
+                'dean-students': "Dean of Students",
+                'student-affairs': "Student Affairs",
                 'counselling': "Counselling Services",
-                'chaplaincy': "Chaplaincy / Spiritual Services",
-                'career-guidance': "Career Guidance Office",
-                'games': "Games and Sports Office",
-                'student-clubs': "Student Clubs & Associations Office",
+                'chaplaincy': "Chaplaincy",
+                'career-guidance': "Attachment & Career Services",
+                'games': "Games & Sports",
+                'student-clubs': "Student Clubs",
                 'finance': "Finance Department",
                 'fees-office': "Fees Office",
                 'accounts-office': "Accounts Office",
                 'procurement': "Procurement Office",
-                'internal-audit': "Internal Audit Office",
-                'hr-office': "Human Resource Office",
-                'staff-welfare': "Staff Welfare Office",
-                'training-dev': "Training & Development Office",
-                'library': "Library Services",
+                'internal-audit': "Internal Audit",
+                'hr-office': "Human Resource",
+                'staff-welfare': "Staff Welfare",
+                'training-dev': "Training & Development",
+                'library': "Library",
                 'ict-services': "ICT Services",
-                'health-unit': "Health Unit / Clinic",
-                'hostel': "Accommodation / Hostel Office",
-                'catering': "Catering Services",
-                'estate': "Estate / Maintenance Department",
-                'transport': "Transport Office",
-                'security': "Security Department",
-                'grounds': "Grounds & Cleaning Services",
+                'health-unit': "Health Unit",
+                'hostel': "Hostel / Accommodation",
+                'catering': "Catering",
+                'estate': "Estate / Maintenance",
+                'transport': "Transport",
+                'security': "Security",
+                'grounds': "Grounds & Cleaning",
                 'research-dir': "Research Directorate",
-                'innovation-office': "Innovation & Tech Transfer Office",
-                'community-outreach': "Community Outreach & Extension"
+                'innovation-office': "Innovation Office",
+                'community-outreach': "Community Outreach"
             }
             dept_name = slug_map.get(office_val, office_val)
-            dept = db.query(Department).filter(Department.name.ilike(dept_name)).first()
+            # Handle different apostrophes (straight vs curly)
+            dept_name_alt = dept_name.replace("’", "'") if "’" in dept_name else dept_name.replace("'", "’")
+            
+            dept = db.query(Department).filter(
+                (Department.name.ilike(dept_name)) | (Department.name.ilike(dept_name_alt))
+            ).first()
+            
             if dept:
                 feedback_dict['department_id'] = dept.id
+                logger.info(f"Mapped office '{office_val}' to department '{dept.name}' (ID: {dept.id})")
+            else:
+                logger.warning(f"Could not map office '{office_val}' to any department. Dept name searched: '{dept_name}'")
 
         # Set default values for status fields
         feedback_dict['is_read'] = False
@@ -201,12 +211,46 @@ def submit_feedback(feedback: FeedbackCreate, db: Session = Depends(get_db),
         tracking_id = ''.join(secrets.choice(alphabet) for _ in range(10))
         feedback_dict['tracking_id'] = f"REF-{tracking_id}"
         
-        db_feedback = Feedback(**feedback_dict)
+        # Filter feedback_dict to only include keys that exist in the Feedback model
+        allowed_keys = {c.key for c in Feedback.__table__.columns}
+        filtered_feedback_dict = {k: v for k, v in feedback_dict.items() if k in allowed_keys}
+        
+        db_feedback = Feedback(**filtered_feedback_dict)
         db.add(db_feedback)
         db.commit()
         db.refresh(db_feedback)
         
-        logger.info(f"Feedback submitted: ID {db_feedback.id}, Tracking ID {db_feedback.tracking_id}")
+        logger.info(f"Feedback submitted: ID {db_feedback.id}, Tracking ID {db_feedback.tracking_id}, Dept ID {db_feedback.department_id}")
+
+        # Send notification to department admins
+        if db_feedback.department_id:
+            try:
+                # Find all admins for this department
+                admins = db.query(User).filter(
+                    User.department_id == db_feedback.department_id,
+                    User.role == "admin"
+                ).all()
+                
+                dept = db.query(Department).filter(Department.id == db_feedback.department_id).first()
+                dept_name = dept.name if dept else db_feedback.office
+                
+                for admin in admins:
+                    if admin.email:
+                        email_service.send_new_feedback_notification(
+                            to_email=admin.email,
+                            department_name=dept_name,
+                            feedback_data={
+                                "name": db_feedback.name,
+                                "email": db_feedback.email,
+                                "rating": db_feedback.rating,
+                                "message": db_feedback.message,
+                                "tracking_id": db_feedback.tracking_id
+                            }
+                        )
+                        logger.info(f"Notification sent to admin: {admin.email}")
+            except Exception as e:
+                logger.error(f"Failed to send department notifications: {str(e)}")
+
         return db_feedback
         
     except SQLAlchemyError as e:
@@ -332,8 +376,8 @@ def send_reply(
         message = request.get("message")
         feedback_id = request.get("feedback_id")
 
-        if not email or not subject or not message or not feedback_id:
-            raise HTTPException(status_code=400, detail="Missing required fields")
+        if not message or not feedback_id:
+            raise HTTPException(status_code=400, detail="Missing required fields: message and feedback_id")
 
         # Update feedback with reply info
         feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
@@ -360,10 +404,87 @@ def send_reply(
         
         logger.info(f"Reply sent to feedback {feedback_id} by admin {user_id_for_log(current_user)}")
         
+        # Send email notification if user has an email
+        if feedback.email:
+            try:
+                email_sent = email_service.send_feedback_reply(
+                    to_email=feedback.email,
+                    subject=subject or f"Response to your feedback regarding {feedback.office}",
+                    message=message,
+                    user_name=feedback.name
+                )
+                if email_sent:
+                    logger.info(f"Email notification sent to {feedback.email}")
+                else:
+                    logger.error(f"Failed to send email notification to {feedback.email}")
+            except Exception as e:
+                logger.error(f"Error calling email service: {str(e)}")
+
         return {"message": "✅ Reply sent successfully and feedback marked as answered"}
         
     except SQLAlchemyError as e:
         logger.error(f"Database error in send_reply: {str(e)}")
+        db.rollback()
+        raise HTTPException(status_code=500, detail="Database error")
+
+# 📨 Admin → Member: Send proactive message to registered user
+@router.post("/admin/send-message")
+def send_admin_message_to_member(
+    request: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    try:
+        if not current_user or current_user.role != "admin":
+            raise HTTPException(status_code=403, detail="Forbidden – Admins only")
+
+        recipient_email = request.get("recipient_email", "").strip()
+        subject = request.get("subject", "").strip()
+        message = request.get("message", "").strip()
+
+        if not recipient_email or not message:
+            raise HTTPException(status_code=400, detail="recipient_email and message are required")
+
+        # Verify the recipient is a registered member
+        recipient = db.query(User).filter(User.email == recipient_email).first()
+        if not recipient:
+            raise HTTPException(status_code=404, detail=f"No registered member found with email: {recipient_email}")
+
+        # Create a feedback record as the "admin message" so it appears in My Feedback
+        import secrets, string
+        alphabet = string.ascii_uppercase + string.digits
+        tracking_id = "MSG-" + ''.join(secrets.choice(alphabet) for _ in range(8))
+
+        new_msg = Feedback(
+            name=current_user.fullname or "Administration",
+            email=recipient_email,
+            category="Admin Message",
+            office="admin-message",
+            message=f"Subject: {subject}\n\n{message}",
+            anonymous="false",
+            tracking_id=tracking_id,
+            department_id=current_user.department_id,
+            is_read=False,
+            reply_message=message,
+            replied_at=datetime.now(),   # Mark as already answered since admin composed it
+        )
+        db.add(new_msg)
+
+        # Log the action
+        log = ActivityLog(
+            user_id=current_user.id,
+            department_id=current_user.department_id,
+            action="admin_message",
+            details=f"Sent message to {recipient_email}: {subject}"
+        )
+        db.add(log)
+        db.commit()
+
+        logger.info(f"Admin {user_id_for_log(current_user)} sent message to {recipient_email}")
+        return {"message": f"✅ Message sent to {recipient_email} successfully"}
+
+    except SQLAlchemyError as e:
+        logger.error(f"Database error in send_admin_message: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 

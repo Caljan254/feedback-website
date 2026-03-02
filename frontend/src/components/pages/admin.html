@@ -119,7 +119,11 @@
                     Manage your department's feedback and activity.
                 </p>
             </div>
-            <div class="mt-4 md:mt-0 flex space-x-3">
+            <div class="mt-4 md:mt-0 flex space-x-3 flex-wrap gap-2">
+                <button onclick="openComposeModal()"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-paper-plane mr-2"></i>Message Member
+                </button>
                 <button onclick="viewActivityLogs()"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-history mr-2"></i>Logs
@@ -263,6 +267,56 @@
         </div>
     </div>
 
+    <!-- COMPOSE MESSAGE TO MEMBER MODAL -->
+    <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in">
+            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-xl"><i class="fas fa-paper-plane mr-2"></i>Send Message to Registered Member
+                </h3>
+                <button onclick="closeComposeModal()" class="text-2xl hover:text-indigo-200 transition">&times;</button>
+            </div>
+            <div class="p-6">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <i class="fas fa-info-circle mr-1 text-indigo-400"></i>
+                    Enter the email address of a registered member to send them an official message. They will see it in
+                    their <strong>My Feedback</strong> page.
+                </p>
+                <form id="compose-form" class="space-y-4" onsubmit="sendMessageToMember(event)">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Recipient Email</label>
+                        <div class="relative">
+                            <input type="email" id="compose-email" required placeholder="member@seku.ac.ke"
+                                class="w-full px-4 py-3 pl-10 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                        </div>
+                        <p id="compose-email-error" class="text-red-500 text-xs mt-1 hidden">Could not send. Please
+                            verify the email address.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Subject</label>
+                        <input type="text" id="compose-subject" required
+                            placeholder="Official Notice from Administration"
+                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Message</label>
+                        <textarea id="compose-message" rows="6" required
+                            placeholder="Type your official message here..."
+                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-2">
+                        <button type="button" onclick="closeComposeModal()"
+                            class="px-6 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition font-medium">Cancel</button>
+                        <button type="submit" id="compose-send-btn"
+                            class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md font-bold transition">
+                            <i class="fas fa-paper-plane mr-2"></i>Send Message
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <div id="analytics-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
@@ -385,7 +439,7 @@
 
             // Fetch department name
             try {
-                const res = await fetch("http://localhost:8000/api/departments");
+                const res = await fetch("/api/departments");
                 const depts = await res.json();
                 const myDept = depts.find(d => d.id == deptId);
                 if (myDept) document.getElementById("dept-title").textContent = myDept.name + " Panel";
@@ -410,7 +464,7 @@
             spin.classList.add("refresh-spinner");
 
             try {
-                const res = await fetch("http://localhost:8000/api/admin/feedback", {
+                const res = await fetch("/api/admin/feedback", {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (res.ok) {
@@ -443,7 +497,8 @@
                 const matchesSearch = !query ||
                     (f.name && f.name.toLowerCase().includes(query)) ||
                     (f.message && f.message.toLowerCase().includes(query)) ||
-                    (f.email && f.email.toLowerCase().includes(query));
+                    (f.email && f.email.toLowerCase().includes(query)) ||
+                    (f.tracking_id && f.tracking_id.toLowerCase().includes(query));
 
                 let matchesStatus = true;
                 if (status === 'unread') matchesStatus = !f.is_read;
@@ -466,8 +521,8 @@
             body.innerHTML = pageData.map(f => `
                 <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
                     <td class="px-6 py-4">
-                        <div class="font-bold text-gray-900 dark:text-white">${f.anonymous === "true" ? '<span class="text-gray-400 italic">Anonymous</span>' : (f.name || 'Anonymous')}</div>
-                        <div class="text-xs text-gray-500">${f.anonymous === "true" ? '-' : (f.email || 'No email')}</div>
+                        <div class="font-bold text-gray-900 dark:text-white">${f.anonymous === "true" ? `<span class="text-blue-600 dark:text-blue-400 font-mono text-xs">${f.tracking_id || 'Anon'}</span>` : (f.name || 'Anonymous')}</div>
+                        <div class="text-[10px] text-gray-400 italic">${f.anonymous === "true" ? 'Anonymous' : (f.email || 'No email')}</div>
                     </td>
                     <td class="px-6 py-4">${getStatusBadge(f)}</td>
                     <td class="px-6 py-4 text-sm">${f.category}</td>
@@ -505,7 +560,7 @@
 
             // Mark as read in backend
             if (!f.is_read) {
-                fetch(`http://localhost:8000/api/admin/feedback/${id}/read`, {
+                fetch(`/api/admin/feedback/${id}/read`, {
                     method: 'POST',
                     headers: { "Authorization": `Bearer ${token}` }
                 }).then(() => { f.is_read = true; updateStats(); renderTable(); });
@@ -593,7 +648,7 @@
             btn.textContent = "Sending...";
 
             try {
-                const res = await fetch("http://localhost:8000/api/send-reply", {
+                const res = await fetch("/api/send-reply", {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
                     body: JSON.stringify({
@@ -615,7 +670,7 @@
         async function viewActivityLogs() {
             document.getElementById("logs-modal").classList.remove("hidden");
             try {
-                const res = await fetch("http://localhost:8000/api/admin/activity-logs", {
+                const res = await fetch("/api/admin/activity-logs", {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 const logs = await res.json();
@@ -644,7 +699,7 @@
         }
 
         function exportToCSV() {
-            window.location.href = `http://localhost:8000/api/admin/export-csv?access_token=${token}`;
+            window.location.href = `/api/admin/export-csv?access_token=${token}`;
         }
 
         // Analytics & Data Mining Functions
@@ -758,6 +813,61 @@
         function closeReplyModal() { document.getElementById("reply-modal").classList.add("hidden"); }
         function closeDetailsModal() { document.getElementById("details-modal").classList.add("hidden"); }
         function closeLogsModal() { document.getElementById("logs-modal").classList.add("hidden"); }
+
+        // === Compose / Message Member Functions ===
+        function openComposeModal() {
+            const deptTitle = document.getElementById("dept-title").textContent.replace(' Panel', '');
+            const adminName = localStorage.getItem("userFullname") || "Admin";
+            document.getElementById("compose-subject").value = `Official Notice from ${deptTitle}`;
+            document.getElementById("compose-message").value = `Dear Member,\n\nThis is an official communication from the ${deptTitle}.\n\n\n\nBest Regards,\n${adminName}\n${deptTitle}`;
+            document.getElementById("compose-email").value = "";
+            document.getElementById("compose-email-error").classList.add("hidden");
+            document.getElementById("compose-modal").classList.remove("hidden");
+        }
+
+        function closeComposeModal() { document.getElementById("compose-modal").classList.add("hidden"); }
+
+        async function sendMessageToMember(e) {
+            e.preventDefault();
+            const btn = document.getElementById("compose-send-btn");
+            const emailErr = document.getElementById("compose-email-error");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+            emailErr.classList.add("hidden");
+
+            const payload = {
+                recipient_email: document.getElementById("compose-email").value.trim(),
+                subject: document.getElementById("compose-subject").value.trim(),
+                message: document.getElementById("compose-message").value.trim()
+            };
+
+            try {
+                const res = await fetch("/api/admin/send-message", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    closeComposeModal();
+                    alert(`✅ Message sent successfully to ${payload.recipient_email}. They will see it in their My Feedback page.`);
+                    document.getElementById("compose-form").reset();
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    emailErr.textContent = data.detail || "Failed to send. Please verify the email and try again.";
+                    emailErr.classList.remove("hidden");
+                }
+            } catch (err) {
+                emailErr.textContent = "Network error. Please check your connection.";
+                emailErr.classList.remove("hidden");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+            }
+        }
         function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
         function nextPage() { if (currentPage < Math.ceil(filteredFeedback.length / itemsPerPage)) { currentPage++; renderTable(); } }
 

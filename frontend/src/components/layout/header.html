@@ -1,140 +1,138 @@
-<header class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md flex items-center z-50 min-h-[72px]">
-    <div class="px-6 sm:px-10 flex items-center justify-between w-full">
-        <!-- Logo -->
-        <a href="src/components/pages/home.html" class="flex items-center space-x-3">
-            <img src="public/uploads/logo.png" alt="University Logo"
-                class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow" />
-        </a>
+<header
+    class="fixed top-0 left-0 w-full bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between z-50">
+    <!-- Logo -->
+    <a href="src/components/pages/home.html" class="flex items-center space-x-3">
+        <img src="public/uploads/logo.png" alt="University Logo"
+            class="h-10 w-10 sm:h-12 sm:w-12 rounded-full shadow" />
+    </a>
 
-        <!-- Welcome Text -->
-        <div class="text-center flex-1 px-2">
-            <span id="header-welcome-text"
-                class="font-bold text-green-700 dark:text-green-400 text-sm sm:text-lg">Welcome
-                to South Eastern Kenya University (SEKU) Feedback
-                Portal</span>
+    <!-- Welcome Text -->
+    <div class="text-center flex-1 px-2">
+        <span id="header-welcome-text" class="font-bold text-green-700 dark:text-green-400 text-sm sm:text-lg">Welcome
+            to South Eastern Kenya University (SEKU) Feedback
+            System</span>
+    </div>
+
+    <!-- Hamburger Button - Using inline onclick for reliability -->
+    <button id="hamburgerBtn" class="md:hidden flex flex-col space-y-1.5 z-50"
+        onclick="document.getElementById('mobileMenu').style.display = 'block'; document.getElementById('mobileMenuOverlay').style.display = 'block'; document.body.style.overflow = 'hidden'; this.setAttribute('aria-expanded', 'true');"
+        aria-label="Toggle menu" aria-expanded="false">
+        <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
+        <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
+        <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
+    </button>
+
+    <!-- Desktop Menu -->
+    <nav class="hidden md:flex ml-auto space-x-2 sm:space-x-4 items-center">
+        <a href="src/components/pages/home.html" data-nav="public"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Home</a>
+        <a href="src/components/pages/about.html" data-nav="public"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">About</a>
+        <a href="src/components/pages/submit-feedback.html" data-nav="public"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Submit
+            Feedback</a>
+        <a href="src/components/pages/my-feedback.html" data-nav="public"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">My
+            Feedback</a>
+        <a href="src/components/pages/contact.html" data-nav="public"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Contact</a>
+        <a href="src/components/pages/admin.html" data-auth="admin" style="display:none"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Admin Panel</a>
+        <a href="src/components/pages/login.html" data-auth="guest"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Login</a>
+        <a href="src/components/pages/signup.html" data-auth="guest"
+            class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Sign Up</a>
+        <a href="#" data-auth="user" data-action="logout" style="display:none"
+            class="nav-link hover:text-red-700 dark:hover:text-red-400 px-2 py-1 font-bold">Logout</a>
+    </nav>
+
+    <!-- Overlay -->
+    <div id="mobileMenuOverlay"
+        onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9998;">
+    </div>
+
+    <!-- MOBILE MENU - Using inline styles for guaranteed visibility -->
+    <div id="mobileMenu"
+        style="display: none; position: fixed; top: 0; right: 0; width: 80%; max-width: 300px; height: 100%; background-color: white; z-index: 9999; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.1);">
+
+        <!-- Header with Close Button -->
+        <div
+            style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: white; position: sticky; top: 0;">
+            <span style="font-weight: bold; color: #059669;">Menu</span>
+            <button
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
+                style="padding: 8px; border-radius: 50%; border: none; background: transparent; cursor: pointer;">
+                <i class="fas fa-times" style="font-size: 24px; color: #4b5563;"></i>
+            </button>
         </div>
 
-        <!-- Hamburger Button - Using inline onclick for reliability -->
-        <button id="hamburgerBtn" class="md:hidden flex flex-col space-y-1.5 z-50"
-            onclick="document.getElementById('mobileMenu').style.display = 'block'; document.getElementById('mobileMenuOverlay').style.display = 'block'; document.body.style.overflow = 'hidden'; this.setAttribute('aria-expanded', 'true');"
-            aria-label="Toggle menu" aria-expanded="false">
-            <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
-            <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
-            <span class="block w-6 h-0.5 bg-gray-800 dark:bg-gray-200 rounded"></span>
-        </button>
-
-        <!-- Desktop Menu -->
-        <nav class="hidden md:flex ml-auto space-x-2 sm:space-x-4 items-center">
+        <!-- Menu Items -->
+        <div style="padding: 16px;">
             <a href="src/components/pages/home.html" data-nav="public"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Home</a>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-home" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Home</span>
+            </a>
+
             <a href="src/components/pages/about.html" data-nav="public"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">About</a>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-info-circle" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>About</span>
+            </a>
+
             <a href="src/components/pages/submit-feedback.html" data-nav="public"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Submit
-                Feedback</a>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-edit" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Submit Feedback</span>
+            </a>
+
             <a href="src/components/pages/my-feedback.html" data-nav="public"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">My
-                Feedback</a>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-list" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>My Feedback</span>
+            </a>
+
             <a href="src/components/pages/contact.html" data-nav="public"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Contact</a>
-            <a href="src/components/pages/admin.html" data-auth="admin" style="display:none"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Admin Panel</a>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-envelope" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Contact</span>
+            </a>
+
+            <div style="height: 1px; background-color: #e5e7eb; margin: 16px 0;"></div>
+
             <a href="src/components/pages/login.html" data-auth="guest"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Login</a>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-sign-in-alt" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Login</span>
+            </a>
+
             <a href="src/components/pages/signup.html" data-auth="guest"
-                class="nav-link hover:text-green-600 dark:hover:text-green-400 px-2 py-1">Sign Up</a>
-            <a href="#" data-auth="user" data-action="logout" style="display:none"
-                class="nav-link hover:text-red-700 dark:hover:text-red-400 px-2 py-1 font-bold">Logout</a>
-        </nav>
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-user-plus" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Sign Up</span>
+            </a>
 
-        <!-- Overlay -->
-        <div id="mobileMenuOverlay"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
-            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9998;">
-        </div>
+            <a href="src/components/pages/admin.html" data-auth="admin"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
+                <i class="fas fa-user-shield" style="width: 24px; color: #059669; margin-right: 12px;"></i>
+                <span>Admin Panel</span>
+            </a>
 
-        <!-- MOBILE MENU - Using inline styles for guaranteed visibility -->
-        <div id="mobileMenu"
-            style="display: none; position: fixed; top: 0; right: 0; width: 80%; max-width: 300px; height: 100%; background-color: white; z-index: 9999; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.1);">
-
-            <!-- Header with Close Button -->
-            <div
-                style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: white; position: sticky; top: 0;">
-                <span style="font-weight: bold; color: #059669;">Menu</span>
-                <button
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
-                    style="padding: 8px; border-radius: 50%; border: none; background: transparent; cursor: pointer;">
-                    <i class="fas fa-times" style="font-size: 24px; color: #4b5563;"></i>
-                </button>
-            </div>
-
-            <!-- Menu Items -->
-            <div style="padding: 16px;">
-                <a href="src/components/pages/home.html" data-nav="public"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-home" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>Home</span>
-                </a>
-
-                <a href="src/components/pages/about.html" data-nav="public"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-info-circle" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>About</span>
-                </a>
-
-                <a href="src/components/pages/submit-feedback.html" data-nav="public"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-edit" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>Submit Feedback</span>
-                </a>
-
-                <a href="src/components/pages/my-feedback.html" data-nav="public"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-list" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>My Feedback</span>
-                </a>
-
-                <a href="src/components/pages/contact.html" data-nav="public"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-envelope" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>Contact</span>
-                </a>
-
-                <div style="height: 1px; background-color: #e5e7eb; margin: 16px 0;"></div>
-
-                <a href="src/components/pages/login.html" data-auth="guest"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-sign-in-alt" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>Login</span>
-                </a>
-
-                <a href="src/components/pages/signup.html" data-auth="guest"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-user-plus" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>Sign Up</span>
-                </a>
-
-                <a href="admin.html" data-auth="admin"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-                    <i class="fas fa-user-shield" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-                    <span>Admin Panel</span>
-                </a>
-
-                <a href="#" data-auth="user" data-action="logout"
-                    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-                    style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #b91c1c; border-radius: 8px; background: white; font-size: 16px; font-weight: bold;">
-                    <i class="fas fa-sign-out-alt" style="width: 24px; color: #b91c1c; margin-right: 12px;"></i>
-                    <span>Logout</span>
-                </a>
-            </div>
+            <a href="#" data-auth="user" data-action="logout"
+                onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
+                style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #b91c1c; border-radius: 8px; background: white; font-size: 16px; font-weight: bold;">
+                <i class="fas fa-sign-out-alt" style="width: 24px; color: #b91c1c; margin-right: 12px;"></i>
+                <span>Logout</span>
+            </a>
         </div>
     </div>
 </header>

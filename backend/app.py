@@ -5,6 +5,7 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 import hashlib
+from email_service import email_service
 
 app = Flask(__name__)
 CORS(app)
@@ -227,6 +228,26 @@ def submit_feedback():
     db.commit()
     
     feedback_id = cursor.lastrowid
+
+    # Send notification to admins
+    try:
+        cursor.execute("SELECT fullname, email FROM users WHERE role = 'admin'")
+        admins = cursor.fetchall()
+        for admin in admins:
+            if admin['email']:
+                email_service.send_new_feedback_notification(
+                    to_email=admin['email'],
+                    department_name=office,
+                    feedback_data={
+                        "name": name,
+                        "email": email,
+                        "rating": rating,
+                        "message": message,
+                        "tracking_id": f"ID-{feedback_id}"
+                    }
+                )
+    except Exception as e:
+        print(f"Error sending notifications in app.py: {e}")
     
     return jsonify({
         'id': feedback_id,
@@ -368,8 +389,25 @@ def send_reply(current_user):
         """, (message, feedback_id))
         db.commit()
         
-        # Here you would send the actual email
-        print(f"Reply sent to {email}: {subject}")
+        # Send actual email using email_service
+        try:
+            # Try to get the user's name from the feedback record
+            cursor.execute("SELECT name FROM feedback WHERE id = %s", (feedback_id,))
+            fb_record = cursor.fetchone()
+            user_name = fb_record['name'] if fb_record and fb_record.get('name') else None
+            
+            email_sent = email_service.send_feedback_reply(
+                to_email=email,
+                subject=subject or "Response to your feedback",
+                message=message,
+                user_name=user_name
+            )
+            if email_sent:
+                print(f"Email sent successfully to {email}")
+            else:
+                print(f"Failed to send email to {email}")
+        except Exception as email_err:
+            print(f"Error sending email: {str(email_err)}")
         
         return jsonify({'message': 'Reply sent successfully and marked as answered'}), 200
     except Exception as e:

@@ -61,6 +61,11 @@ class FeedbackCreate(BaseModel):
     anonymous: str  # 'true' or 'false'
     department_id: Optional[int] = None
     rating: Optional[str] = None
+    q_0: Optional[str] = None
+    q_1: Optional[str] = None
+    q_2: Optional[str] = None
+    q_3: Optional[str] = None
+    q_4: Optional[str] = None
 
 
 class FeedbackOut(BaseModel):
@@ -81,6 +86,11 @@ class FeedbackOut(BaseModel):
     replied_at: Optional[datetime] = None
     reply_message: Optional[str] = None
     tracking_id: Optional[str] = None
+    q_0: Optional[str] = None
+    q_1: Optional[str] = None
+    q_2: Optional[str] = None
+    q_3: Optional[str] = None
+    q_4: Optional[str] = None
 
     class Config:
         from_attributes = True

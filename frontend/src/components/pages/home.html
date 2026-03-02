@@ -170,6 +170,27 @@
         footer {
             flex-shrink: 0;
         }
+
+        /* New Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-card {
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
     </style>
 </head>
 
@@ -177,17 +198,39 @@
     <!-- Header placeholder -->
     <div id="header-placeholder"></div>
 
+    <!-- Top Spacer to prevent header overlap (Dynamically Adjusted) -->
+    <div id="header-dynamic-spacer" class="w-full"></div>
+
     <!-- Content Wrapper -->
-    <div class="content-wrapper pt-[96px]">
+    <div class="content-wrapper">
         <!-- Notification Container -->
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
 
         <!-- HOME SECTION -->
         <section id="home-section" class="w-full">
-            <div id="carousel" class="relative w-full h-[20vh] sm:h-[28vh] overflow-hidden shadow-lg">
-                <img src="../../../public/uploads/slide1.png" alt="University Campus" class="w-full h-full object-cover"
+            <div id="carousel" class="relative w-full h-[50vh] sm:h-[45vh] overflow-hidden shadow-lg group">
+                <img src="../../../public/uploads/slide1.png" alt="University Campus"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="eager" />
+
+                <!-- Animated Text Overlay (Reduced opacity for brightness) -->
+                <div class="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">
+                    <div class="text-center px-6">
+                        <h2
+                            class="text-white text-3xl sm:text-5xl md:text-6xl font-black tracking-tight drop-shadow-[0_8px_8px_rgba(0,0,0,0.8)]">
+                            <span id="hero-typing-text" class="text-green-500"></span><span
+                                class="animate-pulse text-white">|</span>
+                        </h2>
+                        <div class="mt-4 flex flex-col items-center">
+                            <div class="h-1.5 w-32 bg-green-500 rounded-full mb-3 shadow-lg"></div>
+                            <p
+                                class="text-white text-sm sm:text-xl font-bold tracking-widest uppercase bg-black/60 backdrop-blur-sm px-6 py-2 rounded-full border-2 border-green-500/50 shadow-xl">
+                                Institutional Feedback System
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <main class="flex-grow w-full max-w-6xl mx-auto px-4">
@@ -201,35 +244,154 @@
                     </div>
                 </div>
 
-                <!-- FAQ Section -->
-                <section class="max-w-4xl mx-auto px-4 py-6 sm:py-8">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-4 sm:mb-6">Frequently
-                        Asked Questions</h2>
-                    <div class="mb-4 sm:mb-6">
-                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">Can I submit
-                            feedback anonymously?</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">Yes, you can choose to
-                            submit your feedback anonymously. However, we won't be able to follow up with you directly.
-                        </p>
+                <!-- NEW: How It Works Section -->
+                <section class="py-6 sm:py-8 reveal">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-green-700 dark:text-green-400 mb-4">How It
+                            Works</h2>
+                        <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Providing feedback is simple,
+                            secure, and has a real impact on our university community.</p>
                     </div>
-                    <div class="mb-4 sm:mb-6">
-                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">Who reviews my
-                            feedback?</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">The Director of Human
-                            Resources and relevant department heads.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+                        <div
+                            class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-xl text-center border-t-8 border-green-500">
+                            <div
+                                class="w-12 h-12 sm:w-14 sm:h-14 bg-green-100 dark:bg-green-900/50 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold mb-2 dark:text-white">1. Share Thoughts</h3>
+                            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-tight">
+                                Select your
+                                department and fill out the simple feedback form anonymously or with your
+                                details.</p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-xl text-center border-t-8 border-blue-500">
+                            <div
+                                class="w-12 h-12 sm:w-14 sm:h-14 bg-blue-100 dark:bg-blue-900/50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
+                                <i class="fas fa-paper-plane"></i>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold mb-2 dark:text-white">2. Immediate Routing
+                            </h3>
+                            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-tight">Your
+                                feedback
+                                is instantly routed to the relevant administrator and department heads for
+                                review.</p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-2xl shadow-xl text-center border-t-8 border-purple-500">
+                            <div
+                                class="w-12 h-12 sm:w-14 sm:h-14 bg-purple-100 dark:bg-purple-900/50 text-purple-600 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 text-xl sm:text-2xl">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="text-lg sm:text-xl font-bold mb-2 dark:text-white">3. Get Results</h3>
+                            <p class="text-sm sm:text-base text-gray-600 dark:text-gray-400 leading-tight">Track
+                                your
+                                response in real-time or receive an email once the issue has been addressed.</p>
+                        </div>
                     </div>
-                    <div class="mb-4 sm:mb-6">
-                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">Is my feedback
-                            confidential?</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">Yes, all feedback is
-                            treated confidentially and is only shared with relevant personnel for resolution purposes.
-                        </p>
+                </section>
+
+                <section
+                    class="py-8 sm:py-10 bg-green-700 dark:bg-green-900 rounded-3xl mx-4 my-6 text-white shadow-2xl reveal">
+                    <div class="grid grid-cols-2 lg:grid-cols-6 gap-6 px-4 text-center">
+                        <div class="stat-card">
+                            <div class="text-3xl sm:text-4xl font-black mb-2">5K+</div>
+                            <div class="text-green-100 text-xs sm:text-sm uppercase tracking-widest font-bold">Students
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-3xl sm:text-4xl font-black mb-2">1.2K+</div>
+                            <div class="text-green-100 text-xs sm:text-sm uppercase tracking-widest font-bold">Staffs
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-3xl sm:text-4xl font-black mb-2">800+</div>
+                            <div class="text-green-100 text-xs sm:text-sm uppercase tracking-widest font-bold">Visitors
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-3xl sm:text-4xl font-black mb-2">98%</div>
+                            <div class="text-green-100 text-xs sm:text-sm uppercase tracking-widest font-bold">Resolved
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-3xl sm:text-4xl font-black mb-2">24/7</div>
+                            <div class="text-green-100 text-xs sm:text-sm uppercase tracking-widest font-bold">Access
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="text-3xl sm:text-4xl font-black mb-2">50+</div>
+                            <div class="text-green-100 text-xs sm:text-sm uppercase tracking-widest font-bold">Offices
+                            </div>
+                        </div>
                     </div>
-                    <div class="mb-4 sm:mb-6">
-                        <h3 class="text-xl sm:text-2xl font-semibold text-blue-600 dark:text-blue-300">How long does it
-                            take to get a response?</h3>
-                        <p class="text-gray-600 dark:text-gray-300 mt-1 text-sm sm:text-base">We aim to respond to all
-                            feedback within 3-5 business days. Urgent matters are addressed within 24 hours.</p>
+                </section>
+
+                <section class="max-w-6xl mx-auto px-4 py-8 sm:py-12 reveal">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white mb-10 text-center">
+                        Frequently Asked Questions
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div
+                            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Can I submit feedback
+                                anonymously?</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Yes, you can choose to submit your feedback anonymously. However, we won't be able to
+                                follow up with you directly.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-green-500 hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Who reviews my feedback?
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                The relevant department heads and appointed administrators review all submissions.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-purple-500 hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Is my feedback
+                                confidential?</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Yes, all feedback is treated confidentially and is only shared with relevant personnel
+                                for resolution.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Response Time?</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                We aim to respond to all matters and give feedback within 48 hours.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-red-500 hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">How do I track my feedback?
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                Use the unique Tracking ID provided after submission on the "My Feedback" page.
+                            </p>
+                        </div>
+
+                        <div
+                            class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-pink-500 hover:shadow-lg transition-shadow">
+                            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2">Who can use this portal?
+                            </h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                                All SEKU students, staff members, and external visitors are welcome to share their
+                                experiences.
+                            </p>
+                        </div>
                     </div>
                 </section>
             </main>
@@ -572,6 +734,84 @@
     <script>
         // Make selectedOfficeValue available globally
         window.selectedOfficeValue = null;
+
+        // Typewriter Animation Logic (Word-by-Word)
+        const phrases = [
+            "Your Voice Shapes SEKU Excellence",
+            "Professional Feedback, Real Improvements",
+            "Bridging Communication For Growth",
+            "Transforming Our University Together"
+        ];
+
+        const typingText = document.getElementById('hero-typing-text');
+        let phraseIndex = 0;
+        let wordIndex = 0;
+        let isDeleting = false;
+        let delay = 1500;
+
+        function typeWords() {
+            const currentPhrase = phrases[phraseIndex];
+            const words = currentPhrase.split(' ');
+
+            if (isDeleting) {
+                // Remove one word at a time (Much Slower)
+                wordIndex--;
+                typingText.textContent = words.slice(0, wordIndex).join(' ');
+                delay = 600;
+            } else {
+                // Add one word at a time (Very slowly/deliberately)
+                wordIndex++;
+                typingText.textContent = words.slice(0, wordIndex).join(' ');
+                delay = 1200; // Increased to 1.2 seconds per word
+            }
+
+            if (!isDeleting && wordIndex === words.length) {
+                // Finished typing the phrase - long pause for reading
+                isDeleting = true;
+                delay = 5000; // Stay for 5 seconds
+            } else if (isDeleting && wordIndex === 0) {
+                // Finished deleting
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+                delay = 1500;
+            }
+
+            setTimeout(typeWords, delay);
+        }
+
+        // Scroll Reveal Logic
+        function reveal() {
+            const reveals = document.querySelectorAll(".reveal");
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+
+        // Dynamic Header Spacer Logic
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                spacer.style.height = header.offsetHeight + 'px';
+            }
+        }
+
+        // Run on load and on resize
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        // Start animation after small delay
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(typeWords, 1000);
+            reveal(); // Initial check
+            setTimeout(adjustHeaderSpacer, 100); // Trigger spacer calculation
+        });
     </script>
 </body>
 

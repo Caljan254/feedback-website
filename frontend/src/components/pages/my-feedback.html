@@ -343,7 +343,7 @@
             </button>
         </div>
 
-        Login Prompt (shown when not logged in)
+        <!-- Login Prompt (shown when not logged in) -->
         <div id="login-prompt"
             class="hidden bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
             <div class="flex items-center">
@@ -351,11 +351,12 @@
                     <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
                 </div>
                 <div class="ml-3">
-                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                    <!-- <p class="text-sm text-yellow-700 dark:text-yellow-200">
                         Please <a href="/src/components/pages/login.html"
-                            class="font-medium underline text-yellow-700 dark:text-yellow-200 hover:text-yellow-600">login</a>
+                        class="font-medium underline text-yellow-700 dark:text-yellow-200
+                        hover:text-yellow-600">login</a>
                         to view your feedback history automatically, or use the guest tracking below.
-                    </p>
+                    </p> -->
                 </div>
             </div>
         </div>
@@ -705,27 +706,22 @@
         function formatDate(dateString) {
             try {
                 const date = new Date(dateString);
-                const now = new Date();
-                const diffMs = now - date;
-                const diffMins = Math.floor(diffMs / (1000 * 60));
-                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-                const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-                if (diffMins < 1) return 'Just now';
-                if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
-                if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
-                if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-
-                return date.toLocaleString('en-US', {
+                return date.toLocaleString('en-KE', {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric',
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
+                    hour12: true
                 });
             } catch {
                 return dateString || 'Unknown date';
             }
+        }
+
+        // Format a reply/read date - also shows real time
+        function formatRealTime(dateString) {
+            return formatDate(dateString);
         }
 
         function formatOfficeName(officeId) {
@@ -733,6 +729,7 @@
             const cleanOffice = officeId.replace('-q', '');
 
             const offices = {
+                'admin-message': "📨 Official Admin Communication",
                 'vc-office': "Vice Chancellor's Office",
                 'dvc-academic': "DVC (Academic, Research & AR)",
                 'dvc-admin': "DVC (Admin, Finance & Planning)",
@@ -912,7 +909,7 @@
                 console.log('Fetching user feedback from API...');
 
                 // Use the new user-specific endpoint
-                const response = await fetch('http://localhost:8000/api/user/feedback', {
+                const response = await fetch('/api/user/feedback', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1028,7 +1025,7 @@
                 const payload = isTrackingId ? { tracking_id: inputValue } : { email: inputValue };
 
                 console.log('Tracking guest feedback for:', inputValue);
-                const response = await fetch('http://localhost:8000/api/feedback/track', {
+                const response = await fetch('/api/feedback/track', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1184,9 +1181,14 @@
                 if (item.is_read) card.classList.add('read');
                 if (item.replied_at) card.classList.add('answered');
 
-                // Department badge
+                // Department badge — special style for admin-initiated messages
                 const deptBadge = clone.querySelector('.department-badge');
-                deptBadge.textContent = formatOfficeName(item.office);
+                if (item.office === 'admin-message') {
+                    deptBadge.textContent = '📨 Admin Message';
+                    deptBadge.className = 'department-badge px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium';
+                } else {
+                    deptBadge.textContent = formatOfficeName(item.office);
+                }
 
                 // Read status badge
                 const readBadge = clone.querySelector('.read-status-badge');
@@ -1231,10 +1233,10 @@
                     messagePreview.textContent = item.message.substring(0, 200) + '...';
                 }
 
-                // Date
+                // Date — show real date and time of submission
                 const dateSpan = clone.querySelector('.date-text');
                 dateSpan.setAttribute('data-timestamp', item.created_at);
-                dateSpan.textContent = window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.created_at) : formatDate(item.created_at);
+                dateSpan.textContent = formatDate(item.created_at);
 
                 // Category
                 const categorySpan = clone.querySelector('.category-text');
@@ -1250,7 +1252,7 @@
 
                     const replyDate = clone.querySelector('.reply-date-text');
                     replyDate.setAttribute('data-timestamp', item.replied_at);
-                    replyDate.textContent = `Replied ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.replied_at) : formatDate(item.replied_at)}`;
+                    replyDate.textContent = `Replied on: ${formatDate(item.replied_at)}`;
                 }
 
                 // View details button
@@ -1306,7 +1308,7 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Submitted</p>
-                                    <p class="text-gray-900 dark:text-white" data-timestamp="${item.created_at}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.created_at) : new Date(item.created_at).toLocaleString()}</p>
+                                    <p class="text-gray-900 dark:text-white font-semibold">${formatDate(item.created_at)}</p>
                                 </div>
                             </div>
                         </div>
@@ -1488,7 +1490,7 @@
                                 <div class="text-xs font-bold font-mono text-gray-800 dark:text-gray-200">${item.id}</div>
                                 <div class="flex justify-between items-center gap-2">
                                     <div class="text-[10px] text-gray-400 truncate max-w-[80px]">${item.officeName || 'Office'}</div>
-                                    <div class="text-[9px] text-gray-500 whitespace-nowrap" data-timestamp="${item.date || ''}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.date) : ''}</div>
+                                    <div class="text-[9px] text-gray-500 whitespace-nowrap" data-timestamp="${item.date || ''}">${formatDate(item.date)}</div>
                                 </div>
                             </div>
                         </button>

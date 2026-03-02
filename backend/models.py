@@ -24,7 +24,7 @@ class User(Base):
     hashed_password = Column(String(200))
     role = Column(String(20))  # student, staff, visitor, admin
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
 
     department = relationship("Department", back_populates="users")
 
@@ -42,8 +42,15 @@ class Feedback(Base):
     anonymous = Column(String(5), default="false")  # 'true' or 'false'
     tracking_id = Column(String(20), unique=True, index=True, nullable=True)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
     rating = Column(String(10), nullable=True)
+    
+    # Dynamic question responses
+    q_0 = Column(String(50), nullable=True)
+    q_1 = Column(String(50), nullable=True)
+    q_2 = Column(String(50), nullable=True)
+    q_3 = Column(String(50), nullable=True)
+    q_4 = Column(String(50), nullable=True)
     
     # Status fields
     is_read = Column(Boolean, default=False)
@@ -63,4 +70,4 @@ class ActivityLog(Base):
     department_id = Column(Integer, ForeignKey("departments.id"))
     action = Column(String(100))  # e.g., 'read_message', 'reply_message'
     details = Column(Text, nullable=True)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=datetime.now)

@@ -85,6 +85,66 @@ class EmailService:
         
         return self.send_email(to_email, subject, body)
 
+    def send_new_feedback_notification(self, to_email: str, department_name: str, feedback_data: dict) -> bool:
+        subject = f"New Feedback Received - {department_name}"
+        
+        sender_name = feedback_data.get('name') or "Anonymous"
+        sender_email = feedback_data.get('email') or "N/A"
+        rating = feedback_data.get('rating') or "N/A"
+        message = feedback_data.get('message') or "No message provided."
+        tracking_id = feedback_data.get('tracking_id') or "N/A"
+        
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                <div style="background-color: #4CAF50; color: white; padding: 15px; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px;">
+                    <h2 style="margin: 0; text-align: center;">New Feedback Alert</h2>
+                </div>
+                <p>Hello Team,</p>
+                <p>New feedback has been submitted for the <strong>{department_name}</strong>.</p>
+                
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; width: 30%;">Tracking ID:</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">{tracking_id}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Sender:</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">{sender_name}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Email:</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">{sender_email}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Rating:</td>
+                        <td style="padding: 10px; border-bottom: 1px solid #eee;">{rating}</td>
+                    </tr>
+                </table>
+                
+                <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    <h4 style="margin-top: 0; color: #4CAF50;">Message:</h4>
+                    <p style="white-space: pre-wrap;">{message}</p>
+                </div>
+                
+                <p style="margin-top: 30px; text-align: center;">
+                    <a href="{Config.FRONTEND_URL}/admin" style="background-color: #2196F3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                        View in Admin Panel
+                    </a>
+                </p>
+                
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #666; font-size: 12px; text-align: center;">
+                    Institutional Feedback Portal Notification
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        return self.send_email(to_email, subject, body)
+
 def generate_reset_token(length=32):
     """Generate a secure random token for password reset"""
     alphabet = string.ascii_letters + string.digits

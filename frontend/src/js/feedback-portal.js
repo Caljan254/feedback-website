@@ -33,13 +33,13 @@ class FeedbackPortal {
     initializePageSpecificFunctions() {
         const currentPath = window.location.pathname;
         
-        // Check if we're on a department feedback page (in public/departments/)
-        if (currentPath.includes('/public/departments/')) {
+        // Check if we're on a department feedback page (served from /departments/ in Vite)
+        if (currentPath.includes('/departments/')) {
             this.initializeDepartmentPage();
         }
         
         // Check if we're on home page
-        if (currentPath.includes('home.html')) {
+        if (currentPath.includes('home.html') || currentPath === '/' || currentPath.endsWith('/')) {
             this.initializeHomePage();
         }
     }
@@ -73,8 +73,7 @@ class FeedbackPortal {
         if (!userInfo) {
             this.showNotification('Please select an office first', 'error');
             setTimeout(() => {
-                const isDept = window.location.pathname.includes('/public/departments/');
-                window.location.href = isDept ? '../../src/components/pages/home.html' : 'home.html';
+                window.location.href = '/src/components/pages/home.html';
             }, 2000);
             return;
         }
@@ -389,36 +388,22 @@ class FeedbackPortal {
         const logoutElements = document.querySelectorAll('[data-auth="user"]');
         const adminElements = document.querySelectorAll('[data-auth="admin"]');
 
+        const showEl = (el) => {
+            el.style.display = el.tagName === 'A' ? 'inline-flex' : 'flex';
+        };
+
         if (isLoggedIn) {
-            loginElements.forEach(el => el.style.setProperty('display', 'none', 'important'));
-            logoutElements.forEach(el => {
-                if (el.tagName === 'A' && el.classList.contains('flex')) {
-                    el.style.display = 'flex';
-                } else {
-                    el.style.display = ''; // Fallback to CSS default
-                }
-            });
+            loginElements.forEach(el => el.style.display = 'none');
+            logoutElements.forEach(el => showEl(el));
             if (userRole === 'admin') {
-                adminElements.forEach(el => {
-                    if (el.tagName === 'A' && el.classList.contains('flex')) {
-                        el.style.display = 'flex';
-                    } else {
-                        el.style.display = '';
-                    }
-                });
+                adminElements.forEach(el => showEl(el));
             } else {
-                adminElements.forEach(el => el.style.setProperty('display', 'none', 'important'));
+                adminElements.forEach(el => el.style.display = 'none');
             }
         } else {
-            loginElements.forEach(el => {
-                if (el.tagName === 'A' && el.classList.contains('flex')) {
-                    el.style.display = 'flex';
-                } else {
-                    el.style.display = '';
-                }
-            });
-            logoutElements.forEach(el => el.style.setProperty('display', 'none', 'important'));
-            adminElements.forEach(el => el.style.setProperty('display', 'none', 'important'));
+            loginElements.forEach(el => showEl(el));
+            logoutElements.forEach(el => el.style.display = 'none');
+            adminElements.forEach(el => el.style.display = 'none');
         }
     }
 
@@ -556,7 +541,7 @@ class FeedbackPortal {
         try {
             const loadingNotification = this.showNotification('Submitting your feedback...', 'info', 0);
             
-            const res = await fetch("http://localhost:8000/api/submit-feedback", {
+            const res = await fetch("/api/submit-feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },
                 body: JSON.stringify(finalData)
@@ -583,13 +568,13 @@ class FeedbackPortal {
                                 <i class="fas fa-copy mr-1"></i> COPY
                             </button>
                         </div>
-                        <p class="text-xs italic opacity-80">Please save this number to track your feedback later.</p>
+                        <p class="text-xs italic opacity-80">This page will automatically return to home in <span id="redirect-timer">15</span> seconds.</p>
                         <div class="flex gap-2 mt-2">
-                            <button onclick="const isDept = window.location.pathname.includes('/public/departments/'); window.location.href = isDept ? '../../src/components/pages/home.html' : 'home.html';"
+                            <button onclick="window.location.href = '/src/components/pages/home.html';"
                                     class="flex-1 bg-green-700 hover:bg-green-800 text-white py-2.5 rounded text-sm font-bold transition-all border border-green-400 shadow-md">
                                 <i class="fas fa-home mr-2"></i> Return Home
                             </button>
-                            <button onclick="this.closest('.notification').remove()" 
+                            <button onclick="window.location.href = '/src/components/pages/home.html';" 
                                     class="bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded text-sm font-medium transition-all border border-white/30">
                                 Close
                             </button>
@@ -597,8 +582,21 @@ class FeedbackPortal {
                     </div>
                 `, 'success', 0); // 0 duration means it stays until clicked/dismissed
                 
-                // Save to history
-                this.saveTrackingIdToHistory(trackingId, office);
+                // Set up automatic redirect timer
+                let timeLeft = 15;
+                const timerInterval = setInterval(() => {
+                    timeLeft--;
+                    const timerEl = document.getElementById('redirect-timer');
+                    if (timerEl) {
+                        timerEl.textContent = timeLeft;
+                    }
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        window.location.href = '/src/components/pages/home.html';
+                    }
+                }, 1000);                
+                // Save to history with server timestamp
+                this.saveTrackingIdToHistory(trackingId, office, result.created_at);
                 
                 form.reset();
                 
@@ -714,10 +712,9 @@ class FeedbackPortal {
             'dean': 'dean-feedback.html'
         };
 
-        // Redirect to department page in public/departments/
-        const isPages = window.location.pathname.includes('/src/components/pages/');
-        const relPath = isPages ? `../../../public/departments/generic-feedback.html?office=${office}` : `public/departments/generic-feedback.html?office=${office}`;
-        window.location.href = relPath;
+        // Redirect to department page (served from public folder in Vite)
+        const fileName = officeFiles[office] || 'generic-feedback.html';
+        window.location.href = `/departments/${fileName}?office=${office}`;
     }
 
     // ===== EVENT LISTENERS =====
@@ -739,9 +736,10 @@ class FeedbackPortal {
                 ['name', 'email', 'category'].forEach(id => {
                     const input = document.getElementById(id);
                     if (input) {
-                        input.disabled = isAnonymous;
-                        if (isAnonymous) input.value = '';
-                    }
+                    input.disabled = isAnonymous;
+                    input.style.cursor = isAnonymous ? 'not-allowed' : 'auto';
+                    if (isAnonymous) input.value = '';
+                }
                 });
             };
             anonymousCheckbox.addEventListener('change', this.anonymousToggleHandler);
@@ -751,25 +749,32 @@ class FeedbackPortal {
     // ===== UI ENHANCEMENTS =====
     highlightActiveNavLink() {
         const currentPath = window.location.pathname;
-        const currentFile = currentPath.split('/').pop() || 'index.html';
-        
-        // Handle index.html or root path
-        const isHome = currentFile === 'home.html' || currentFile === 'index.html' || currentFile === '';
+        // In Vite, currentPath might be '/', '/src/components/pages/home.html', or '/departments/...'
         
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
-            const linkHref = link.getAttribute('href');
-            if (!linkHref) return;
+            const href = link.getAttribute('href');
+            if (!href) return;
             
-            const linkFile = linkHref.split('/').pop();
+            // Normalize current path
+            let normalizedPath = currentPath;
+            if (currentPath === '/' || currentPath === '/index.html') {
+                normalizedPath = '/src/components/pages/home.html';
+            }
             
-            // Remove active class first
+            // Normalize href (ensure it starts with / for comparison if it's relative)
+            let normalizedHref = href;
+            if (!href.startsWith('/') && !href.startsWith('http')) {
+                normalizedHref = '/' + href;
+            }
+            
             link.classList.remove('active');
             
-            // Check for match
-            if (isHome && (linkFile === 'home.html' || linkFile === 'index.html')) {
-                link.classList.add('active');
-            } else if (linkFile === currentFile && currentFile !== '') {
+            // Match if paths are same or if the filename matches (for relative links)
+            const currentFile = normalizedPath.split('/').pop();
+            const hrefFile = normalizedHref.split('/').pop();
+            
+            if (normalizedPath === normalizedHref || (currentFile === hrefFile && currentFile !== '')) {
                 link.classList.add('active');
             }
         });
@@ -817,7 +822,7 @@ class FeedbackPortal {
     }
 
     // Save tracking ID to localStorage history
-    saveTrackingIdToHistory(id, office) {
+    saveTrackingIdToHistory(id, office, timestamp = null) {
         try {
             let history = JSON.parse(localStorage.getItem('feedback_history') || '[]');
             // Remove if already exists (to move to top)
@@ -827,7 +832,7 @@ class FeedbackPortal {
                 id: id,
                 office: office,
                 officeName: this.getOfficeName(office),
-                date: new Date().toISOString()
+                date: timestamp || new Date().toISOString()
             });
             // Keep only last 10
             history = history.slice(0, 10);
@@ -872,22 +877,13 @@ class FeedbackPortal {
         if (!timestamp) return 'Unknown';
         try {
             const date = new Date(timestamp);
-            const now = new Date();
-            const diffMs = now - date;
-            const diffSecs = Math.floor(diffMs / 1000);
-            const diffMins = Math.floor(diffSecs / 60);
-            const diffHours = Math.floor(diffMins / 60);
-            const diffDays = Math.floor(diffHours / 24);
-
-            if (diffSecs < 60) return 'Just now';
-            if (diffMins < 60) return `${diffMins} min${diffMins === 1 ? '' : 's'} ago`;
-            if (diffHours < 24) return `${diffHours} hr${diffHours === 1 ? '' : 's'} ago`;
-            if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
-
-            return date.toLocaleDateString(undefined, { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+            return date.toLocaleString('en-KE', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true
             });
         } catch (e) {
             return 'Invalid date';
@@ -917,10 +913,10 @@ class FeedbackPortal {
             clearInterval(this.timeUpdateInterval);
         }
         
-        // Update every 60 seconds
+        // Update every 30 seconds
         this.timeUpdateInterval = setInterval(() => {
             this.updateAllTimestamps();
-        }, 60000);
+        }, 30000);
     }
 }
 

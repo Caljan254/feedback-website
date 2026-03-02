@@ -1,59 +1,54 @@
-// Dynamically load header and footer
+// Dynamically load header and footer for Vite
 async function loadComponent(elementId, filePath) {
     try {
-        // Get the base path - handle both home and department pages
-        const currentPath = window.location.pathname;
-        let basePath = '';
-        
-        if (currentPath.includes('/public/departments/')) {
-            // If we're in a department page (public/departments/), go up 2 levels to root (public/departments -> public -> root)
-            // Wait, public/departments/admin-feedback.html. To get to root: ../../ (up to public, then up to root)
-            basePath = '../../';
-        } else if (currentPath.includes('/src/components/pages/')) {
-            // If we're in src/components/pages/, go up 3 levels to root (pages -> components -> src -> root)
-            basePath = '../../../';
-        } else {
-            basePath = './';
-        }
-        
-        // Construct full path
-        let fullPath = filePath;
-        if (!filePath.startsWith('/') && !filePath.startsWith('http')) {
-            fullPath = basePath + filePath;
-        }
+        // In Vite, we use root-relative paths starting with /
+        const fullPath = filePath.startsWith('/') ? filePath : '/' + filePath;
         
         const response = await fetch(fullPath + '?v=' + new Date().getTime());
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const html = await response.text();
         
-        // Fix relative links in the injected HTML
+        // Use a temporary div to process the HTML
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = html;
         
-        const links = tempDiv.querySelectorAll('a');
-        links.forEach(link => {
-            const href = link.getAttribute('href');
-            if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('/')) {
-                // Prepend basePath to relative links
-                link.setAttribute('href', basePath + href);
-            }
-        });
+        // Ensure all relative links and images in the header/footer use root-relative paths
+        const fixPaths = (selector, attr) => {
+            tempDiv.querySelectorAll(selector).forEach(el => {
+                const val = el.getAttribute(attr);
+                if (val && !val.startsWith('http') && !val.startsWith('#') && !val.startsWith('/')) {
+                    // Prepend / to make it root-relative
+                    el.setAttribute(attr, '/' + val);
+                }
+            });
+        };
         
-        // Fix image sources too
-        const images = tempDiv.querySelectorAll('img');
-        images.forEach(img => {
-            const src = img.getAttribute('src');
-            if (src && !src.startsWith('http') && !src.startsWith('/')) {
-                img.setAttribute('src', basePath + src);
-            }
-        });
+        fixPaths('a', 'href');
+        fixPaths('img', 'src');
 
         document.getElementById(elementId).innerHTML = tempDiv.innerHTML;
         
-        // Re-initialize any components that need it
-        if (window.feedbackPortal) {
-            window.feedbackPortal.reinitializeComponents();
+        // Re-initialize any components that need it (themes, mobile menu, etc.)
+        if (typeof initTheme === 'function') initTheme();
+        if (typeof setupMobileMenu === 'function') setupMobileMenu();
+
+        // After header is injected, re-run auth + nav highlighting
+        if (elementId === 'header-placeholder') {
+            if (window.feedbackPortal) {
+                window.feedbackPortal.reinitializeComponents();
+            } else {
+                // feedbackPortal loads after this script on some pages, so retry
+                const retryInterval = setInterval(() => {
+                    if (window.feedbackPortal) {
+                        window.feedbackPortal.reinitializeComponents();
+                        clearInterval(retryInterval);
+                    }
+                }, 100);
+                // Give up after 3 seconds
+                setTimeout(() => clearInterval(retryInterval), 3000);
+            }
         }
+        
     } catch (err) {
         console.error(`Failed to load ${filePath}:`, err);
         document.getElementById(elementId).innerHTML = `<p style="color:red; text-align:center;">Error loading component. Please refresh.</p>`;
