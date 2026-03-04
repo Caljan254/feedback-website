@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DEPARTMENT OF BIOLOGICAL SCIENCES FEEDBACK - SEKU Feedback</title>
+    <title>DP BIOLOGICAL SCIENCES FEEDBACK - SEKU Feedback</title>
     <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
@@ -109,20 +109,17 @@
             class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6 text-gray-800 dark:text-gray-200"></div>
         <section
             class="bg-blue-50/50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700">
-            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8 uppercase">
-                DEPARTMENT OF BIOLOGICAL SCIENCES FEEDBACK</h3>
+            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8 uppercase">DP BIOLOGICAL SCIENCES FEEDBACK</h3>
 
             <form class="department-feedback-form space-y-8"
                 x-data="{ compliments: '', complaints: '', suggestions: '' }">
-
-                <!-- Question 1: Primary Purpose (with "Other" option) -->
+                <!-- Question 1 -->
                 <div class="dynamic-question-block space-y-4" data-question-id="3"
                     x-data="{ otherPurpose: false, otherText: '' }">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of
-                        your visit to the Biological Sciences Department? (Select one)</p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of your visit to DP Biological Sciences? (Select one)</p>
                     <div class="space-y-3 pl-2">
                         <template
-                            x-for="opt in ['Course registration/Advising', 'Laboratory practical session', 'Research/Project supervision', 'Specimen/Equipment request', 'Field trip/Excursion', 'Consultation with lecturer', 'Exam/Result inquiry']">
+                            x-for="opt in ['Course registration/Advising', 'Laboratory practical session', 'Equipment/Apparatus request', 'Research/Project supervision', 'Consultation with lecturer', 'Exam/Result inquiry']">
                             <label class="flex items-center cursor-pointer group">
                                 <input type="radio" name="dq_3" :value="opt" required @change="otherPurpose = false"
                                     class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
@@ -142,16 +139,13 @@
                         </label>
                     </div>
                 </div>
-
-                <!-- Question 2: Academic Quality -->
+                <!-- Question 2 -->
                 <div class="dynamic-question-block space-y-4" data-question-id="5">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the quality
-                        of theoretical and practical instruction in biological sciences? <span
-                            class="text-sm font-normal text-gray-500 block mt-1">(Consider lectures, lab demonstrations,
-                            field work)</span></p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the quality of instruction and academic support in DP Biological Sciences? <span
+                            class="text-sm font-normal text-gray-500 block mt-1">(Consider lectures, tutorials, course materials, and staff helpfulness)</span></p>
                     <div class="space-y-3 pl-2">
                         <template
-                            x-for="opt in ['Excellent - Very comprehensive and engaging', 'Good - Well-structured and clear', 'Average - Adequate but could improve', 'Poor - Lacks depth or clarity', 'Very Poor - Disorganized or insufficient']">
+                            x-for="opt in ['Excellent - Very comprehensive and helpful', 'Good - Well-structured and clear', 'Average - Adequate but could be better', 'Poor - Lacks depth or clarity', 'Very Poor - Inadequate']">
                             <label class="flex items-center cursor-pointer group">
                                 <input type="radio" :name="'dq_5'" :value="opt" required
                                     class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
@@ -163,86 +157,43 @@
                     </div>
                 </div>
 
-                <!-- Question 3: Departmental Services Ratings Grid -->
+                <!-- Question 3 Grid -->
                 <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the
-                        following departmental facilities and services? (Please rate each item)</p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the following departmental areas?</p>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-blue-50 dark:bg-gray-700/50">
-                                    <th class="px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300">Service /
-                                        Facility</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Excellent</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Good</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Fair</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Poor</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        N/A</th>
+                                    <th class="px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300">Aspect</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Excellent</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Good</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Fair</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Poor</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">N/A</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <!-- Laboratories -->
                                 <tr class="dynamic-question-block" data-question-id="7">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Laboratory
-                                        Facilities/Equipment</td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Laboratory/Workshop facilities & equipment</td>
                                     <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                         <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_7" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
+                                            <input type="radio" name="dq_7" :value="val" required class="w-4 h-4 text-blue-600">
                                         </td>
                                     </template>
                                 </tr>
-                                <!-- Specimens -->
                                 <tr class="dynamic-question-block" data-question-id="9">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Specimens/Collection
-                                        Availability</td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Practical demonstrations & tech support</td>
                                     <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                         <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_9" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
+                                            <input type="radio" name="dq_9" :value="val" required class="w-4 h-4 text-blue-600">
                                         </td>
                                     </template>
                                 </tr>
-                                <!-- Field Equipment -->
                                 <tr class="dynamic-question-block" data-question-id="11">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Field
-                                        Equipment/Resources</td>
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Classroom environment & resources</td>
                                     <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                         <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_11" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
-                                        </td>
-                                    </template>
-                                </tr>
-                                <!-- Safety -->
-                                <tr class="dynamic-question-block" data-question-id="13">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Lab Safety/Protocols
-                                    </td>
-                                    <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
-                                        <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_13" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
-                                        </td>
-                                    </template>
-                                </tr>
-                                <!-- Research Support -->
-                                <tr class="dynamic-question-block" data-question-id="14">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Research
-                                        Support/Supervision</td>
-                                    <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
-                                        <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_14" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
+                                            <input type="radio" name="dq_11" :value="val" required class="w-4 h-4 text-blue-600">
                                         </td>
                                     </template>
                                 </tr>
@@ -251,115 +202,60 @@
                     </div>
                 </div>
 
-                <!-- Question 4: Laboratory Experience -->
+                <!-- Question 4 -->
                 <div class="dynamic-question-block space-y-4" data-question-id="15">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How would you rate your
-                        laboratory and practical session experience? <span
-                            class="text-sm font-normal text-gray-500 block mt-1">(Consider organization, materials,
-                            technician support)</span></p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. Rate your experience with departmental communication (notices, emails, timetables):</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pl-2">
-                        <template x-for="opt in ['Excellent', 'Good', 'Average', 'Poor', 'Very Poor']">
+                        <template x-for="opt in ['Very Effective', 'Effective', 'Neutral', 'Ineffective', 'Needs Urgent Improvement']">
                             <label class="flex items-center cursor-pointer group">
                                 <input type="radio" :name="'dq_15'" :value="opt" required
                                     class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
+                                <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-all font-medium" x-text="opt"></span>
                             </label>
                         </template>
                     </div>
                 </div>
 
-                <!-- Question 5: Staff Interaction -->
+                <!-- Question 5 -->
                 <div class="dynamic-question-block space-y-4" data-question-id="17">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. How would you rate your
-                        interaction with academic and technical staff?</p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. How satisfied are you with the professionalism and approachability of the staff?</p>
                     <div class="space-y-3 pl-2">
                         <template
-                            x-for="opt in ['Excellent - Very knowledgeable and supportive', 'Good - Helpful and approachable', 'Fair - Professional but reserved', 'Poor - Unhelpful or dismissive', 'Did not interact with staff']">
+                            x-for="opt in ['Highly Satisfied - Professional and helpful', 'Satisfied - Met expectations', 'Neutral - Average experience', 'Dissatisfied - Unprofessional behavior', 'Did not interact with staff']">
                             <label class="flex items-center cursor-pointer group">
                                 <input type="radio" :name="'dq_17'" :value="opt" required
                                     class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
+                                <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors" x-text="opt"></span>
                             </label>
                         </template>
                     </div>
                 </div>
-
-                <!-- Question 6: Curriculum Relevance -->
-                <div class="dynamic-question-block space-y-4" data-question-id="19">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">6. How relevant and current is the
-                        biological sciences curriculum?</p>
-                    <div class="space-y-3 pl-2">
-                        <template
-                            x-for="opt in ['Excellent (Very current and research-aligned)', 'Good (Mostly up-to-date)', 'Fair (Somewhat outdated)', 'Poor (Outdated content)', 'Cannot assess']">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_19'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
-                            </label>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Question 7: Research Opportunities -->
-                <div class="dynamic-question-block space-y-4" data-question-id="21">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">7. How would you rate research
-                        opportunities and support for undergraduate/graduate students?</p>
-                    <div class="space-y-3 pl-2">
-                        <template
-                            x-for="opt in ['Excellent (Many opportunities, well-supported)', 'Good (Adequate opportunities)', 'Fair (Limited opportunities)', 'Poor (Very few opportunities)', 'Not applicable']">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_21'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
-                            </label>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Question 8: Resources -->
-                <div class="dynamic-question-block space-y-4" data-question-id="22">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">8. How adequate are learning
-                        resources? (Textbooks, journals, online databases)</p>
-                    <div class="space-y-3 pl-2">
-                        <template
-                            x-for="opt in ['Excellent (Comprehensive and accessible)', 'Good (Adequate resources)', 'Fair (Limited resources)', 'Poor (Inadequate resources)', 'Not applicable']">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_22'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
-                            </label>
-                        </template>
-                    </div>
-                </div>
-
                 <!-- Question 9: Overall Rating -->
                 <div class="dynamic-question-block space-y-4" data-question-id="23">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg font-bold border-t pt-6"> 9. Overall, how would you rate your experience with Department Of Biological Sciences Feedback today? * </p>
-                    <div class="flex flex-wrap items-center gap-6 pl-2">
-                        <template x-for="opt in ['Excellent', 'Good', 'Average', 'Poor']">
-                            <label
-                                class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
-                                <input type="radio" :name="'dq_23'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold" x-text="opt"></span>
-                            </label>
-                        </template>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg font-bold border-t pt-6">9.
+                        Overall, how would you rate your experience with DP Biological Sciences Feedback today? *</p>
+                    <div class="flex flex-wrap items-center gap-6 pl-2" x-data="{ currentRating: '' }">
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Excellent" required @change="currentRating = 'Excellent'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Excellent</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Good" required @change="currentRating = 'Good'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Good</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Average" required @change="currentRating = 'Average'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Average</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Poor" required @change="currentRating = 'Poor'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Poor</span>
+                        </label>
+                        
+                        <!-- Map to core rating for admin dashboard fallback -->
+                        <input type="hidden" name="q_4" :value="currentRating">
+                        <input type="hidden" name="rating" :value="currentRating">
                     </div>
-                    <!-- Map to core rating for admin dashboard fallback -->
-                    <input type="hidden" name="q_4"
-                        x-effect="$el.value = document.querySelector('input[name=dq_23]:checked')?.value || ''">
-                    <input type="hidden" name="rating"
-                        x-effect="$el.value = document.querySelector('input[name=dq_23]:checked')?.value || ''">
                 </div>
 
                 <!-- Question 10: Compliments & Complaints -->
@@ -367,33 +263,31 @@
                     class="space-y-6 bg-blue-50/50 dark:bg-gray-700/30 p-6 rounded-2xl border border-blue-100 dark:border-gray-600">
                     <p class="text-gray-800 dark:text-gray-200 font-bold text-xl mb-4">10. Please share your specific
                         Complaints and/or Compliments to help us improve. <span
-                            class="text-sm font-normal text-gray-500 block mt-1 italic">(Your feedback matters)</span>
+                            class="text-sm font-normal text-red-500 block mt-1 italic">(All fields are mandatory) *</span>
                     </p>
 
                     <div class="space-y-3">
                         <label class="text-blue-700 dark:text-blue-300 font-semibold block underline">Compliments (What
-                            went well? Was there a lecturer, technician, or facility that stood out?)</label>
-                        <textarea x-model="compliments" rows="3"
+                            went well? Was there a staff member or facility that stood out?) *</label>
+                        <textarea x-model="compliments" rows="3" required
                             class="w-full rounded-xl border-2 border-white dark:border-gray-600 bg-white dark:bg-gray-800 p-4 shadow-sm outline-none focus:border-blue-500 transition-all"
                             placeholder="Share your positive feedback..."></textarea>
                     </div>
 
                     <div class="space-y-3">
                         <label class="text-red-700 dark:text-red-300 font-semibold block underline">Complaints (What
-                            went wrong or needs immediate attention?)</label>
-                        <textarea x-model="complaints" rows="3"
+                            went wrong or needs improvement?) *</label>
+                        <textarea x-model="complaints" rows="3" required
                             class="w-full rounded-xl border-2 border-white dark:border-gray-600 bg-white dark:bg-gray-800 p-4 shadow-sm outline-none focus:border-red-500 transition-all"
-                            placeholder="Tell us what needs improvement..."></textarea>
+                            placeholder="Tell us what needs attention..."></textarea>
                     </div>
                 </div>
 
                 <!-- Question 11: General Comments -->
                 <div class="space-y-4">
                     <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">11. Do you have any
-                        general comments, suggestions, or specific areas where we need to improve? <span
-                            class="text-sm font-normal text-gray-500 block mt-1 italic">*(e.g., "More modern lab
-                            equipment needed" or "Field trips were very educational")*</span></label>
-                    <textarea x-model="suggestions" rows="4"
+                        general comments, suggestions, or specific areas where we need to improve? *</label>
+                    <textarea x-model="suggestions" rows="4" required
                         class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
                         placeholder="Additional comments or suggestions..."></textarea>
                 </div>

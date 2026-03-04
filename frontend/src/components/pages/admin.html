@@ -786,9 +786,12 @@
                 // Fallback 1: Search in detailed responses for the "Overall" question
                 if ((!displayRating || displayRating === 'N/A') && f.responses && f.responses.length > 0) {
                     const overallResp = f.responses.find(r => {
+                        // Check explicitly for our standard ID 23 first
+                        if (r.question_id === 23) return true;
+
                         const qObj = allQuestions.find(q => q.id === r.question_id);
                         const qt = (r.question_text || (qObj ? qObj.text : "")).toLowerCase();
-                        return qt.includes("overall") && qt.includes("rate your experience");
+                        return (qt.includes("overall") && (qt.includes("rate") || qt.includes("experience") || qt.includes("satisfaction")));
                     });
                     if (overallResp) displayRating = overallResp.answer;
                 }
@@ -801,16 +804,21 @@
                 let ratingClass = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'; // Default
                 let ratingDot = '⚪';
 
-                if (ratingLower.includes('poor') || ratingLower.includes('dissatisfied') || ratingLower.includes('difficult')) {
+                if (ratingLower.includes('poor')) {
                     ratingClass = 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400';
                     ratingDot = '🔴';
-                } else if (ratingLower.includes('excellent') || ratingLower.includes('very') || ratingLower.includes('exceptional')) {
+                } else if (ratingLower.includes('excellent')) {
                     ratingClass = 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400';
                     ratingDot = '🟢';
-                } else if (ratingLower !== '' && ratingLower !== 'n/a') {
-                    // Match good, satisfied, easy, neutral, fair, or any specific category
+                } else if (ratingLower.includes('good')) {
                     ratingClass = 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400';
                     ratingDot = '🔵';
+                } else if (ratingLower.includes('average')) {
+                    ratingClass = 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/40 dark:text-yellow-400';
+                    ratingDot = '🟡';
+                } else if (ratingLower !== '' && ratingLower !== 'n/a') {
+                    ratingClass = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+                    ratingDot = '⚪';
                 }
 
                 return `
@@ -922,9 +930,10 @@
 
             if ((!displayRating || displayRating === 'N/A') && f.responses && f.responses.length > 0) {
                 const overallResp = f.responses.find(r => {
+                    if (r.question_id === 23) return true;
                     const qObj = allQuestions.find(q => q.id === r.question_id);
                     const qt = (qObj ? qObj.text : "").toLowerCase();
-                    return qt.includes("overall") && qt.includes("rate your experience");
+                    return (qt.includes("overall") && (qt.includes("rate") || qt.includes("experience") || qt.includes("satisfaction")));
                 });
                 if (overallResp) displayRating = overallResp.answer;
             }
@@ -934,12 +943,14 @@
             const ratingLower = displayRating.toLowerCase();
             let ratingClassModal = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
 
-            if (ratingLower.includes('poor') || ratingLower.includes('dissatisfied') || ratingLower.includes('difficult')) {
+            if (ratingLower.includes('poor')) {
                 ratingClassModal = 'bg-red-500 text-white';
-            } else if (ratingLower.includes('excellent') || ratingLower.includes('very') || ratingLower.includes('exceptional')) {
+            } else if (ratingLower.includes('excellent')) {
                 ratingClassModal = 'bg-green-600 text-white';
-            } else if (ratingLower !== '' && ratingLower !== 'n/a') {
+            } else if (ratingLower.includes('good')) {
                 ratingClassModal = 'bg-blue-600 text-white';
+            } else if (ratingLower.includes('average')) {
+                ratingClassModal = 'bg-yellow-500 text-white';
             }
 
             const content = document.getElementById("details-content");

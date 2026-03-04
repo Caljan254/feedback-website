@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DEPT ICT FEEDBACK - SEKU Feedback</title>
+    <title>DP ICT FEEDBACK - SEKU Feedback</title>
     <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
@@ -109,21 +109,19 @@
             class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6 text-gray-800 dark:text-gray-200"></div>
         <section
             class="bg-blue-50/50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700">
-            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8">DEPT ICT FEEDBACK
-            </h3>
+            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8 uppercase">DP ICT FEEDBACK</h3>
 
             <form class="department-feedback-form space-y-8"
                 x-data="{ compliments: '', complaints: '', suggestions: '' }">
-                <!-- Question 1: Primary Purpose -->
-                <div class="dynamic-question-block space-y-4" data-question-id="4"
+                <!-- Question 1 -->
+                <div class="dynamic-question-block space-y-4" data-question-id="3"
                     x-data="{ otherPurpose: false, otherText: '' }">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of
-                        your visit or task today? (Select one)</p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of your visit to DP ICT? (Select one)</p>
                     <div class="space-y-3 pl-2">
                         <template
-                            x-for="opt in ['Academic Work (Classes, Studying)', 'Administrative/Office Work', 'Research', 'Event/Meeting', 'General Browsing / Internet Access']">
+                            x-for="opt in ['Wi-Fi/Network connectivity', 'Email/Portal access issue', 'Hardware/Software support', 'E-Learning platform assistance', 'General IT inquiry', 'Smart card/ID issue']">
                             <label class="flex items-center cursor-pointer group">
-                                <input type="radio" name="dq_4" :value="opt" required @change="otherPurpose = false"
+                                <input type="radio" name="dq_3" :value="opt" required @change="otherPurpose = false"
                                     class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
                                 <span
                                     class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
@@ -131,7 +129,7 @@
                             </label>
                         </template>
                         <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="dq_4" :value="otherText" required @change="otherPurpose = true"
+                            <input type="radio" name="dq_3" :value="otherText" required @change="otherPurpose = true"
                                 class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
                             <span
                                 class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Other:</span>
@@ -141,18 +139,15 @@
                         </label>
                     </div>
                 </div>
-
-                <!-- Question 2: Reliability -->
-                <div class="dynamic-question-block space-y-4" data-question-id="6">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the
-                        reliability of our technical infrastructure today? <span
-                            class="text-sm font-normal text-gray-500 block mt-1">(Consider Wi-Fi speed, connection
-                            stability, computer lab equipment, and classroom technology)</span></p>
+                <!-- Question 2 -->
+                <div class="dynamic-question-block space-y-4" data-question-id="5">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the quality of instruction and academic support in DP ICT? <span
+                            class="text-sm font-normal text-gray-500 block mt-1">(Consider lectures, tutorials, course materials, and staff helpfulness)</span></p>
                     <div class="space-y-3 pl-2">
                         <template
-                            x-for="opt in ['Excellent (Fast and seamless)', 'Good (Occasional minor issues)', 'Average (Works sometimes, but has frequent issues)', 'Poor (Frequent disruptions or unavailable)']">
+                            x-for="opt in ['Excellent - Very comprehensive and helpful', 'Good - Well-structured and clear', 'Average - Adequate but could be better', 'Poor - Lacks depth or clarity', 'Very Poor - Inadequate']">
                             <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_6'" :value="opt" required
+                                <input type="radio" :name="'dq_5'" :value="opt" required
                                     class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
                                 <span
                                     class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
@@ -162,71 +157,43 @@
                     </div>
                 </div>
 
-                <!-- Question 3: System Ratings Grid -->
+                <!-- Question 3 Grid -->
                 <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the
-                        following ICT systems? (Please rate each item)</p>
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the following departmental areas?</p>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-blue-50 dark:bg-gray-700/50">
-                                    <th class="px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300">System /
-                                        Process</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Excellent</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Good</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Fair</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        Poor</th>
-                                    <th
-                                        class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">
-                                        N/A</th>
+                                    <th class="px-4 py-3 text-sm font-bold text-gray-700 dark:text-gray-300">Aspect</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Excellent</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Good</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Fair</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">Poor</th>
+                                    <th class="px-2 py-3 text-sm font-bold text-center text-gray-700 dark:text-gray-300">N/A</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                <tr class="dynamic-question-block" data-question-id="8">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Internet/Wi-Fi
-                                        Coverage & Stability</td>
+                                <tr class="dynamic-question-block" data-question-id="7">
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Laboratory/Workshop facilities & equipment</td>
                                     <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                         <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_8" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
+                                            <input type="radio" name="dq_7" :value="val" required class="w-4 h-4 text-blue-600">
                                         </td>
                                     </template>
                                 </tr>
-                                <tr class="dynamic-question-block" data-question-id="10">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Student/Staff Portal
-                                        Access (Login)</td>
+                                <tr class="dynamic-question-block" data-question-id="9">
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Practical demonstrations & tech support</td>
                                     <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                         <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_10" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
+                                            <input type="radio" name="dq_9" :value="val" required class="w-4 h-4 text-blue-600">
                                         </td>
                                     </template>
                                 </tr>
-                                <tr class="dynamic-question-block" data-question-id="12">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">ERP System Functions
-                                        (Registration, Fees, Results)</td>
+                                <tr class="dynamic-question-block" data-question-id="11">
+                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Classroom environment & resources</td>
                                     <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                         <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_12" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
-                                        </td>
-                                    </template>
-                                </tr>
-                                <tr class="dynamic-question-block" data-question-id="14">
-                                    <td class="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">Computer Lab
-                                        Equipment & Printing Services</td>
-                                    <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
-                                        <td class="px-2 py-4 text-center">
-                                            <input type="radio" name="dq_14" :value="val" required
-                                                class="w-4 h-4 text-blue-600">
+                                            <input type="radio" name="dq_11" :value="val" required class="w-4 h-4 text-blue-600">
                                         </td>
                                     </template>
                                 </tr>
@@ -235,134 +202,97 @@
                     </div>
                 </div>
 
-                <!-- Question 4: Navigation -->
-                <div class="dynamic-question-block space-y-4" data-question-id="16">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How easy was it to navigate ICT
-                        services today? <span class="text-sm font-normal text-gray-500 block mt-1">(e.g., connecting to
-                            Wi-Fi, finding printing stations, using the portal)</span></p>
+                <!-- Question 4 -->
+                <div class="dynamic-question-block space-y-4" data-question-id="15">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. Rate your experience with departmental communication (notices, emails, timetables):</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pl-2">
-                        <template x-for="opt in ['Very Easy', 'Easy', 'Neutral', 'Difficult', 'Very Difficult']">
+                        <template x-for="opt in ['Very Effective', 'Effective', 'Neutral', 'Ineffective', 'Needs Urgent Improvement']">
                             <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_16'" :value="opt" required
+                                <input type="radio" :name="'dq_15'" :value="opt" required
                                     class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
+                                <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-all font-medium" x-text="opt"></span>
                             </label>
                         </template>
                     </div>
                 </div>
 
-                <!-- Question 5: Helpdesk -->
-                <div class="dynamic-question-block space-y-4" data-question-id="18">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. If you contacted the ICT
-                        Helpdesk or Support Team, how would you rate the support experience?</p>
+                <!-- Question 5 -->
+                <div class="dynamic-question-block space-y-4" data-question-id="17">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. How satisfied are you with the professionalism and approachability of the staff?</p>
                     <div class="space-y-3 pl-2">
                         <template
-                            x-for="opt in ['Did not seek help', 'Excellent - Quick response and issue resolved', 'Good - Responded within acceptable time, issue resolved', 'Fair - Slow response or issue partially resolved', 'Poor - Unhelpful, rude, or issue unresolved']">
+                            x-for="opt in ['Highly Satisfied - Professional and helpful', 'Satisfied - Met expectations', 'Neutral - Average experience', 'Dissatisfied - Unprofessional behavior', 'Did not interact with staff']">
                             <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_18'" :value="opt" required
+                                <input type="radio" :name="'dq_17'" :value="opt" required
                                     class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
+                                <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors" x-text="opt"></span>
                             </label>
                         </template>
                     </div>
                 </div>
-
-                <!-- Question 6: Professionalism -->
-                <div class="dynamic-question-block space-y-4" data-question-id="20">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">6. How would you rate the
-                        professionalism and attitude of ICT personnel you interacted with?</p>
-                    <div class="space-y-3 pl-2">
-                        <template
-                            x-for="opt in ['Excellent (Very helpful, courteous, and competent)', 'Good (Professional and helpful)', 'Fair (Rushed, indifferent, or inconsistent)', 'Poor (Unprofessional or unhelpful)', 'Did not interact with staff']">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_20'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
-                            </label>
-                        </template>
+                <!-- Question 9: Overall Rating -->
+                <div class="dynamic-question-block space-y-4" data-question-id="23">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg font-bold border-t pt-6">9.
+                        Overall, how would you rate your experience with DP ICT Feedback today? *</p>
+                    <div class="flex flex-wrap items-center gap-6 pl-2" x-data="{ currentRating: '' }">
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Excellent" required @change="currentRating = 'Excellent'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Excellent</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Good" required @change="currentRating = 'Good'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Good</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Average" required @change="currentRating = 'Average'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Average</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
+                            <input type="radio" name="dq_23" value="Poor" required @change="currentRating = 'Poor'" class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold">Poor</span>
+                        </label>
+                        
+                        <!-- Map to core rating for admin dashboard fallback -->
+                        <input type="hidden" name="q_4" :value="currentRating">
+                        <input type="hidden" name="rating" :value="currentRating">
                     </div>
                 </div>
 
-                <!-- Question 7: Efficiency -->
-                <div class="dynamic-question-block space-y-4" data-question-id="22">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">7. How would you rate the
-                        efficiency and waiting time for in-person administrative services at the ICT Office? (If
-                        applicable)</p>
-                    <div class="space-y-3 pl-2">
-                        <template
-                            x-for="opt in ['Excellent (Served immediately)', 'Good (Normal waiting time)', 'Fair (Slight delay)', 'Poor (Long delay / Needs improvement)', 'Did not visit the ICT Office']">
-                            <label class="flex items-center cursor-pointer group">
-                                <input type="radio" :name="'dq_22'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span
-                                    class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
-                                    x-text="opt"></span>
-                            </label>
-                        </template>
-                    </div>
-                </div>
-
-                <!-- Question 8: Overall Rating -->
-                <div class="dynamic-question-block space-y-4" data-question-id="24">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg font-bold border-t pt-6"> 8. Overall, how would you rate your experience with Dept ICT Feedback today? * </p>
-                    <div class="flex flex-wrap items-center gap-6 pl-2">
-                        <template x-for="opt in ['Excellent', 'Good', 'Average', 'Poor']">
-                            <label
-                                class="flex items-center cursor-pointer group py-2 px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm">
-                                <input type="radio" :name="'dq_24'" :value="opt" required
-                                    class="w-5 h-5 text-blue-600 border-gray-300">
-                                <span class="ml-3 text-gray-700 dark:text-gray-300 font-bold" x-text="opt"></span>
-                            </label>
-                        </template>
-                    </div>
-                    <input type="hidden" name="q_4"
-                        x-effect="$el.value = document.querySelector('input[name=dq_24]:checked')?.value || ''">
-                    <input type="hidden" name="rating"
-                        x-effect="$el.value = document.querySelector('input[name=dq_24]:checked')?.value || ''">
-                </div>
-
-                <!-- Question 9: Compliments & Complaints -->
+                <!-- Question 10: Compliments & Complaints -->
                 <div
                     class="space-y-6 bg-blue-50/50 dark:bg-gray-700/30 p-6 rounded-2xl border border-blue-100 dark:border-gray-600">
-                    <p class="text-gray-800 dark:text-gray-200 font-bold text-xl mb-4">9. Please share your specific
+                    <p class="text-gray-800 dark:text-gray-200 font-bold text-xl mb-4">10. Please share your specific
                         Complaints and/or Compliments to help us improve. <span
-                            class="text-sm font-normal text-gray-500 block mt-1 italic">(Your feedback matters)</span>
+                            class="text-sm font-normal text-red-500 block mt-1 italic">(All fields are mandatory) *</span>
                     </p>
 
                     <div class="space-y-3">
                         <label class="text-blue-700 dark:text-blue-300 font-semibold block underline">Compliments (What
-                            went well? Was there a staff member or service that stood out?)</label>
-                        <textarea x-model="compliments" rows="3"
+                            went well? Was there a staff member or facility that stood out?) *</label>
+                        <textarea x-model="compliments" rows="3" required
                             class="w-full rounded-xl border-2 border-white dark:border-gray-600 bg-white dark:bg-gray-800 p-4 shadow-sm outline-none focus:border-blue-500 transition-all"
                             placeholder="Share your positive feedback..."></textarea>
                     </div>
 
                     <div class="space-y-3">
                         <label class="text-red-700 dark:text-red-300 font-semibold block underline">Complaints (What
-                            went wrong or needs immediate fixing?)</label>
-                        <textarea x-model="complaints" rows="3"
+                            went wrong or needs improvement?) *</label>
+                        <textarea x-model="complaints" rows="3" required
                             class="w-full rounded-xl border-2 border-white dark:border-gray-600 bg-white dark:bg-gray-800 p-4 shadow-sm outline-none focus:border-red-500 transition-all"
-                            placeholder="Tell us what needs improvement..."></textarea>
+                            placeholder="Tell us what needs attention..."></textarea>
                     </div>
                 </div>
 
-                <!-- Question 10: General Comments -->
+                <!-- Question 11: General Comments -->
                 <div class="space-y-4">
-                    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">10. Do you have any
-                        general comments, suggestions, or specific locations where we need to improve? <span
-                            class="text-sm font-normal text-gray-500 block mt-1 italic">*(e.g., "Library Wi-Fi is slow"
-                            or "Lab 3 printers are not working")*</span></label>
-                    <textarea x-model="suggestions" rows="4"
+                    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">11. Do you have any
+                        general comments, suggestions, or specific areas where we need to improve? *</label>
+                    <textarea x-model="suggestions" rows="4" required
                         class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
-                        placeholder="Additional locations or general suggestions..."></textarea>
+                        placeholder="Additional comments or suggestions..."></textarea>
                 </div>
 
+                <!-- Final Message Accumulator -->
                 <input type="hidden" name="comment"
                     x-effect="$el.value = `COMPLIMENTS: ${compliments || 'N/A'}\n\nCOMPLAINTS: ${complaints || 'N/A'}\n\nSUGGESTIONS: ${suggestions || 'N/A'}`">
 
@@ -376,7 +306,6 @@
                 </div>
             </form>
         </section>
-
     </div>
     <div id="footer-placeholder"></div>
     <script src="../../src/js/load-components.js"></script>
