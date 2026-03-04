@@ -43,7 +43,7 @@ class Feedback(Base):
     tracking_id = Column(String(20), unique=True, index=True, nullable=True)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
     created_at = Column(DateTime, default=datetime.now)
-    rating = Column(String(10), nullable=True)
+    rating = Column(String(50), nullable=True)
     
     # Dynamic question responses
     q_0 = Column(String(50), nullable=True)
@@ -59,6 +59,34 @@ class Feedback(Base):
     reply_message = Column(Text, nullable=True)
 
     department = relationship("Department", back_populates="feedbacks")
+    responses = relationship("QuestionResponse", back_populates="feedback")
+
+
+class Question(Base):
+    __tablename__ = "questions"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(Integer, primary_key=True, index=True)
+    text = Column(String(500), nullable=False)
+    options = Column(String(200), default="Yes,No") # Composed of comma-separated options
+    target_office = Column(String(100), nullable=True) # If null, it's global. If 'management', it's for all management offices.
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.now)
+
+    responses = relationship("QuestionResponse", back_populates="question")
+
+
+class QuestionResponse(Base):
+    __tablename__ = "question_responses"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(Integer, primary_key=True, index=True)
+    feedback_id = Column(Integer, ForeignKey("feedback.id"), index=True)
+    question_id = Column(Integer, ForeignKey("questions.id"), index=True)
+    answer = Column(String(255))
+
+    feedback = relationship("Feedback", back_populates="responses")
+    question = relationship("Question", back_populates="responses")
 
 
 class ActivityLog(Base):

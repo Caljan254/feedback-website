@@ -100,34 +100,45 @@ class FeedbackPortal {
     }
 
     // Inject department-specific questions
-    injectQuestions(officeId) {
+    async injectQuestions(officeId) {
         const questionsContainer = document.getElementById('dynamic-questions');
         if (!questionsContainer) return;
 
-        const questions = this.getDepartmentQuestions(officeId);
-        let html = '';
-
-        questions.forEach((qObj, index) => {
-            const name = `q_${index}`;
-            const question = typeof qObj === 'string' ? qObj : qObj.q;
-            const options = typeof qObj === 'string' ? ["Yes", "No"] : (qObj.options || ["Yes", "No"]);
+        try {
+            // Fetch dynamic questions from backend
+            const res = await fetch(`/api/questions?office=${officeId}`);
+            const questions = await res.json();
             
-            html += `
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">${question}</p>
-                    <div class="flex items-center space-x-6">
-                        ${options.map(opt => `
-                            <label class="flex items-center cursor-pointer">
-                                <input type="radio" name="${name}" value="${opt}" required class="mr-2 form-radio text-green-600"> 
-                                <span class="text-gray-700 dark:text-gray-300">${opt}</span>
-                            </label>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        });
+            if (questions.length === 0) {
+                questionsContainer.innerHTML = '<p class="text-gray-500 italic text-sm">No specific questions for this office.</p>';
+                return;
+            }
 
-        questionsContainer.innerHTML = html;
+            let html = '';
+            questions.forEach((qObj) => {
+                const question = qObj.text;
+                const options = qObj.options ? qObj.options.split(',') : ["Yes", "No"];
+                
+                html += `
+                    <div class="space-y-3 dynamic-question-block" data-question-id="${qObj.id}">
+                        <p class="text-gray-700 dark:text-gray-300 font-medium">${question}</p>
+                        <div class="flex items-center space-x-6">
+                            ${options.map(opt => `
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="dq_${qObj.id}" value="${opt}" required class="mr-2 form-radio text-green-600"> 
+                                    <span class="text-gray-700 dark:text-gray-300">${opt}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+
+            questionsContainer.innerHTML = html;
+        } catch (error) {
+            console.error('Error fetching dynamic questions:', error);
+            questionsContainer.innerHTML = '<p class="text-red-500">Error loading questions.</p>';
+        }
     }
 
     // Get questions based on office category
@@ -174,7 +185,37 @@ class FeedbackPortal {
             ]
         };
 
-        // Specific overrides for legacy feel
+        // Specific overrides
+        if (officeId === 'admissions') {
+            return [
+                { q: "What type of application is this feedback about?", options: ["Undergraduate", "Postgraduate", "Transfer", "International", "Scholarship"] },
+                { q: "Clarity of admissions policies and procedures?", options: ["Excellent", "Good", "Poor"] },
+                { q: "Ease of finding information about admissions?", options: ["Very Easy", "Easy", "Neutral", "Difficult", "Very Difficult"] },
+                { q: "Responsiveness and helpfulness of Admissions Office?", options: ["Excellent", "Good", "Poor", "Did not contact"] },
+                { q: "Overall admission process satisfaction?", options: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very Dissatisfied"] }
+            ];
+        }
+
+        if (officeId === 'finance' || officeId === 'fees-office' || officeId === 'accounts-office') {
+            return [
+                { q: "Primary purpose of your interaction today?", options: ["Fee payment", "Reimbursement", "Procurement", "Budget inquiry", "General inquiry"] },
+                { q: "Clarity and ease of understanding financial procedures?", options: ["Excellent", "Good", "Poor"] },
+                { q: "Efficiency and timeliness of financial transactions?", options: ["Excellent", "Good", "Poor"] },
+                { q: "Helpfulness and professionalism of Finance staff?", options: ["Excellent", "Good", "Poor", "Did not interact"] },
+                { q: "Transparency of financial information?", options: ["Very Satisfied", "Satisfied", "Neutral", "Dissatisfied", "Very Dissatisfied"] }
+            ];
+        }
+
+        if (officeId === 'ict-services' || officeId === 'dept-ict') {
+            return [
+                { q: "Primary purpose of your visit today?", options: ["Academic Work", "Administrative Work", "Research", "Event/Meeting", "General Browsing"] },
+                { q: "Reliability of technical infrastructure?", options: ["Excellent", "Good", "Poor"] },
+                { q: "Rating of ICT Helpdesk support experience?", options: ["Excellent", "Good", "Poor", "Did not seek help"] },
+                { q: "Ease of navigating ICT services?", options: ["Very Easy", "Easy", "Neutral", "Difficult", "Very Difficult"] },
+                { q: "Overall ICT experience rating?", options: ["Excellent", "Good", "Poor"] }
+            ];
+        }
+
         if (officeId === 'library') {
             return [
                 { q: "Were the resources sufficient?", options: ["Yes", "No"] },
@@ -522,6 +563,20 @@ class FeedbackPortal {
             }
         });
 
+        // Collect dynamic responses
+        const dynamicResponses = [];
+        const questionBlocks = document.querySelectorAll('.dynamic-question-block');
+        questionBlocks.forEach(block => {
+            const questionId = block.getAttribute('data-question-id');
+            const selectedOption = block.querySelector(`input[name="dq_${questionId}"]:checked`);
+            if (selectedOption) {
+                dynamicResponses.push({
+                    question_id: parseInt(questionId),
+                    answer: selectedOption.value
+                });
+            }
+        });
+
         const userInfo = this.getUserInfo();
         const urlParams = new URLSearchParams(window.location.search);
         const office = urlParams.get('office') || 'unknown';
@@ -532,8 +587,9 @@ class FeedbackPortal {
             category: userInfo?.category || '',
             office: office,
             anonymous: userInfo?.anonymous ? "true" : "false",
-            rating: formValues.rating || '',
+            rating: formValues.rating || formValues.q_4 || '',
             message: formValues.comment || '',
+            dynamic_responses: dynamicResponses,
             ...formValues,
             timestamp: new Date().toISOString()
         };
@@ -698,19 +754,70 @@ class FeedbackPortal {
 
         // Get the office file mapping (pointing to public/departments/)
         const officeFiles = {
-            'admin': 'admin-feedback.html',
-            'library': 'library-feedback.html',
-            'finance': 'finance-feedback.html',
+            'academic-registry': 'academic-registry-feedback.html',
+            'accounts-office': 'accounts-office-feedback.html',
             'admissions': 'admissions-feedback.html',
-            'ict': 'ict-feedback.html',
-            'security': 'security-feedback.html',
+            'career-guidance': 'career-guidance-feedback.html',
             'catering': 'catering-feedback.html',
-            'registry': 'registry-feedback.html',
-            'health': 'health-feedback.html',
+            'chaplaincy': 'chaplaincy-feedback.html',
+            'community-outreach': 'community-outreach-feedback.html',
+            'corp-comm': 'corp-comm-feedback.html',
+            'council-office': 'council-office-feedback.html',
+            'counselling': 'counselling-feedback.html',
+            'dean-students': 'dean-students-feedback.html',
+            'dept-accounting': 'dept-accounting-feedback.html',
+            'dept-admin': 'dept-admin-feedback.html',
+            'dept-agri': 'dept-agri-feedback.html',
+            'dept-biological': 'dept-biological-feedback.html',
+            'dept-civil': 'dept-civil-feedback.html',
+            'dept-economics': 'dept-economics-feedback.html',
+            'dept-edu': 'dept-edu-feedback.html',
+            'dept-elec': 'dept-elec-feedback.html',
+            'dept-env': 'dept-env-feedback.html',
+            'dept-humanities': 'dept-humanities-feedback.html',
+            'dept-ict': 'dept-ict-feedback.html',
+            'dept-math': 'dept-math-feedback.html',
+            'dept-mech': 'dept-mech-feedback.html',
+            'dept-physical': 'dept-physical-feedback.html',
+            'dept-social': 'dept-social-feedback.html',
+            'dvc-academic': 'dvc-academic-feedback.html',
+            'dvc-admin': 'dvc-admin-feedback.html',
+            'elearning': 'elearning-feedback.html',
+            'estate': 'estate-feedback.html',
+            'exams-office': 'exams-office-feedback.html',
+            'fees-office': 'fees-office-feedback.html',
+            'finance': 'finance-feedback.html',
             'games': 'games-feedback.html',
+            'grounds': 'grounds-feedback.html',
+            'health-unit': 'health-unit-feedback.html',
             'hostel': 'hostel-feedback.html',
-            'dean': 'dean-feedback.html'
-        };
+            'hr-office': 'hr-office-feedback.html',
+            'ict-services': 'ict-services-feedback.html',
+            'industrial-attachment': 'industrial-attachment-feedback.html',
+            'innovation-office': 'innovation-office-feedback.html',
+            'internal-audit': 'internal-audit-feedback.html',
+            'legal-services': 'legal-services-feedback.html',
+            'library': 'library-feedback.html',
+            'procurement': 'procurement-feedback.html',
+            'quality-assurance': 'quality-assurance-feedback.html',
+            'registrar-academic': 'registrar-academic-feedback.html',
+            'registrar-admin': 'registrar-admin-feedback.html',
+            'research-dir': 'research-dir-feedback.html',
+            'research-postgrad': 'research-postgrad-feedback.html',
+            'sanr-dean': 'sanr-dean-feedback.html',
+            'sbe-dean': 'sbe-dean-feedback.html',
+            'security': 'security-feedback.html',
+            'seh-dean': 'seh-dean-feedback.html',
+            'set-dean': 'set-dean-feedback.html',
+            'ssc-dean': 'ssc-dean-feedback.html',
+            'staff-welfare': 'staff-welfare-feedback.html',
+            'student-affairs': 'student-affairs-feedback.html',
+            'student-clubs': 'student-clubs-feedback.html',
+            'timetabling': 'timetabling-feedback.html',
+            'training-dev': 'training-dev-feedback.html',
+            'transport': 'transport-feedback.html',
+            'vc-office': 'vc-office-feedback.html'
+};
 
         // Redirect to department page (served from public folder in Vite)
         const fileName = officeFiles[office] || 'generic-feedback.html';
@@ -866,7 +973,7 @@ class FeedbackPortal {
             // Update welcome text for admin panel
             const welcomeText = document.getElementById('header-welcome-text');
             if (welcomeText) {
-                welcomeText.innerText = 'Welcome to admin panel, university feedback system';
+                welcomeText.innerText = 'Welcome to admin panel, Customer Feedback System';
             }
         }
     }

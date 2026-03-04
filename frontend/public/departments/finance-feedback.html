@@ -101,57 +101,186 @@
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
         <div class="mb-6"><button onclick="goBack()"
-                class="flex items-center text-yellow-600 hover:text-yellow-700 transition-colors"><i
+                class="flex items-center text-blue-600 hover:text-blue-700 transition-colors"><i
                     class="fas fa-arrow-left mr-2"></i> ← Back to Office Selection</button></div>
         <div id="user-info-display"
             class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6 text-gray-800 dark:text-gray-200"></div>
-        <section class="bg-yellow-50 dark:bg-yellow-900 p-6 rounded-lg shadow-lg">
-            <h3 class="text-2xl font-bold text-yellow-800 dark:text-yellow-300 mb-6">Finance Office Feedback</h3>
-            <form class="department-feedback-form space-y-6">
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">Was the Finance office transparent with fee
-                        payments?</p>
-                    <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer"><input
-                                type="radio" name="transparency" value="Yes" required
-                                class="mr-2 form-radio text-yellow-600"> <span
-                                class="text-gray-700 dark:text-gray-300">Yes</span></label><label
-                            class="flex items-center cursor-pointer"><input type="radio" name="transparency" value="No"
-                                required class="mr-2 form-radio text-yellow-600"> <span
-                                class="text-gray-700 dark:text-gray-300">No</span></label></div>
-                </div>
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">Did Finance staff respond to your concerns
-                        promptly?</p>
-                    <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer"><input
-                                type="radio" name="prompt_response" value="Yes" required
-                                class="mr-2 form-radio text-yellow-600"> <span
-                                class="text-gray-700 dark:text-gray-300">Yes</span></label><label
-                            class="flex items-center cursor-pointer"><input type="radio" name="prompt_response"
-                                value="No" required class="mr-2 form-radio text-yellow-600"> <span
-                                class="text-gray-700 dark:text-gray-300">No</span></label></div>
-                </div>
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">Rate your experience:</p>
-                    <div class="space-y-2">
-                        <div class="flex items-center"><input type="radio" id="rating-poor" name="rating" value="Poor"
-                                required class="mr-2 form-radio text-yellow-600"><label for="rating-poor"
-                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Poor</label></div>
-                        <div class="flex items-center"><input type="radio" id="rating-good" name="rating" value="Good"
-                                required class="mr-2 form-radio text-yellow-600"><label for="rating-good"
-                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Good</label></div>
-                        <div class="flex items-center"><input type="radio" id="rating-excellent" name="rating"
-                                value="Excellent" required class="mr-2 form-radio text-yellow-600"><label
-                                for="rating-excellent"
-                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Excellent</label></div>
+        <section
+            class="bg-blue-50/50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700">
+            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8">Finance
+                Department Feedback</h3>
+
+            <form class="department-feedback-form space-y-8">
+                <!-- Dynamic Questions Container -->
+                <div id="dynamic-questions" class="space-y-6"></div>
+
+                <!-- Question 1 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. Primary purpose of your
+                        interaction with the Finance office today? *</p>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Fee payment" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Fee
+                                Payment</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Reimbursement" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Reimbursement
+                                Claim</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Procurement" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Procurement
+                                / Purchase</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="General Inquiry" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">General
+                                Inquiry</span>
+                        </label>
                     </div>
                 </div>
-                <div><label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">General Comment
-                        (optional):</label><textarea name="comment" rows="4"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:ring-yellow-500 focus:border-yellow-500 dark:bg-gray-800 dark:text-white p-3"
-                        placeholder="Write your feedback here..."></textarea></div>
-                <button type="submit"
-                    class="bg-yellow-600 text-white px-6 py-3 rounded-lg shadow hover:bg-yellow-700 w-full transition-colors duration-200 text-lg font-medium">Submit
-                    Feedback</button>
+
+                <!-- Question 2 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the clarity
+                        of financial procedures and documentation requirements?</p>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_1" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
+                                - Very clear and well-documented</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_1" value="Good" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
+                                - Accessible information</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_1" value="Poor" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
+                                - Confusing or inconsistent</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the
+                        timeliness and efficiency of the financial transactions today?</p>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
+                                - Highly efficient</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Good" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
+                                - Reasonable waiting time</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Poor" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
+                                - Delayed / Needs improvement</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How would you rate the
+                        professionalism and helpfulness of the finance staff?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Exceptional
+                                Support</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Good" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Helpful
+                                & Polite</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Poor" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Needs
+                                Major Improvement</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. How transparent was the
+                        financial information provided to you? *</p>
+                    <div class="flex flex-wrap items-center gap-8 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_4" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Excellent</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_4" value="Good" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Good</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_4" value="Poor" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Poor</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Hidden input for rating -->
+                <input type="hidden" name="rating" x-data
+                    x-effect="$el.value = $nextTick(() => document.querySelector('input[name=q_4]:checked')?.value)">
+
+                <!-- Question 6 -->
+                <div class="space-y-4">
+                    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">6. Do you have any
+                        specific issues or suggestions for the Finance department? *</label>
+                    <textarea name="comment" rows="5" required
+                        class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
+                        placeholder="Write your feedback here..."></textarea>
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 w-full transition-all duration-300 text-xl font-bold tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                        Submit Feedback
+                    </button>
+                </div>
             </form>
         </section>
     </div>

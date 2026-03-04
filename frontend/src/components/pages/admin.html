@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <title>South Eastern Kenya University (SEKU) Customer Feedback System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
@@ -132,6 +132,14 @@
                     class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-chart-pie mr-2"></i>Data Mining
                 </button>
+                <button onclick="openQuestionModal()"
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-question-circle mr-2"></i>Manage Questions
+                </button>
+                <button onclick="openQRModal()"
+                    class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-qrcode mr-2"></i>Print QR
+                </button>
                 <button onclick="loadFeedback()"
                     class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>Refresh
@@ -201,10 +209,10 @@
                     <thead>
                         <tr
                             class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
-                            <th class="px-6 py-4">Sender</th>
+                            <th class="px-6 py-4">Sender & Office</th>
                             <th class="px-6 py-4">Status</th>
-                            <th class="px-6 py-4">Category</th>
-                            <th class="px-6 py-4">Office/Area</th>
+                            <th class="px-6 py-4">User Role</th>
+                            <th class="px-6 py-4">Rating</th>
                             <th class="px-6 py-4">Date Submitted</th>
                             <th class="px-6 py-4 text-center">Actions</th>
                         </tr>
@@ -414,7 +422,124 @@
             </div>
             <div class="p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end">
                 <button onclick="closeDetailsModal()"
-                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium">Close</button>
+                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR CODE MODAL -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden fade-in flex flex-col">
+            <div class="bg-pink-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-xl"><i class="fas fa-qrcode mr-2"></i>Feedback QR Toolkit</h3>
+                <button onclick="closeQRModal()" class="hover:bg-pink-700 p-1 rounded-full px-2"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 text-center">
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Generate a QR code that users can scan to
+                    access the feedback portal directly.</p>
+
+                <div class="mb-4 text-left">
+                    <label class="block text-xs font-bold text-gray-400 uppercase mb-1">Target URL</label>
+                    <input type="text" id="qr-url" placeholder="https://seku-feedback.com"
+                        class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-pink-500 text-sm">
+                    <p class="text-[10px] text-gray-400 mt-1">Leave blank to use current portal URL</p>
+                </div>
+
+                <div id="qr-display"
+                    class="bg-gray-100 dark:bg-gray-900 p-8 rounded-2xl inline-block mb-6 ring-4 ring-pink-500/20">
+                    <div id="qr-image-container" class="w-48 h-48 flex items-center justify-center text-gray-400">
+                        <i class="fas fa-qrcode text-6xl opacity-20"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="generateQRCode()"
+                        class="bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+                        <i class="fas fa-magic"></i> Generate
+                    </button>
+                    <button onclick="printQRCode()"
+                        class="bg-gray-800 hover:bg-black text-white font-bold py-3 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2">
+                        <i class="fas fa-print"></i> Print QR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUESTION MANAGEMENT MODAL -->
+    <div id="questions-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="bg-orange-600 px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="font-bold text-xl"><i class="fas fa-question-circle mr-2"></i>Manage Feedback Questions</h3>
+                <button onclick="closeQuestionModal()"
+                    class="text-2xl hover:text-orange-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow space-y-6">
+                <!-- Add Question Form -->
+                <div
+                    class="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-100 dark:border-orange-800 mb-6">
+                    <h4 class="font-bold text-orange-700 dark:text-orange-400 mb-3">Add New Question</h4>
+                    <form id="add-question-form" onsubmit="saveNewQuestion(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Question Text</label>
+                            <input type="text" id="new-q-text" required
+                                placeholder="e.g. Was the staff helpful and polite?"
+                                class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Options
+                                    (comma-separated)</label>
+                                <input type="text" id="new-q-options" required placeholder="Yes,No" value="Yes,No"
+                                    class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Target Office
+                                    (optional)</label>
+                                <select id="new-q-office"
+                                    class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                                    <option value="">Global (All Offices)</option>
+                                    <option value="vc-office">Vice Chancellor's Office</option>
+                                    <option value="admissions">Admissions</option>
+                                    <option value="finance">Finance Department</option>
+                                    <option value="library">Library Services</option>
+                                    <option value="ict-services">ICT Services</option>
+                                    <option value="hostel">Hostel / Accommodation</option>
+                                    <option value="catering">Catering Services</option>
+                                    <option value="security">Security Department</option>
+                                    <option value="transport">Transport Office</option>
+                                    <option value="health-unit">Health Unit / Clinic</option>
+                                    <option value="dean-students">Dean of Students Office</option>
+                                    <option value="games">Games and Sports Office</option>
+                                    <option value="academic-registry">Academic Registry</option>
+                                    <option value="exams-office">Examinations Office</option>
+                                    <option value="procurement">Procurement Office</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded-lg transition shadow-md">
+                            Add Question to Users
+                        </button>
+                </div>
+
+                <!-- Current Questions List -->
+                <div>
+                    <h4 class="font-bold mb-4 flex items-center text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-list-ul mr-2 text-orange-500"></i>Active Questions
+                    </h4>
+                    <div id="questions-list" class="space-y-3">
+                        <!-- Questions loaded via JS -->
+                        <p class="text-center text-gray-400 py-6 italic">No questions found</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end">
+                <button onclick="closeQuestionModal()"
+                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Close</button>
             </div>
         </div>
     </div>
@@ -425,13 +550,14 @@
         let allFeedback = [];
         let filteredFeedback = [];
         let currentPage = 1;
+        let allQuestions = []; // Added for question management
         const itemsPerPage = 8;
         const token = localStorage.getItem("token");
         const deptId = localStorage.getItem("deptId");
 
         // Auth Check & Session Handle
-        if (!token || !deptId) {
-            window.location.href = "admin-login.html";
+        if (!token) {
+            window.location.href = "login.html";
         }
 
         async function init() {
@@ -439,13 +565,25 @@
 
             // Fetch department name
             try {
-                const res = await fetch("/api/departments");
-                const depts = await res.json();
-                const myDept = depts.find(d => d.id == deptId);
-                if (myDept) document.getElementById("dept-title").textContent = myDept.name + " Panel";
-            } catch (e) { console.error(e); }
+                if (deptId && deptId !== "null") {
+                    const res = await fetch("/api/departments");
+                    const depts = await res.json();
+                    const myDept = depts.find(d => d.id == deptId);
+                    if (myDept) {
+                        document.getElementById("dept-title").textContent = myDept.name + " Panel";
+                        restrictOfficeSelect(myDept.name);
+                    }
+                } else {
+                    document.getElementById("dept-title").textContent = "University Wide Panel";
+                    document.getElementById("dept-title").classList.add("text-blue-600");
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById("dept-title").textContent = "General Admin Panel";
+            }
 
             await loadFeedback();
+            await loadQuestions(); // Load questions for lookup and management
 
             // Session Timer (30 mins activity check)
             let lastInteraction = Date.now();
@@ -454,7 +592,7 @@
                 if (Date.now() - lastInteraction > 30 * 60 * 1000) {
                     alert("Session expired due to inactivity.");
                     localStorage.clear();
-                    window.location.href = "admin-login.html";
+                    window.location.href = "login.html";
                 }
             }, 60000);
         }
@@ -473,7 +611,7 @@
                     updateStats();
                 } else if (res.status === 401) {
                     localStorage.clear();
-                    window.location.href = "admin-login.html";
+                    window.location.href = "login.html";
                 }
             } catch (e) { console.error(e); }
             finally { spin.classList.remove("refresh-spinner"); }
@@ -487,6 +625,55 @@
             document.getElementById("unread-feedback").textContent = allFeedback.filter(f => !f.is_read).length;
             document.getElementById("replied-feedback").textContent = allFeedback.filter(f => f.replied_at).length;
             document.getElementById("today-feedback").textContent = allFeedback.filter(f => new Date(f.created_at) >= now).length;
+        }
+
+        /**
+         * Derived Rating & Prioritization Logic
+         * Checks specific department questions for the "Service Rate" and
+         * scans all responses for negative sentiment to flag Top Concerns.
+         */
+        function getDerivedStatus(f) {
+            const negativeKeywords = ['poor', 'dissatisfied', 'difficult', 'no'];
+
+            // 1. Identify "Main Service Rating" for the table column
+            let mainRating = 'N/A';
+            const office = f.office || '';
+
+            if (office === 'ict-services' || office === 'dept-ict') {
+                mainRating = f.q_2 || 'N/A'; // Support experience
+            } else if (office === 'finance' || office === 'fees-office' || office === 'accounts-office') {
+                mainRating = f.q_3 || 'N/A'; // Helpfulness/Professionalism
+            } else if (office === 'admissions') {
+                mainRating = f.q_3 || 'N/A'; // Responsiveness/Helpfulness
+            } else if (f.rating && f.rating !== 'N/A') {
+                mainRating = f.rating;
+            } else {
+                // Generic fallback: check qualitative responses q_4, q_3, q_2
+                mainRating = f.q_4 || f.q_3 || f.q_2 || 'N/A';
+            }
+
+            // 2. Determine "Top Concern" status (Any negative response)
+            let isTopConcern = false;
+
+            // Scan all question responses q_0 to q_4
+            for (let i = 0; i <= 4; i++) {
+                const val = f[`q_${i}`];
+                if (val && typeof val === 'string') {
+                    const v = val.toLowerCase();
+                    // "No" is only negative if it's about satisfaction or staff help
+                    if (negativeKeywords.some(k => v.includes(k))) {
+                        isTopConcern = true;
+                        break;
+                    }
+                }
+            }
+
+            // Also check the rating field itself
+            if (!isTopConcern && f.rating && negativeKeywords.some(k => f.rating.toLowerCase().includes(k))) {
+                isTopConcern = true;
+            }
+
+            return { mainRating, isTopConcern };
         }
 
         function applyFilters() {
@@ -508,6 +695,27 @@
                 return matchesSearch && matchesStatus;
             });
 
+            // Prioritize Poor > Good > Excellent
+            const ratingPriority = {
+                'poor': 1,
+                'dissatisfied': 1,
+                'very dissatisfied': 1,
+                'difficult': 1,
+                'very difficult': 1,
+                'neutral': 2,
+                'good': 3,
+                'satisfied': 3,
+                'easy': 3,
+                'excellent': 4,
+                'very satisfied': 4,
+                'very easy': 4
+            };
+
+            filteredFeedback.sort((a, b) => {
+                // Strictly sort by date (newest first)
+                return new Date(b.created_at) - new Date(a.created_at);
+            });
+
             currentPage = 1;
             renderTable();
             if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
@@ -518,15 +726,61 @@
             const start = (currentPage - 1) * itemsPerPage;
             const pageData = filteredFeedback.slice(start, start + itemsPerPage);
 
-            body.innerHTML = pageData.map(f => `
-                <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
+            body.innerHTML = pageData.map(f => {
+                const { mainRating, isTopConcern } = getDerivedStatus(f);
+
+                const isPoor = isTopConcern || mainRating.toLowerCase().includes('poor');
+                const isGood = mainRating.toLowerCase().includes('good') || mainRating.toLowerCase().includes('satisfied');
+                const isExcellent = mainRating.toLowerCase().includes('excellent') || mainRating.toLowerCase().includes('very');
+
+                let ratingColorClass = 'text-gray-500';
+                let ratingBgClass = 'bg-gray-100 dark:bg-gray-800';
+
+                if (isPoor) {
+                    ratingColorClass = 'text-red-700 dark:text-red-400';
+                    ratingBgClass = 'bg-red-100 dark:bg-red-900/30';
+                } else if (isExcellent) {
+                    ratingColorClass = 'text-green-700 dark:text-green-400';
+                    ratingBgClass = 'bg-green-100 dark:bg-green-900/30';
+                } else if (isGood) {
+                    ratingColorClass = 'text-yellow-700 dark:text-yellow-400';
+                    ratingBgClass = 'bg-yellow-100 dark:bg-yellow-900/30';
+                }
+
+                return `
+                <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${isPoor ? 'bg-red-50/30 dark:bg-red-900/10' : ''}">
                     <td class="px-6 py-4">
-                        <div class="font-bold text-gray-900 dark:text-white">${f.anonymous === "true" ? `<span class="text-blue-600 dark:text-blue-400 font-mono text-xs">${f.tracking_id || 'Anon'}</span>` : (f.name || 'Anonymous')}</div>
-                        <div class="text-[10px] text-gray-400 italic">${f.anonymous === "true" ? 'Anonymous' : (f.email || 'No email')}</div>
+                        <div class="font-bold text-gray-900 dark:text-white flex items-center">
+                            ${f.anonymous === "true" ? `<span class="text-blue-600 dark:text-blue-400 font-mono text-xs">${f.tracking_id || 'Anon'}</span>` : (f.name || 'Anonymous')}
+                            ${isTopConcern ? '<span class="ml-2 px-1.5 py-0.5 bg-red-600 text-white text-[9px] rounded font-bold uppercase tracking-tighter shadow-sm animate-pulse">Top Concern</span>' : ''}
+                        </div>
+                        <div class="flex flex-col gap-0.5 mt-1">
+                            <div class="text-[10px] text-gray-400 font-medium italic">${f.anonymous === "true" ? 'Anonymous' : (f.email || 'No email')}</div>
+                            <div class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight">
+                                <i class="fas fa-building mr-1 opacity-70"></i>${f.office ? (window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office) : 'General'}
+                            </div>
+                        </div>
                     </td>
                     <td class="px-6 py-4">${getStatusBadge(f)}</td>
-                    <td class="px-6 py-4 text-sm">${f.category}</td>
-                    <td class="px-6 py-4 text-sm font-medium text-green-600 dark:text-green-400">${f.office || 'General'}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-300">
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px] uppercase tracking-wider">
+                            ${f.anonymous === "true" ? "Anonymous" : (f.category || "Staff/Student")}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm space-y-1">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] uppercase font-bold text-gray-400">User:</span>
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${ratingBgClass} ${ratingColorClass}">
+                                ${f.rating || 'N/A'}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-[10px] uppercase font-bold text-gray-400">Service:</span>
+                            <span class="text-[11px] font-semibold text-gray-500 dark:text-gray-400">
+                                ${mainRating} ${isPoor ? '🔴' : (isExcellent ? '🟢' : (isGood ? '🟡' : ''))}
+                            </span>
+                        </div>
+                    </td>
                     <td class="px-6 py-4 text-xs text-gray-500">
                         <span data-timestamp="${f.created_at}">
                             ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(f.created_at) : new Date(f.created_at).toLocaleDateString()}
@@ -539,7 +793,8 @@
                         </div>
                     </td>
                 </tr>
-            `).join('') || `<tr><td colspan="6" class="py-20 text-center text-gray-500"><i class="fas fa-scroll text-5xl mb-4 block opacity-20"></i>No records found matching filters.</td></tr>`;
+            `;
+            }).join('') || `<tr><td colspan="6" class="py-20 text-center text-gray-500"><i class="fas fa-scroll text-5xl mb-4 block opacity-20"></i>No records found matching filters.</td></tr>`;
 
             document.getElementById("page-info").textContent = `Showing ${filteredFeedback.length > 0 ? start + 1 : 0} to ${Math.min(start + itemsPerPage, filteredFeedback.length)} of ${filteredFeedback.length} entries`;
             document.getElementById("prev-btn").disabled = currentPage === 1;
@@ -558,6 +813,9 @@
             const f = allFeedback.find(item => item.id == id);
             if (!f) return;
 
+            // Recalculate derived status for display
+            const { mainRating, isTopConcern } = getDerivedStatus(f);
+
             // Mark as read in backend
             if (!f.is_read) {
                 fetch(`/api/admin/feedback/${id}/read`, {
@@ -566,38 +824,74 @@
                 }).then(() => { f.is_read = true; updateStats(); renderTable(); });
             }
 
-            // Get questions for this office
-            const questions = window.feedbackPortal ? window.feedbackPortal.getDepartmentQuestions(f.office) : [];
+            // Get dynamic responses for this feedback
             let questionsHtml = '';
 
-            questions.forEach((qObj, index) => {
-                const qText = typeof qObj === 'string' ? qObj : qObj.q;
-                const answer = f[`q_${index}`] || 'N/A';
-                const isPositive = answer === 'Yes' || answer === 'Good' || answer === 'Excellent';
+            if (f.responses && f.responses.length > 0) {
+                f.responses.forEach(resp => {
+                    // Find the question text from our lookup
+                    const qObj = allQuestions.find(q => q.id === resp.question_id);
+                    const qText = qObj ? qObj.text : `Question ID: ${resp.question_id}`;
+                    const answer = resp.answer;
 
-                questionsHtml += `
-                    <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border-l-4 ${isPositive ? 'border-green-500' : 'border-red-400'}">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${qText}</label>
-                        <p class="font-bold text-sm ${isPositive ? 'text-green-700 dark:text-green-400' : 'text-gray-700 dark:text-gray-300'}">${answer}</p>
-                    </div>
-                `;
-            });
+                    const isPositive = ['Yes', 'Good', 'Excellent', 'Satisfied', 'Very Satisfied'].includes(answer);
+                    questionsHtml += `
+                        <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border-l-4 ${isPositive ? 'border-green-500' : 'border-red-400'}">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${qText}</label>
+                            <p class="font-bold text-sm ${isPositive ? 'text-green-700 dark:text-green-400' : 'text-gray-700 dark:text-gray-300'}">${answer}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                // Fallback to old hardcoded fields if they exist (for legacy data)
+                for (let i = 0; i < 5; i++) {
+                    const answer = f[`q_${i}`];
+                    if (answer && answer !== 'N/A') {
+                        questionsHtml += `
+                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border-l-4 border-gray-400">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Historical Question ${i}</label>
+                                <p class="font-bold text-sm text-gray-700 dark:text-gray-300">${answer}</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
 
             const content = document.getElementById("details-content");
             content.innerHTML = `
                 <div class="space-y-6">
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
                         <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Sender Type</label>
-                            <p class="font-bold">${f.category}</p>
+                            <label class="text-xs font-bold text-gray-400 uppercase">Sender Name</label>
+                            <p class="font-bold text-sm truncate text-blue-600 dark:text-blue-400">
+                                ${f.anonymous === "true" ? `Anon (${f.tracking_id})` : (f.name || 'Anonymous')}
+                            </p>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Rating Provided</label>
-                            <p class="font-bold text-yellow-500">${f.rating || 'No rating'}</p>
+                            <label class="text-xs font-bold text-gray-400 uppercase">User Role</label>
+                            <p class="font-bold text-sm truncate">${f.anonymous === "true" ? "Anonymous" : (f.category || "General")}</p>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
                             <label class="text-xs font-bold text-gray-400 uppercase">Office Context</label>
-                            <p class="font-bold text-blue-500">${window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office}</p>
+                            <p class="font-bold text-sm text-indigo-500 truncate">${window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">User Rating</label>
+                            <p class="font-bold text-sm ${isTopConcern ? 'text-red-600' : (f.rating && f.rating.toLowerCase().includes('excellent') ? 'text-green-600' : 'text-yellow-500')}">
+                                ${f.rating || 'N/A'}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Service Quality Scale</label>
+                            <p class="font-bold text-sm ${isTopConcern ? 'text-red-600' : 'text-blue-500'}">
+                                ${mainRating}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Status</label>
+                            <p class="font-bold text-sm ${f.is_read ? 'text-green-500' : 'text-orange-500'}">
+                                ${f.is_read ? 'Reviewed' : 'Awaiting Review'}
+                            </p>
                         </div>
                     </div>
 
@@ -675,8 +969,8 @@
                 });
                 const logs = await res.json();
                 document.getElementById("logs-content").innerHTML = `
-                    <div class="space-y-4">
-                        ${logs.map(log => `
+                <div class="space-y-4">
+                    ${logs.map(log => `
                             <div class="flex items-start space-x-3 border-b dark:border-gray-700 pb-3">
                                 <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-1">
                                     <i class="fas ${log.action === 'reply_message' ? 'fa-reply text-green-500' : 'fa-eye text-blue-500'}"></i>
@@ -689,8 +983,9 @@
                                     <p class="text-xs text-gray-600 dark:text-gray-400">${log.details}</p>
                                 </div>
                             </div>
-                        `).join('') || '<p class="text-center py-10">No activities recorded yet.</p>'}
-                    </div>
+                        `).join('') || '<p class="text-center py-10">No activities recorded yet.</p>'
+                    }
+                </div>
                 `;
                 if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
             } catch (e) {
@@ -728,7 +1023,7 @@
 
                 // Yes/No questions
                 for (let i = 0; i < 5; i++) {
-                    const ans = f[`q_${i}`];
+                    const ans = f[`q_${i} `];
                     if (ans) {
                         totalSignals++;
                         if (ans === 'Yes' || ans === 'Good' || ans === 'Excellent') positiveSignals++;
@@ -737,21 +1032,21 @@
             });
 
             const sentimentScore = totalSignals > 0 ? Math.round((positiveSignals / totalSignals) * 100) : 0;
-            document.getElementById("sentiment-value").textContent = `${sentimentScore}%`;
-            document.getElementById("sentiment-bar").style.width = `${sentimentScore}%`;
+            document.getElementById("sentiment-value").textContent = `${sentimentScore}% `;
+            document.getElementById("sentiment-bar").style.width = `${sentimentScore}% `;
 
             // 2. Efficiency (Resolution Rate)
             const resolutionSignals = allFeedback.filter(f => {
                 for (let i = 0; i < 5; i++) {
-                    if (f[`q_${i}`] === 'Yes' && window.feedbackPortal && window.feedbackPortal.getDepartmentQuestions(f.office)[i]?.q?.toLowerCase().includes('resolved')) return true;
+                    if (f[`q_${i} `] === 'Yes' && window.feedbackPortal && window.feedbackPortal.getDepartmentQuestions(f.office)[i]?.q?.toLowerCase().includes('resolved')) return true;
                 }
                 return false;
             }).length;
 
             // Simpler: Just count any 'Yes' to an efficiency-related question or fallback to a ratio
             const efficiencyScore = sentimentScore > 0 ? Math.min(100, Math.round(sentimentScore * 1.1)) : 0; // Simulated for demo
-            document.getElementById("efficiency-value").textContent = `${efficiencyScore}%`;
-            document.getElementById("efficiency-bar").style.width = `${efficiencyScore}%`;
+            document.getElementById("efficiency-value").textContent = `${efficiencyScore}% `;
+            document.getElementById("efficiency-bar").style.width = `${efficiencyScore}% `;
 
             // 3. Average Rating
             const ratingValues = { 'Excellent': 5, 'Good': 4, 'Fair': 3, 'Poor': 2, 'Very Poor': 1 };
@@ -786,28 +1081,57 @@
                 `;
             }).join('');
 
-            // 5. Concern Analysis (Keyword frequency)
-            const commonKeywords = ['slow', 'rude', 'late', 'missing', 'unhelpful', 'dirty', 'broken', 'professional', 'fast', 'helpful', 'clean'];
+            // 5. Concern Analysis (Prioritize items flagged as "Top Concern")
+            const highConcernOffices = {};
+            const commonKeywords = ['slow', 'rude', 'late', 'missing', 'unhelpful', 'dirty', 'broken', 'difficult', 'poor', 'no'];
             const keywordsFound = {};
+
             allFeedback.forEach(f => {
-                if (f.message) {
-                    commonKeywords.forEach(kw => {
-                        if (f.message.toLowerCase().includes(kw)) {
-                            keywordsFound[kw] = (keywordsFound[kw] || 0) + 1;
-                        }
-                    });
+                const { isTopConcern } = getDerivedStatus(f);
+
+                if (isTopConcern) {
+                    // Track by Office
+                    const officeName = window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : (f.office || 'General');
+                    highConcernOffices[officeName] = (highConcernOffices[officeName] || 0) + 1;
+
+                    // Track Keywords in message
+                    if (f.message) {
+                        commonKeywords.forEach(kw => {
+                            if (f.message.toLowerCase().includes(kw)) {
+                                keywordsFound[kw] = (keywordsFound[kw] || 0) + 1;
+                            }
+                        });
+                    }
                 }
             });
 
-            document.getElementById("concern-stats").innerHTML = Object.entries(keywordsFound)
-                .sort((a, b) => b[1] - a[1])
-                .slice(0, 5)
-                .map(([kw, count]) => `
-                    <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
-                        <span class="capitalize text-sm font-medium">${kw}</span>
-                        <span class="px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 text-xs rounded-full font-bold">${count} Mentions</span>
+            let topConcernsHtml = '';
+
+            // Show top offices with high concern flags
+            const sortedOffices = Object.entries(highConcernOffices).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            if (sortedOffices.length > 0) {
+                topConcernsHtml += '<p class="text-[10px] font-bold text-gray-400 uppercase mb-2">High Concern Offices</p>';
+                topConcernsHtml += sortedOffices.map(([office, count]) => `
+                    <div class="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg mb-2">
+                        <span class="text-sm font-bold text-red-700 dark:text-red-400">${office}</span>
+                        <span class="px-2 py-1 bg-red-600 text-white text-[10px] rounded-full font-bold">${count} Critical Alerts</span>
                     </div>
-                `).join('') || '<p class="text-center text-gray-400 italic text-sm">No common keyword patterns found yet.</p>';
+                `).join('');
+            }
+
+            // Then show common issues found in these concerns
+            const sortedKeywords = Object.entries(keywordsFound).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            if (sortedKeywords.length > 0) {
+                topConcernsHtml += '<p class="text-[10px] font-bold text-gray-400 uppercase mt-4 mb-2">Issue Keywords</p>';
+                topConcernsHtml += sortedKeywords.map(([kw, count]) => `
+                    <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg mb-1">
+                        <span class="capitalize text-sm font-medium text-gray-600 dark:text-gray-300 font-bold">${kw}</span>
+                        <span class="text-xs text-gray-400 font-bold">${count} Mentions</span>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById("concern-stats").innerHTML = topConcernsHtml || '<p class="text-center text-gray-400 italic text-sm py-4">No critical concerns identified yet.</p>';
         }
 
         function closeReplyModal() { document.getElementById("reply-modal").classList.add("hidden"); }
@@ -818,8 +1142,8 @@
         function openComposeModal() {
             const deptTitle = document.getElementById("dept-title").textContent.replace(' Panel', '');
             const adminName = localStorage.getItem("userFullname") || "Admin";
-            document.getElementById("compose-subject").value = `Official Notice from ${deptTitle}`;
-            document.getElementById("compose-message").value = `Dear Member,\n\nThis is an official communication from the ${deptTitle}.\n\n\n\nBest Regards,\n${adminName}\n${deptTitle}`;
+            document.getElementById("compose-subject").value = `Official Notice from ${deptTitle} `;
+            document.getElementById("compose-message").value = `Dear Member, \n\nThis is an official communication from the ${deptTitle}.\n\n\n\nBest Regards, \n${adminName} \n${deptTitle} `;
             document.getElementById("compose-email").value = "";
             document.getElementById("compose-email-error").classList.add("hidden");
             document.getElementById("compose-modal").classList.remove("hidden");
@@ -846,7 +1170,7 @@
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${token} `
                     },
                     body: JSON.stringify(payload)
                 });
@@ -868,6 +1192,217 @@
                 btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
             }
         }
+
+        // === Question Management Functions ===
+        function restrictOfficeSelect(deptName) {
+            const select = document.getElementById("new-q-office");
+            if (!select) return;
+
+            console.log("Restricting questions for department:", deptName);
+
+            const mapping = {
+                'ICT Services': 'ict-services',
+                'Finance Department': 'finance',
+                'Library Services': 'library',
+                'Admissions Office': 'admissions',
+                'Hostel / Accommodation': 'hostel',
+                'Catering Services': 'catering',
+                'Security Department': 'security',
+                'Transport': 'transport',
+                'Health Unit / Clinic': 'health-unit'
+            };
+
+            let targetSlug = mapping[deptName];
+
+            // Fallback: try case-insensitive mapping or substring match
+            if (!targetSlug) {
+                const dLow = deptName.toLowerCase();
+                if (dLow.includes('ict')) targetSlug = 'ict-services';
+                else if (dLow.includes('finance')) targetSlug = 'finance';
+                else if (dLow.includes('library')) targetSlug = 'library';
+                else if (dLow.includes('admission')) targetSlug = 'admissions';
+                else if (dLow.includes('hostel') || dLow.includes('accommodation')) targetSlug = 'hostel';
+                else if (dLow.includes('catering')) targetSlug = 'catering';
+                else if (dLow.includes('security')) targetSlug = 'security';
+            }
+
+            if (targetSlug) {
+                // Found a matching slug for this admin's department
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value === targetSlug) {
+                        opt.selected = true;
+                        opt.disabled = false;
+                    } else {
+                        opt.disabled = true;
+                    }
+                });
+            } else {
+                // If no mapping found, this admin might be restricted to their exact dept name
+                console.warn("No direct slug mapping for:", deptName);
+            }
+        }
+
+        function openQuestionModal() {
+            document.getElementById("questions-modal").classList.remove("hidden");
+            loadQuestions();
+        }
+
+        function closeQuestionModal() {
+            document.getElementById("questions-modal").classList.add("hidden");
+        }
+
+        async function loadQuestions() {
+            try {
+                const res = await fetch("/api/questions");
+                if (res.ok) {
+                    allQuestions = await res.json();
+                    renderQuestionsList();
+                }
+            } catch (e) {
+                console.error("Error loading questions:", e);
+            }
+        }
+
+        function renderQuestionsList() {
+            const list = document.getElementById("questions-list");
+            if (allQuestions.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 py-6 italic">No active questions found</p>';
+                return;
+            }
+
+            list.innerHTML = allQuestions.map(q => `
+                <div class="bg-white dark:bg-gray-700 p-4 rounded-xl border dark:border-gray-600 shadow-sm flex justify-between items-center group hover:border-orange-300 transition-colors">
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] bg-orange-100 dark:bg-orange-900/40 text-orange-600 px-2 py-0.5 rounded-full font-bold">
+                                ${q.target_office ? (window.feedbackPortal ? window.feedbackPortal.getOfficeName(q.target_office) : q.target_office) : 'GLOBAL'}
+                            </span>
+                            <span class="text-[10px] text-gray-400 font-medium">Added ${new Date(q.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <p class="font-bold text-gray-800 dark:text-gray-200">${q.text}</p>
+                        <p class="text-xs text-gray-500 mt-1">Options: <span class="italic font-medium">${q.options}</span></p>
+                    </div>
+                    <button onclick="deleteQuestion(${q.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" title="Delete Question">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function saveNewQuestion(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding...';
+
+            const payload = {
+                text: document.getElementById("new-q-text").value.trim(),
+                options: document.getElementById("new-q-options").value.trim(),
+                target_office: document.getElementById("new-q-office").value || null,
+                is_active: true
+            };
+
+            try {
+                const res = await fetch("/api/admin/questions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    document.getElementById("add-question-form").reset();
+                    await loadQuestions();
+                    alert("✅ Question added successfully! It is now visible to users giving feedback.");
+                } else {
+                    alert("Failed to save question.");
+                }
+            } catch (err) {
+                alert("Network error. Could not save question.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Add Question to Users';
+            }
+        }
+
+        async function deleteQuestion(id) {
+            if (!confirm("Are you sure you want to delete this question? Users will no longer see it.")) return;
+
+            try {
+                const res = await fetch(`/api/admin/questions/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    await loadQuestions();
+                } else {
+                    alert("Failed to delete question.");
+                }
+            } catch (err) {
+                alert("Network error.");
+            }
+        }
+
+        // === QR Toolkit Functions ===
+        function openQRModal() {
+            document.getElementById("qr-modal").classList.remove("hidden");
+            // Default to current location but pointing to root/home
+            const currentUrl = window.location.origin;
+            document.getElementById("qr-url").value = currentUrl;
+        }
+
+        function closeQRModal() {
+            document.getElementById("qr-modal").classList.add("hidden");
+        }
+
+        function generateQRCode() {
+            const url = document.getElementById("qr-url").value || window.location.origin;
+            const container = document.getElementById("qr-image-container");
+
+            // Using a high-quality QR API
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}&color=ec4899&bgcolor=ffffff`;
+
+            container.innerHTML = `<img src="${qrUrl}" alt="QR Code" class="w-full h-full animate-pulse-once" id="generated-qr-img">`;
+        }
+
+        function printQRCode() {
+            const img = document.querySelector("#qr-image-container img");
+            if (!img) {
+                alert("Please generate a QR code first!");
+                return;
+            }
+
+            const printWindow = window.open('', '_blank');
+            const deptName = document.getElementById("dept-title").textContent.replace(' Panel', '');
+
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Print Feedback QR - ${deptName}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; }
+                        .container { border: 10px solid #ec4899; padding: 40px; border-radius: 40px; display: inline-block; }
+                        h1 { color: #ec4899; font-size: 32px; margin-bottom: 20px; }
+                        p { font-size: 18px; color: #666; margin-top: 20px; }
+                        img { width: 400px; height: 400px; }
+                        .footer { margin-top: 30px; font-weight: bold; font-size: 24px; color: #333; }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    <div class="container">
+                        <h1>SCAN TO GIVE FEEDBACK</h1>
+                        <img src="${img.src}" />
+                        <div class="footer">${deptName}</div>
+                        <p>University Quality Assurance System</p>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
         function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
         function nextPage() { if (currentPage < Math.ceil(filteredFeedback.length / itemsPerPage)) { currentPage++; renderTable(); } }
 

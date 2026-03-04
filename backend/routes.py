@@ -1,21 +1,59 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from models import Feedback, User, Department, ActivityLog
+from models import Feedback, User, Department, ActivityLog, Question, QuestionResponse
 from schemas import (
     FeedbackCreate, FeedbackOut, UserCreate, UserOut, 
-    LoginRequest, Token, FeedbackTrackRequest
+    LoginRequest, Token, FeedbackTrackRequest,
+    QuestionCreate, QuestionOut, QuestionResponseCreate, FeedbackCreateExtended,
+    FeedbackOutExtended
 )
 from auth import authenticate_user, create_access_token, get_current_user, get_password_hash
 from database import get_db
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 import logging
 from email_service import email_service
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Dependency Helper for Background Notifications
+def notify_admins_task(feedback_id: int):
+    """Background task to send email notifications to admins without delaying the user."""
+    from database import SessionLocal
+    db = SessionLocal()
+    try:
+        db_feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
+        if not db_feedback or not db_feedback.department_id:
+            return
+
+        admins = db.query(User).filter(
+            User.department_id == db_feedback.department_id,
+            User.role == "admin"
+        ).all()
+        
+        dept = db.query(Department).filter(Department.id == db_feedback.department_id).first()
+        dept_name = dept.name if dept else db_feedback.office
+        
+        for admin in admins:
+            if admin.email:
+                email_service.send_new_feedback_notification(
+                    to_email=admin.email,
+                    department_name=dept_name,
+                    feedback_data={
+                        "name": db_feedback.name or "Anonymous",
+                        "email": db_feedback.email or "N/A",
+                        "rating": db_feedback.rating or "N/A",
+                        "message": db_feedback.message or "No message provided.",
+                        "tracking_id": db_feedback.tracking_id
+                    }
+                )
+    except Exception as e:
+        logger.error(f"Error in notify_admins_task: {str(e)}")
+    finally:
+        db.close()
 
 router = APIRouter()
 
@@ -104,11 +142,13 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
 
 # 💬 Submit Feedback Route
 @router.post("/submit-feedback", response_model=FeedbackOut)
-def submit_feedback(feedback: FeedbackCreate, db: Session = Depends(get_db), 
-                   current_user: User = Depends(get_current_user)):
+def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: BackgroundTasks, 
+                    db: Session = Depends(get_db), 
+                    current_user: User = Depends(get_current_user)):
     try:
         # Convert to dict
         feedback_dict = feedback.dict()
+        dynamic_responses = feedback_dict.pop('dynamic_responses', [])
         
         # If user is authenticated, use their email
         if current_user:
@@ -219,47 +259,40 @@ def submit_feedback(feedback: FeedbackCreate, db: Session = Depends(get_db),
         db.add(db_feedback)
         db.commit()
         db.refresh(db_feedback)
+
+        # Save dynamic responses
+        for resp in dynamic_responses:
+            db_resp = QuestionResponse(
+                feedback_id=db_feedback.id,
+                question_id=resp['question_id'],
+                answer=resp['answer']
+            )
+            db.add(db_resp)
+        
+        if dynamic_responses:
+            db.commit()
         
         logger.info(f"Feedback submitted: ID {db_feedback.id}, Tracking ID {db_feedback.tracking_id}, Dept ID {db_feedback.department_id}")
 
-        # Send notification to department admins
+        # Trigger notification in background to speed up response for the user
         if db_feedback.department_id:
-            try:
-                # Find all admins for this department
-                admins = db.query(User).filter(
-                    User.department_id == db_feedback.department_id,
-                    User.role == "admin"
-                ).all()
-                
-                dept = db.query(Department).filter(Department.id == db_feedback.department_id).first()
-                dept_name = dept.name if dept else db_feedback.office
-                
-                for admin in admins:
-                    if admin.email:
-                        email_service.send_new_feedback_notification(
-                            to_email=admin.email,
-                            department_name=dept_name,
-                            feedback_data={
-                                "name": db_feedback.name,
-                                "email": db_feedback.email,
-                                "rating": db_feedback.rating,
-                                "message": db_feedback.message,
-                                "tracking_id": db_feedback.tracking_id
-                            }
-                        )
-                        logger.info(f"Notification sent to admin: {admin.email}")
-            except Exception as e:
-                logger.error(f"Failed to send department notifications: {str(e)}")
+            background_tasks.add_task(notify_admins_task, db_feedback.id)
+            logger.info(f"Background notification task scheduled for feedback ID: {db_feedback.id}")
 
         return db_feedback
         
     except SQLAlchemyError as e:
-        logger.error(f"Database error in submit_feedback: {str(e)}")
+        import traceback
+        error_msg = str(e)
+        stack_trace = traceback.format_exc()
+        logger.error(f"Database error in submit_feedback: {error_msg}\n{stack_trace}")
+        print(f"❌ DATABASE ERROR: {error_msg}")
+        print(f"DATA ATTEMPTED: {feedback_dict}")
         db.rollback()
-        raise HTTPException(status_code=500, detail="Database error")
+        raise HTTPException(status_code=500, detail=f"Database error: {error_msg[:100]}")
 
 # 👀 Admin Route – View All Feedback
-@router.get("/admin/feedback", response_model=List[FeedbackOut])
+@router.get("/admin/feedback", response_model=List[FeedbackOutExtended])
 def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         if not current_user:
@@ -271,11 +304,16 @@ def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends
         
         logger.info(f"Admin {current_user.email or current_user.username} fetching feedback")
         
+        # We use joinedload or simply rely on relationship lazy loading which Pydantic handles
         query = db.query(Feedback)
         if current_user.role == "admin" and current_user.department_id:
             query = query.filter(Feedback.department_id == current_user.department_id)
             
         feedback = query.order_by(Feedback.created_at.desc()).all()
+        
+        # For each feedback, we need to populate question_text in responses if we want it in the UI
+        # But let's keep it simple for now, the UI can fetch questions separately or we can map them here.
+        
         logger.info(f"Returning {len(feedback)} feedback entries")
         return feedback
         
@@ -298,7 +336,7 @@ def mark_feedback_as_read(
         if not feedback:
             raise HTTPException(status_code=404, detail="Feedback not found")
         
-        if feedback.department_id != current_user.department_id:
+        if current_user.department_id and feedback.department_id != current_user.department_id:
              raise HTTPException(status_code=403, detail="Forbidden – Not your department")
 
         feedback.is_read = True
@@ -337,7 +375,7 @@ def mark_feedback_as_answered(
         if not feedback:
             raise HTTPException(status_code=404, detail="Feedback not found")
         
-        if feedback.department_id != current_user.department_id:
+        if current_user.department_id and feedback.department_id != current_user.department_id:
              raise HTTPException(status_code=403, detail="Forbidden – Not your department")
 
         feedback.replied_at = datetime.now()
@@ -384,7 +422,7 @@ def send_reply(
         if not feedback:
             raise HTTPException(status_code=404, detail="Feedback not found")
             
-        if feedback.department_id != current_user.department_id:
+        if current_user.department_id and feedback.department_id != current_user.department_id:
              raise HTTPException(status_code=403, detail="Forbidden – Not your department")
 
         feedback.replied_at = datetime.now()
@@ -463,7 +501,7 @@ def send_admin_message_to_member(
             message=f"Subject: {subject}\n\n{message}",
             anonymous="false",
             tracking_id=tracking_id,
-            department_id=current_user.department_id,
+            department_id=current_user.department_id or feedback.department_id,
             is_read=False,
             reply_message=message,
             replied_at=datetime.now(),   # Mark as already answered since admin composed it
@@ -591,9 +629,11 @@ def get_activity_logs(db: Session = Depends(get_db), current_user: User = Depend
     if not current_user or current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     
-    return db.query(ActivityLog).filter(
-        ActivityLog.department_id == current_user.department_id
-    ).order_by(ActivityLog.timestamp.desc()).limit(50).all()
+    query = db.query(ActivityLog)
+    if current_user.department_id:
+        query = query.filter(ActivityLog.department_id == current_user.department_id)
+    
+    return query.order_by(ActivityLog.timestamp.desc()).limit(50).all()
 
 # 📥 Export CSV
 @router.get("/admin/export-csv")
@@ -605,9 +645,11 @@ def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depe
     import io
     from fastapi.responses import StreamingResponse
 
-    feedback = db.query(Feedback).filter(
-        Feedback.department_id == current_user.department_id
-    ).all()
+    query = db.query(Feedback)
+    if current_user.department_id:
+        query = query.filter(Feedback.department_id == current_user.department_id)
+    
+    feedback = query.all()
 
     output = io.StringIO()
     writer = csv.writer(output)
@@ -623,6 +665,40 @@ def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depe
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename=feedback_dept_{current_user.department_id}.csv"}
     )
+
+# 🙋‍♂️ Question Management Routes
+@router.get("/questions", response_model=List[QuestionOut])
+def get_questions(office: Optional[str] = None, db: Session = Depends(get_db)):
+    query = db.query(Question).filter(Question.is_active == True)
+    if office:
+        # Filter by specific office or global (target_office is null)
+        query = query.filter((Question.target_office == office) | (Question.target_office == None))
+    return query.all()
+
+@router.post("/admin/questions", response_model=QuestionOut)
+def add_question(question: QuestionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+    
+    db_question = Question(**question.dict())
+    db.add(db_question)
+    db.commit()
+    db.refresh(db_question)
+    return db_question
+
+@router.delete("/admin/questions/{question_id}")
+def delete_question(question_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+    
+    db_question = db.query(Question).filter(Question.id == question_id).first()
+    if not db_question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    # Soft delete by marking inactive
+    db_question.is_active = False
+    db.commit()
+    return {"message": "Question deleted successfully"}
 
 # 🔐 Get Current User Info
 @router.get("/user/me")

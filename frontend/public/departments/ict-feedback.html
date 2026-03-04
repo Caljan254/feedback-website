@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <title>ICT SERVICES FEEDBACK - SEKU Feedback</title>
     <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
@@ -101,56 +101,214 @@
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
         <div class="mb-6"><button onclick="goBack()"
-                class="flex items-center text-indigo-600 hover:text-indigo-700 transition-colors"><i
+                class="flex items-center text-blue-600 hover:text-blue-700 transition-colors"><i
                     class="fas fa-arrow-left mr-2"></i> ← Back to Office Selection</button></div>
         <div id="user-info-display"
             class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6 text-gray-800 dark:text-gray-200"></div>
-        <section class="bg-indigo-50 dark:bg-indigo-900 p-6 rounded-lg shadow-lg">
-            <h3 class="text-2xl font-bold text-indigo-800 dark:text-indigo-300 mb-6">ICT Office Feedback</h3>
-            <form class="department-feedback-form space-y-6">
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">Was the ICT support helpful when needed?</p>
-                    <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer"><input
-                                type="radio" name="ict_support" value="Yes" required
-                                class="mr-2 form-radio text-indigo-600"> <span
-                                class="text-gray-700 dark:text-gray-300">Yes</span></label><label
-                            class="flex items-center cursor-pointer"><input type="radio" name="ict_support" value="No"
-                                required class="mr-2 form-radio text-indigo-600"> <span
-                                class="text-gray-700 dark:text-gray-300">No</span></label></div>
-                </div>
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">Was the university's internet and systems
-                        working reliably?</p>
-                    <div class="flex items-center space-x-6"><label class="flex items-center cursor-pointer"><input
-                                type="radio" name="reliable_systems" value="Yes" required
-                                class="mr-2 form-radio text-indigo-600"> <span
-                                class="text-gray-700 dark:text-gray-300">Yes</span></label><label
-                            class="flex items-center cursor-pointer"><input type="radio" name="reliable_systems"
-                                value="No" required class="mr-2 form-radio text-indigo-600"> <span
-                                class="text-gray-700 dark:text-gray-300">No</span></label></div>
-                </div>
-                <div class="space-y-3">
-                    <p class="text-gray-700 dark:text-gray-300 font-medium">Rate your experience:</p>
-                    <div class="space-y-2">
-                        <div class="flex items-center"><input type="radio" id="rating-poor" name="rating" value="Poor"
-                                required class="mr-2 form-radio text-indigo-600"><label for="rating-poor"
-                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Poor</label></div>
-                        <div class="flex items-center"><input type="radio" id="rating-good" name="rating" value="Good"
-                                required class="mr-2 form-radio text-indigo-600"><label for="rating-good"
-                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Good</label></div>
-                        <div class="flex items-center"><input type="radio" id="rating-excellent" name="rating"
-                                value="Excellent" required class="mr-2 form-radio text-indigo-600"><label
-                                for="rating-excellent"
-                                class="text-gray-700 dark:text-gray-300 cursor-pointer">Excellent</label></div>
+        <section
+            class="bg-blue-50/50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700">
+            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8 uppercase">ICT
+                SERVICES FEEDBACK</h3>
+
+            <form class="department-feedback-form space-y-8">
+                <!-- Dynamic Questions Container -->
+                <div id="dynamic-questions" class="space-y-6"></div>
+
+                <!-- Question 1 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of
+                        your visit today?</p>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Academic Work" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Academic
+                                Work (Classes, Studying)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Administrative Work" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Administrative/Office
+                                Work</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Research" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Research</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="Event/Meeting" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Event/Meeting</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_0" value="General Browsing" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">General
+                                Browsing / Internet Access</span>
+                        </label>
                     </div>
                 </div>
-                <div><label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">General Comment
-                        (optional):</label><textarea name="comment" rows="4"
-                        class="w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-800 dark:text-white p-3"
-                        placeholder="Write your feedback here..."></textarea></div>
-                <button type="submit"
-                    class="bg-indigo-600 text-white px-6 py-3 rounded-lg shadow hover:bg-indigo-700 w-full transition-colors duration-200 text-lg font-medium">Submit
-                    Feedback</button>
+
+                <!-- Question 2 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the
+                        reliability of the technical infrastructure today? <span
+                            class="text-sm font-normal text-gray-500 block mt-1">(Please consider Wi-Fi speed,
+                            connection stability, computer lab equipment, and classroom tech)</span></p>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_1" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
+                                (Fast and seamless)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_1" value="Good" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
+                                (Occasional minor issues)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_1" value="Poor" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
+                                (Frequent disruptions)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 3 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. If you contacted the ICT
+                        Helpdesk or Support Team, how would you rate the support experience? <span
+                            class="text-sm font-normal text-gray-500 block mt-1">(If you did not seek support, select
+                            "Did not seek help")</span></p>
+                    <div class="space-y-3 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Did not seek help" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Did
+                                not seek help</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
+                                - Quick response and issue resolved</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Good" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
+                                - Responded within acceptable time</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_2" value="Poor" required
+                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
+                                - Unhelpful or unresolved issue</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 4 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How easy was it to navigate the
+                        ICT services? <span class="text-sm font-normal text-gray-500 block mt-1">(e.g., connecting to
+                            Wi-Fi, finding printing stations, using the student/staff portal)</span></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Very Easy" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Very
+                                Easy</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Easy" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Easy</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Neutral" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Neutral</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Difficult" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Difficult</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_3" value="Very Difficult" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Very
+                                Difficult</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question 5 -->
+                <div class="space-y-4">
+                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. Overall, how would you rate
+                        your ICT experience at the university today? *</p>
+                    <div class="flex flex-wrap items-center gap-8 pl-2">
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_4" value="Excellent" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Excellent</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_4" value="Good" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Good</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer group">
+                            <input type="radio" name="q_4" value="Poor" required
+                                class="w-5 h-5 text-blue-600 border-gray-300">
+                            <span
+                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Poor</span>
+                        </label>
+                    </div>
+                </div>
+                <!-- Hidden input for rating -->
+                <input type="hidden" name="rating" x-data
+                    x-effect="$el.value = $nextTick(() => document.querySelector('input[name=q_4]:checked')?.value)">
+
+                <!-- Question 6 -->
+                <div class="space-y-4">
+                    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">6. Do you have any
+                        general comments, suggestions, or specific feedback for ICT? *</label>
+                    <textarea name="comment" rows="5" required
+                        class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
+                        placeholder="Write your feedback here..."></textarea>
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit"
+                        class="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 w-full transition-all duration-300 text-xl font-bold tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                        Submit Feedback
+                    </button>
+                </div>
             </form>
         </section>
     </div>

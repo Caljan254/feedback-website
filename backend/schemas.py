@@ -96,6 +96,47 @@ class FeedbackOut(BaseModel):
         from_attributes = True
 
 
+# Dynamic Questions
+class QuestionCreate(BaseModel):
+    text: str
+    options: str = "Yes,No"
+    target_office: Optional[str] = None
+    is_active: bool = True
+
+class QuestionOut(BaseModel):
+    id: int
+    text: str
+    options: str
+    target_office: Optional[str]
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class QuestionResponseCreate(BaseModel):
+    question_id: int
+    answer: str
+
+class QuestionResponseOut(BaseModel):
+    id: int
+    question_id: int
+    answer: str
+    question_text: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+# Update Feedback schemas to include dynamic responses
+class FeedbackCreateExtended(FeedbackCreate):
+    dynamic_responses: Optional[list[QuestionResponseCreate]] = []
+
+class FeedbackOutExtended(FeedbackOut):
+    responses: list[QuestionResponseOut] = []
+    
+    class Config:
+        from_attributes = True
+
 # Optional: Add a schema for marking feedback as read
 class FeedbackReadUpdate(BaseModel):
     is_read: bool = True
