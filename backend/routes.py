@@ -675,6 +675,13 @@ def get_questions(office: Optional[str] = None, db: Session = Depends(get_db)):
         query = query.filter((Question.target_office == office) | (Question.target_office == None))
     return query.all()
 
+@router.get("/admin/questions/all", response_model=List[QuestionOut])
+def get_all_questions_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user or current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admins only")
+    
+    return db.query(Question).filter(Question.is_active == True).all()
+
 @router.post("/admin/questions", response_model=QuestionOut)
 def add_question(question: QuestionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
