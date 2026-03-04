@@ -597,6 +597,9 @@ class FeedbackPortal {
         try {
             const loadingNotification = this.showNotification('Submitting your feedback...', 'info', 0);
             
+            // Artificial delay to ensure user sees the loading state
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
             const res = await fetch("/api/submit-feedback", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", "Accept": "application/json" },

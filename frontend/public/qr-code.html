@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback System QR Code - SEKU</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .print-card {
+                box-shadow: none;
+                border: 1px solid #eee;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-height-screen flex flex-col items-center justify-center p-4">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center print-card">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-blue-900 mb-2">SEKU FEEDBACK SYSTEM</h1>
+            <p class="text-gray-600">Scan to provide your feedback</p>
+        </div>
+
+        <div class="bg-blue-50 p-6 rounded-2xl mb-8 flex justify-center">
+            <!-- Replacing with a real QR code URL. Assuming it points to the root of the site -->
+            <img id="qr-code"
+                src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://your-domain.com"
+                alt="QR Code" class="w-64 h-64 shadow-md">
+        </div>
+
+        <div class="space-y-4 no-print">
+            <p class="text-sm text-gray-500">Note: Replace 'your-domain.com' with your actual server URL in the link
+                below to generate the correct code.</p>
+            <div class="flex gap-2">
+                <input type="text" id="url-input" placeholder="Enter site URL (e.g. http://192.168.1.10:8000)"
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                <button onclick="updateQR()"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Update</button>
+            </div>
+            <button onclick="window.print()"
+                class="w-full bg-green-600 text-white py-3 rounded-xl font-bold hover:bg-green-700 transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                    </path>
+                </svg>
+                Print QR Poster
+            </button>
+            <a href="index.html" class="block text-blue-600 hover:underline">Back to Homepage</a>
+        </div>
+    </div>
+
+    <script>
+        function updateQR() {
+            const url = document.getElementById('url-input').value;
+            if (url) {
+                const qrImg = document.getElementById('qr-code');
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+            }
+        }
+
+        // Auto-detect current URL if possible (though for local IP it might need manual entry)
+        window.onload = () => {
+            const currentUrl = window.location.origin;
+            document.getElementById('url-input').value = currentUrl;
+            updateQR();
+        }
+    </script>
+</body>
+
+</html>

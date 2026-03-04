@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Feedback Directory - SEKU</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 flex flex-col min-h-screen">
+    <div class="bg-green-800 text-white py-12 px-6">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl font-black mb-2 tracking-tight">Department Directory</h1>
+                <p class="text-green-100 opacity-80">Select an office below to provide your feedback</p>
+            </div>
+            <div class="flex gap-4">
+                <a href="../index.html"
+                    class="bg-white/10 hover:bg-white/20 px-6 py-3 rounded-xl transition font-bold flex items-center gap-2">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="../qr-code.html"
+                    class="bg-yellow-400 text-green-900 hover:bg-yellow-300 px-6 py-3 rounded-xl transition font-bold flex items-center gap-2">
+                    <i class="fas fa-qrcode"></i> QR Code
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 py-12 flex-grow">
+        <div class="mb-8">
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                <input type="text" id="deptSearch" placeholder="Search for a department or office..."
+                    class="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-gray-100 shadow-sm focus:border-green-500 focus:ring-4 focus:ring-green-500/10 outline-none transition-all text-lg">
+            </div>
+        </div>
+
+        <div id="deptGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Departments will be auto-populated here -->
+        </div>
+    </div>
+
+    <footer class="bg-gray-100 py-8 border-t border-gray-200">
+        <div class="max-w-6xl mx-auto px-6 text-center text-gray-500 text-sm">
+            &copy; 2026 South Eastern Kenya University | Feedback Management System
+        </div>
+    </footer>
+
+    <script>
+        const departments = [
+            { name: "Academic Registry", file: "academic-registry-feedback.html", type: "academic" },
+            { name: "Accounts Office", file: "accounts-office-feedback.html", type: "admin" },
+            { name: "Admissions Office", file: "admissions-feedback.html", type: "admin" },
+            { name: "Career Guidance", file: "career-guidance-feedback.html", type: "support" },
+            { name: "Catering Services", file: "catering-feedback.html", type: "support" },
+            { name: "Chaplaincy", file: "chaplaincy-feedback.html", type: "support" },
+            { name: "Community Outreach", file: "community-outreach-feedback.html", type: "admin" },
+            { name: "Corporate Communication", file: "corp-comm-feedback.html", type: "admin" },
+            { name: "Council Office", file: "council-office-feedback.html", type: "admin" },
+            { name: "Counselling", file: "counselling-feedback.html", type: "support" },
+            { name: "Dean of Students", file: "dean-students-feedback.html", type: "support" },
+            { name: "DP Accounting", file: "dept-accounting-feedback.html", type: "academic" },
+            { name: "DP Admin", file: "dept-admin-feedback.html", type: "academic" },
+            { name: "DP Agriculture", file: "dept-agri-feedback.html", type: "academic" },
+            { name: "DP Biological Sciences", file: "dept-biological-feedback.html", type: "academic" },
+            { name: "DP Civil Engineering", file: "dept-civil-feedback.html", type: "academic" },
+            { name: "DP Economics", file: "dept-economics-feedback.html", type: "academic" },
+            { name: "DP Education", file: "dept-edu-feedback.html", type: "academic" },
+            { name: "DP Electrical Eng", file: "dept-elec-feedback.html", type: "academic" },
+            { name: "DP Environmental", file: "dept-env-feedback.html", type: "academic" },
+            { name: "DP Humanities", file: "dept-humanities-feedback.html", type: "academic" },
+            { name: "DP ICT", file: "dept-ict-feedback.html", type: "academic" },
+            { name: "DP Mathematics", file: "dept-math-feedback.html", type: "academic" },
+            { name: "DP Mechanical Eng", file: "dept-mech-feedback.html", type: "academic" },
+            { name: "DP Physical Sciences", file: "dept-physical-feedback.html", type: "academic" },
+            { name: "DP Social Sciences", file: "dept-social-feedback.html", type: "academic" },
+            { name: "DVC Academic", file: "dvc-academic-feedback.html", type: "admin" },
+            { name: "DVC Admin", file: "dvc-admin-feedback.html", type: "admin" },
+            { name: "E-Learning", file: "elearning-feedback.html", type: "academic" },
+            { name: "Estate Office", file: "estate-feedback.html", type: "support" },
+            { name: "Exams Office", file: "exams-office-feedback.html", type: "academic" },
+            { name: "Fees Office", file: "fees-office-feedback.html", type: "admin" },
+            { name: "Finance Department", file: "finance-feedback.html", type: "admin" },
+            { name: "Games & Sports", file: "games-feedback.html", type: "support" },
+            { name: "Grounds & Estates", file: "grounds-feedback.html", type: "support" },
+            { name: "Health Services", file: "health-feedback.html", type: "support" },
+            { name: "Health Unit", file: "health-unit-feedback.html", type: "support" },
+            { name: "Hostels", file: "hostel-feedback.html", type: "support" },
+            { name: "Human Resources", file: "hr-office-feedback.html", type: "admin" },
+            { name: "ICT Office", file: "ict-feedback.html", type: "admin" },
+            { name: "ICT Services", file: "ict-services-feedback.html", type: "admin" },
+            { name: "Industrial Attachment", file: "industrial-attachment-feedback.html", type: "academic" },
+            { name: "Innovation Office", file: "innovation-office-feedback.html", type: "admin" },
+            { name: "Internal Audit", file: "internal-audit-feedback.html", type: "admin" },
+            { name: "Legal Services", file: "legal-services-feedback.html", type: "admin" },
+            { name: "Library", file: "library-feedback.html", type: "support" },
+            { name: "Procurement", file: "procurement-feedback.html", type: "admin" },
+            { name: "Quality Assurance", file: "quality-assurance-feedback.html", type: "admin" },
+            { name: "Registrar Academic", file: "registrar-academic-feedback.html", type: "admin" },
+            { name: "Registrar Admin", file: "registrar-admin-feedback.html", type: "admin" },
+            { name: "Registry", file: "registry-feedback.html", type: "admin" },
+            { name: "Research Directorate", file: "research-dir-feedback.html", type: "academic" },
+            { name: "Postgraduate Research", file: "research-postgrad-feedback.html", type: "academic" },
+            { name: "SANR Dean", file: "sanr-dean-feedback.html", type: "academic" },
+            { name: "SBE Dean", file: "sbe-dean-feedback.html", type: "academic" },
+            { name: "Security Services", file: "security-feedback.html", type: "support" },
+            { name: "SEH Dean", file: "seh-dean-feedback.html", type: "academic" },
+            { name: "SET Dean", file: "set-dean-feedback.html", type: "academic" },
+            { name: "SSC Dean", file: "ssc-dean-feedback.html", type: "academic" },
+            { name: "Staff Welfare", file: "staff-welfare-feedback.html", type: "admin" },
+            { name: "Student Affairs", file: "student-affairs-feedback.html", type: "support" },
+            { name: "Student Clubs", file: "student-clubs-feedback.html", type: "support" },
+            { name: "Timetabling", file: "timetabling-feedback.html", type: "academic" },
+            { name: "Training & Dev", file: "training-dev-feedback.html", type: "admin" },
+            { name: "Transport", file: "transport-feedback.html", type: "support" },
+            { name: "VC Office", file: "vc-office-feedback.html", type: "admin" }
+        ];
+
+        function renderDepartments(filter = "") {
+            const grid = document.getElementById('deptGrid');
+            grid.innerHTML = "";
+
+            const filtered = departments.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
+
+            filtered.sort((a, b) => a.name.localeCompare(b.name)).forEach(dept => {
+                const card = document.createElement('a');
+                card.href = dept.file;
+                card.className = "bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-500 transition-all group flex justify-between items-center";
+
+                const typeIcon = dept.type === 'academic' ? 'fa-graduation-cap text-blue-500' :
+                    dept.type === 'support' ? 'fa-clover text-green-500' : 'fa-building text-orange-500';
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="bg-gray-50 p-3 rounded-xl group-hover:bg-green-50 transition">
+                            <i class="fas ${typeIcon} text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 group-hover:text-green-700 transition">${dept.name}</h3>
+                            <span class="text-xs uppercase tracking-widest text-gray-400 font-bold">${dept.type}</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right text-gray-200 group-hover:text-green-500 transform group-hover:translate-x-1 transition"></i>
+                `;
+                grid.appendChild(card);
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-gray-400">No departments found matching your search.</div>`;
+            }
+        }
+
+        document.getElementById('deptSearch').addEventListener('input', (e) => {
+            renderDepartments(e.target.value);
+        });
+
+        renderDepartments();
+    </script>
+</body>
+
+</html>

@@ -97,6 +97,37 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Custom Scrollbar Styles */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 
@@ -241,12 +272,13 @@
     <!-- MODALS (Reply, Details, Logs) -->
     <!-- [Modals remain similar to previous but with streamlined UI] -->
     <div id="reply-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in">
-            <div class="bg-green-600 px-6 py-4 flex justify-between items-center text-white">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="bg-green-600 px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
                 <h3 class="font-bold text-xl"><i class="fas fa-reply mr-2"></i>Send Official Reply</h3>
                 <button onclick="closeReplyModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
-            <form id="reply-form" class="p-6 space-y-4">
+            <form id="reply-form" class="p-6 space-y-4 overflow-y-auto flex-grow custom-scrollbar">
                 <input type="hidden" id="reply-id">
                 <input type="hidden" id="reply-email">
                 <div>
@@ -277,13 +309,14 @@
 
     <!-- COMPOSE MESSAGE TO MEMBER MODAL -->
     <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in">
-            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
                 <h3 class="font-bold text-xl"><i class="fas fa-paper-plane mr-2"></i>Send Message to Registered Member
                 </h3>
                 <button onclick="closeComposeModal()" class="text-2xl hover:text-indigo-200 transition">&times;</button>
             </div>
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
                     <i class="fas fa-info-circle mr-1 text-indigo-400"></i>
                     Enter the email address of a registered member to send them an official message. They will see it in
@@ -411,16 +444,16 @@
     <!-- MESSAGE DETAILS MODAL -->
     <div id="details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in max-h-[90vh]">
-            <div class="border-b dark:border-gray-700 px-6 py-4 flex justify-between items-center">
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="border-b dark:border-gray-700 px-6 py-4 flex justify-between items-center flex-shrink-0">
                 <h3 class="font-bold text-xl" id="details-title">Message Details</h3>
                 <button onclick="closeDetailsModal()"
                     class="text-gray-400 hover:text-gray-600 text-2xl transition">&times;</button>
             </div>
-            <div class="p-6 overflow-y-auto" id="details-content">
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="details-content">
                 <!-- Loaded via JS -->
             </div>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end">
+            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end flex-shrink-0">
                 <button onclick="closeDetailsModal()"
                     class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Close</button>
             </div>
@@ -633,43 +666,57 @@
          * scans all responses for negative sentiment to flag Top Concerns.
          */
         function getDerivedStatus(f) {
-            const negativeKeywords = ['poor', 'dissatisfied', 'difficult', 'no'];
+            const negativeKeywords = [
+                'crash', 'crashed', 'crashing',
+                'freeze', 'frozen', 'freezing',
+                'stuck', 'hang', 'hanging',
+                'unresponsive', 'dead', 'not responding',
+                'broken', 'not working', "doesn't work",
+                'error', 'failure', 'malfunction',
+                'urgent', 'asap', 'immediately',
+                'emergency', 'critical', 'desperate',
+                'serious', 'major', 'severe',
+                'furious', 'angry', 'frustrated',
+                'unacceptable', 'ridiculous', 'horrible',
+                'useless', 'worthless', 'terrible',
+                'slow', 'sluggish', 'lag', 'delay',
+                'loading', 'buffering', 'timeout',
+                'glitch', 'choppy', 'stutter',
+                'difficult', 'hard', 'confusing',
+                'complicated', 'complex', 'unclear',
+                'frustrating', 'annoying', 'irritating',
+                'missing', 'not there', "can't find",
+                "doesn't have", 'no option', 'need',
+                'not intuitive', 'cumbersome', 'cluttered',
+                'overwhelming', 'awkward', 'inconvenient',
+                'tedious', 'inefficient', 'poor', 'dissatisfied', 'no'
+            ];
 
             // 1. Identify "Main Service Rating" for the table column
             let mainRating = 'N/A';
             const office = f.office || '';
 
             if (office === 'ict-services' || office === 'dept-ict') {
-                mainRating = f.q_2 || 'N/A'; // Support experience
+                mainRating = f.q_2 || 'N/A';
             } else if (office === 'finance' || office === 'fees-office' || office === 'accounts-office') {
-                mainRating = f.q_3 || 'N/A'; // Helpfulness/Professionalism
+                mainRating = f.q_3 || 'N/A';
             } else if (office === 'admissions') {
-                mainRating = f.q_3 || 'N/A'; // Responsiveness/Helpfulness
+                mainRating = f.q_3 || 'N/A';
             } else if (f.rating && f.rating !== 'N/A') {
                 mainRating = f.rating;
             } else {
-                // Generic fallback: check qualitative responses q_4, q_3, q_2
                 mainRating = f.q_4 || f.q_3 || f.q_2 || 'N/A';
             }
 
-            // 2. Determine "Top Concern" status (Any negative response)
+            // 2. Determine "Top Concern" status (Keyword matching)
             let isTopConcern = false;
+            const fullContent = (
+                (f.message || '') + ' ' +
+                (f.rating || '') + ' ' +
+                (f.q_0 || '') + ' ' + (f.q_1 || '') + ' ' + (f.q_2 || '') + ' ' + (f.q_3 || '') + ' ' + (f.q_4 || '')
+            ).toLowerCase();
 
-            // Scan all question responses q_0 to q_4
-            for (let i = 0; i <= 4; i++) {
-                const val = f[`q_${i}`];
-                if (val && typeof val === 'string') {
-                    const v = val.toLowerCase();
-                    // "No" is only negative if it's about satisfaction or staff help
-                    if (negativeKeywords.some(k => v.includes(k))) {
-                        isTopConcern = true;
-                        break;
-                    }
-                }
-            }
-
-            // Also check the rating field itself
-            if (!isTopConcern && f.rating && negativeKeywords.some(k => f.rating.toLowerCase().includes(k))) {
+            if (negativeKeywords.some(keyword => fullContent.includes(keyword.toLowerCase()))) {
                 isTopConcern = true;
             }
 
@@ -733,18 +780,22 @@
                 const isGood = mainRating.toLowerCase().includes('good') || mainRating.toLowerCase().includes('satisfied');
                 const isExcellent = mainRating.toLowerCase().includes('excellent') || mainRating.toLowerCase().includes('very');
 
-                let ratingColorClass = 'text-gray-500';
-                let ratingBgClass = 'bg-gray-100 dark:bg-gray-800';
+                // Determine rating value (fallback to q_4 if rating is missing)
+                const displayRating = f.rating || f.q_4 || 'N/A';
+                const ratingLower = displayRating.toLowerCase();
+                let ratingClass = 'bg-gray-100 text-gray-600'; // Default
+                let ratingDot = '⚪';
 
-                if (isPoor) {
-                    ratingColorClass = 'text-red-700 dark:text-red-400';
-                    ratingBgClass = 'bg-red-100 dark:bg-red-900/30';
-                } else if (isExcellent) {
-                    ratingColorClass = 'text-green-700 dark:text-green-400';
-                    ratingBgClass = 'bg-green-100 dark:bg-green-900/30';
-                } else if (isGood) {
-                    ratingColorClass = 'text-yellow-700 dark:text-yellow-400';
-                    ratingBgClass = 'bg-yellow-100 dark:bg-yellow-900/30';
+                if (ratingLower.includes('poor') || ratingLower.includes('dissatisfied') || ratingLower.includes('difficult')) {
+                    ratingClass = 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400';
+                    ratingDot = '🔴';
+                } else if (ratingLower.includes('excellent') || ratingLower.includes('very')) {
+                    ratingClass = 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400';
+                    ratingDot = '🟢';
+                } else if (ratingLower !== '' && ratingLower !== 'n/a') {
+                    // Match good, satisfied, easy, neutral, fair
+                    ratingClass = 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400';
+                    ratingDot = '🟡';
                 }
 
                 return `
@@ -767,18 +818,12 @@
                             ${f.anonymous === "true" ? "Anonymous" : (f.category || "Staff/Student")}
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-sm space-y-1">
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-[10px] uppercase font-bold text-gray-400">User:</span>
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${ratingBgClass} ${ratingColorClass}">
-                                ${f.rating || 'N/A'}
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${ratingClass}">
+                                ${displayRating}
                             </span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="text-[10px] uppercase font-bold text-gray-400">Service:</span>
-                            <span class="text-[11px] font-semibold text-gray-500 dark:text-gray-400">
-                                ${mainRating} ${isPoor ? '🔴' : (isExcellent ? '🟢' : (isGood ? '🟡' : ''))}
-                            </span>
+                            <span class="text-base">${ratingDot}</span>
                         </div>
                     </td>
                     <td class="px-6 py-4 text-xs text-gray-500">
@@ -876,18 +921,6 @@
                             <p class="font-bold text-sm text-indigo-500 truncate">${window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office}</p>
                         </div>
                         <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
-                            <label class="text-xs font-bold text-gray-400 uppercase">User Rating</label>
-                            <p class="font-bold text-sm ${isTopConcern ? 'text-red-600' : (f.rating && f.rating.toLowerCase().includes('excellent') ? 'text-green-600' : 'text-yellow-500')}">
-                                ${f.rating || 'N/A'}
-                            </p>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Service Quality Scale</label>
-                            <p class="font-bold text-sm ${isTopConcern ? 'text-red-600' : 'text-blue-500'}">
-                                ${mainRating}
-                            </p>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
                             <label class="text-xs font-bold text-gray-400 uppercase">Status</label>
                             <p class="font-bold text-sm ${f.is_read ? 'text-green-500' : 'text-orange-500'}">
                                 ${f.is_read ? 'Reviewed' : 'Awaiting Review'}
@@ -906,7 +939,7 @@
 
                     <div>
                         <label class="text-xs font-bold text-gray-400 uppercase">Detailed Feedback Message</label>
-                        <div class="mt-2 message-preview bg-gray-50 dark:bg-gray-900/50 p-4 border dark:border-gray-700 rounded-xl">
+                        <div class="mt-2 message-preview bg-gray-50 dark:bg-gray-900/50 p-4 border dark:border-gray-700 rounded-xl shadow-inner max-h-48 overflow-y-auto custom-scrollbar">
                             ${f.message || '<span class="italic text-gray-400">No message provided</span>'}
                         </div>
                     </div>

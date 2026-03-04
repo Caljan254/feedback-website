@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
 <head>
@@ -114,188 +114,168 @@
 
             <form class="department-feedback-form space-y-8">
                 <!-- Dynamic Questions Container -->
-                <div id="dynamic-questions" class="space-y-6"></div>
+<div id="dynamic-questions" class="space-y-6"></div>
 
-                <!-- Question 1 -->
-                <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of
-                        your visit today?</p>
-                    <div class="space-y-3 pl-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_0" value="General Inquiry" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">General
-                                Inquiry</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_0" value="Service Request" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Service
-                                Request</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_0" value="Document Submission" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Document
-                                Submission</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_0" value="Follow-up Visit" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Follow-up
-                                Visit</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 2 -->
-                <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the clarity
-                        of information and guidance provided?</p>
-                    <div class="space-y-3 pl-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_1" value="Excellent" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
-                                - Very clear and helpful</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_1" value="Good" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
-                                - Clear enough to proceed</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_1" value="Poor" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
-                                - Confusing or incomplete</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 3 -->
-                <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the
-                        efficiency and waiting time for the service?</p>
-                    <div class="space-y-3 pl-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_2" value="Very Efficient" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Very
-                                Efficient - Served immediately</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_2" value="Acceptable" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Acceptable
-                                - Normal waiting time</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_2" value="Slow" required
-                                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Slow
-                                - Long delay / Needs improvement</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 4 -->
-                <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How would you rate the
-                        professionalism and helpfulness of the staff?</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_3" value="Exceptional" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Exceptional
-                                Service</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_3" value="Helpful" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Helpful
-                                & Courteous</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_3" value="Neutral" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Neutral</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_3" value="Unhelpful" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Needs
-                                Improvement</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Question 5 -->
-                <div class="space-y-4">
-                    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. Overall, how would you rate
-                        your experience with this office today? *</p>
-                    <div class="flex flex-wrap items-center gap-8 pl-2">
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_4" value="Excellent" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Excellent</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_4" value="Good" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Good</span>
-                        </label>
-                        <label class="flex items-center cursor-pointer group">
-                            <input type="radio" name="q_4" value="Poor" required
-                                class="w-5 h-5 text-blue-600 border-gray-300">
-                            <span
-                                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Poor</span>
-                        </label>
-                    </div>
-                </div>
-                <!-- Hidden input for rating -->
-                <input type="hidden" name="rating" x-data
-                    x-effect="$el.value = $nextTick(() => document.querySelector('input[name=q_4]:checked')?.value)">
-
-                <!-- Question 6 -->
-                <div class="space-y-4">
-                    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">6. Do you have any
-                        general comments, suggestions, or specific feedback for this office? *</label>
-                    <textarea name="comment" rows="5" required
-                        class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
-                        placeholder="Write your feedback here..."></textarea>
-                </div>
-
-                <div class="pt-6">
-                    <button type="submit"
-                        class="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 w-full transition-all duration-300 text-xl font-bold tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
-                        Submit Feedback
-                    </button>
-                </div>
-            </form>
-        </section>
-
+<!-- Question 1 -->
+<div class="space-y-4">
+    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of
+        your visit today?</p>
+    <div class="space-y-3 pl-2">
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_0" value="General Inquiry" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">General
+                Inquiry</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_0" value="Service Request" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Service
+                Request</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_0" value="Document Submission" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Document
+                Submission</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_0" value="Follow-up Visit" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Follow-up
+                Visit</span>
+        </label>
     </div>
-    <div id="footer-placeholder"></div>
-    <script src="../../src/js/load-components.js"></script>
-    <script src="../../src/js/feedback-portal.js"></script>
+</div>
+
+<!-- Question 2 -->
+<div class="space-y-4">
+    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the clarity
+        of information and guidance provided?</p>
+    <div class="space-y-3 pl-2">
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_1" value="Excellent" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
+                - Very clear and helpful</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_1" value="Good" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
+                - Clear enough to proceed</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_1" value="Poor" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
+                - Confusing or incomplete</span>
+        </label>
+    </div>
+</div>
+
+<!-- Question 3 -->
+<div class="space-y-4">
+    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the
+        efficiency and waiting time for the service?</p>
+    <div class="space-y-3 pl-2">
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_2" value="Very Efficient" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Very
+                Efficient - Served immediately</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_2" value="Acceptable" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Acceptable
+                - Normal waiting time</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_2" value="Slow" required
+                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Slow
+                - Long delay / Needs improvement</span>
+        </label>
+    </div>
+</div>
+
+<!-- Question 4 -->
+<div class="space-y-4">
+    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How would you rate the
+        professionalism and helpfulness of the staff?</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_3" value="Exceptional" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Exceptional
+                Service</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_3" value="Helpful" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Helpful
+                & Courteous</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_3" value="Neutral" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span
+                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Neutral</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_3" value="Unhelpful" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Needs
+                Improvement</span>
+        </label>
+    </div>
+</div>
+
+<!-- Question 5 -->
+<div class="space-y-4">
+    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">5. Overall, how would you rate
+        your experience with this office today? *</p>
+    <div class="flex flex-wrap items-center gap-8 pl-2">
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_4" value="Excellent" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span
+                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Excellent</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_4" value="Good" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span
+                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Good</span>
+        </label>
+        <label class="flex items-center cursor-pointer group">
+            <input type="radio" name="q_4" value="Poor" required class="w-5 h-5 text-blue-600 border-gray-300">
+            <span
+                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Poor</span>
+        </label>
+    </div>
+</div>
+<!-- Hidden input for rating -->
+<input type="hidden" name="rating" x-data
+    x-effect="$nextTick(() => { $el.value = document.querySelector(\'input[name=q_4]:checked\')?.value || \'\' })">
+
+<!-- Question 6 -->
+<div class="space-y-4">
+    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">6. Do you have any
+        general comments, suggestions, or specific feedback for this office? *</label>
+    <textarea name="comment" rows="5" required
+        class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
+        placeholder="Write your feedback here..."></textarea>
+</div>
+
+<div class="pt-6">
+    <button type="submit"
+        class="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 w-full transition-all duration-300 text-xl font-bold tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+        Submit Feedback
+    </button>
+</div>
+</form>
+</section>
+
+</div>
+<div id="footer-placeholder"></div>
+<script src="../../src/js/load-components.js"></script>
+<script src="../../src/js/feedback-portal.js"></script>
 </body>
 
-</html>
+</html> -->
