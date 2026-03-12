@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>South Eastern Kenya University (SEKU) Customer Feedback System</title>
-    <link rel="icon" type="image/x-icon" href="../../../public/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -210,7 +210,7 @@
         <!-- HOME SECTION -->
         <section id="home-section" class="w-full">
             <div id="carousel" class="relative w-full h-[50vh] sm:h-[45vh] overflow-hidden shadow-lg group">
-                <img src="../../../public/uploads/slide1.png" alt="University Campus"
+                <img src="/uploads/slide1.png" alt="University Campus"
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="eager" />
 
@@ -477,6 +477,7 @@
                 search: '',
                 selectedOffice: null,
                 categories: [
+                    /*
                     {
                         name: 'Management Offices',
                         offices: [
@@ -553,20 +554,22 @@
                             { value: 'training-dev', name: 'Training & Development' }
                         ]
                     },
+                    */
                     {
                         name: 'Support Services',
                         offices: [
-                            { value: 'library', name: 'Library Services' },
-                            { value: 'ict-services', name: 'ICT Services' },
-                            { value: 'health-unit', name: 'Health Unit / Clinic' },
+                            /* { value: 'library', name: 'Library Services' }, */
+                            { value: 'ict-services', name: 'ICT Services' }
+                            /* { value: 'health-unit', name: 'Health Unit / Clinic' },
                             { value: 'hostel', name: 'Accommodation / Hostel Office' },
                             { value: 'catering', name: 'Catering Services' },
                             { value: 'estate', name: 'Estate / Maintenance Department' },
                             { value: 'transport', name: 'Transport Office' },
                             { value: 'security', name: 'Security Department' },
-                            { value: 'grounds', name: 'Grounds & Cleaning Services' }
+                            { value: 'grounds', name: 'Grounds & Cleaning Services' } */
                         ]
-                    },
+                    }
+                    /*
                     {
                         name: 'Research & Outreach',
                         offices: [
@@ -575,6 +578,7 @@
                             { value: 'community-outreach', name: 'Community Outreach & Extension' }
                         ]
                     }
+                    */
                 ],
                 get filteredCategories() {
                     if (!this.search) return this.categories;

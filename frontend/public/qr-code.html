@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Feedback System QR Code - SEKU</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         @media print {
             .no-print {
@@ -25,25 +26,22 @@
 </head>
 
 <body class="bg-gray-100 min-height-screen flex flex-col items-center justify-center p-4">
-    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center print-card">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl p-8 text-center print-card mt-10">
         <div class="mb-6">
             <h1 class="text-2xl font-bold text-blue-900 mb-2">SEKU FEEDBACK SYSTEM</h1>
             <p class="text-gray-600">Scan to provide your feedback</p>
         </div>
 
-        <div class="bg-blue-50 p-6 rounded-2xl mb-8 flex justify-center">
-            <!-- Replacing with a real QR code URL. Assuming it points to the root of the site -->
-            <img id="qr-code"
-                src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://your-domain.com"
-                alt="QR Code" class="w-64 h-64 shadow-md">
+        <div class="bg-blue-50 p-6 rounded-2xl mb-8 flex justify-center h-72 items-center" id="qr-container">
+            <!-- QR code will be generated here -->
+            <p class="text-gray-400 text-sm">Generating...</p>
         </div>
 
         <div class="space-y-4 no-print">
-            <p class="text-sm text-gray-500">Note: Replace 'your-domain.com' with your actual server URL in the link
-                below to generate the correct code.</p>
+            <p class="text-sm text-gray-500">Edit the URL below if the auto-detected server URL is incorrect.</p>
             <div class="flex gap-2">
-                <input type="text" id="url-input" placeholder="Enter site URL (e.g. http://192.168.1.10:8000)"
-                    class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" id="url-input" placeholder="Enter site URL"
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none text-sm">
                 <button onclick="updateQR()"
                     class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">Update</button>
             </div>
@@ -61,18 +59,55 @@
     </div>
 
     <script>
+        let qrcodeObj = null;
+
         function updateQR() {
             const url = document.getElementById('url-input').value;
             if (url) {
-                const qrImg = document.getElementById('qr-code');
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+                const container = document.getElementById('qr-container');
+                container.innerHTML = '';
+                try {
+                    qrcodeObj = new QRCode(container, {
+                        text: url,
+                        width: 200,
+                        height: 200,
+                        colorDark : "#1e3a8a", // blue-900
+                        colorLight : "#eff6ff", // blue-50 match for seamless
+                        correctLevel : QRCode.CorrectLevel.M
+                    });
+
+                    setTimeout(() => {
+                        const canvas = container.querySelector('canvas');
+                        const img = container.querySelector('img');
+                        if (img) {
+                            img.className = 'w-64 h-64 shadow-md rounded-lg overflow-hidden mix-blend-multiply';
+                            if(canvas) canvas.style.display = 'none';
+                            img.style.display = 'block';
+                            img.style.margin = '0 auto';
+                        }
+                    }, 50);
+                } catch(e) {
+                    console.error("QR logic missing.", e);
+                    container.innerHTML = '<p class="text-red-500 text-sm">Failed to generate QR</p>';
+                }
             }
         }
 
-        // Auto-detect current URL if possible (though for local IP it might need manual entry)
+        // Auto-detect current URL
         window.onload = () => {
-            const currentUrl = window.location.origin;
-            document.getElementById('url-input').value = currentUrl;
+            // Determine the actual root of the site instead of just origin
+            let currentPath = window.location.pathname;
+            let baseUrl = window.location.origin;
+
+            // If we are nested, strip out qr-code.html to get the public root
+            if (currentPath.endsWith('/qr-code.html')) {
+                baseUrl += currentPath.replace('/qr-code.html', '');
+            } else if (currentPath.indexOf('/public/') !== -1) {
+                baseUrl += currentPath.substring(0, currentPath.indexOf('/public/') + 7);
+            }
+
+            // Fallback to ensuring the user enters the root, but pre-populate the best guess
+            document.getElementById('url-input').value = baseUrl;
             updateQR();
         }
     </script>

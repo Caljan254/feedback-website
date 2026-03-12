@@ -141,6 +141,7 @@
                 search: '',
                 selectedOffice: null,
                 categories: [
+                    /*
                     {
                         name: 'Management Offices',
                         offices: [
@@ -217,20 +218,22 @@
                             { value: 'training-dev', name: 'Training & Development' }
                         ]
                     },
+                    */
                     {
                         name: 'Support Services',
                         offices: [
-                            { value: 'library', name: 'Library Services' },
-                            { value: 'ict-services', name: 'ICT Services' },
-                            { value: 'health-unit', name: 'Health Unit / Clinic' },
+                            /* { value: 'library', name: 'Library Services' }, */
+                            { value: 'ict-services', name: 'ICT Services' }
+                            /* { value: 'health-unit', name: 'Health Unit / Clinic' },
                             { value: 'hostel', name: 'Accommodation / Hostel Office' },
                             { value: 'catering', name: 'Catering Services' },
                             { value: 'estate', name: 'Estate / Maintenance Department' },
                             { value: 'transport', name: 'Transport Office' },
                             { value: 'security', name: 'Security Department' },
-                            { value: 'grounds', name: 'Grounds & Cleaning Services' }
+                            { value: 'grounds', name: 'Grounds & Cleaning Services' } */
                         ]
-                    },
+                    }
+                    /*
                     {
                         name: 'Research & Outreach',
                         offices: [
@@ -239,6 +242,7 @@
                             { value: 'community-outreach', name: 'Community Outreach & Extension' }
                         ]
                     }
+                    */
                 ],
                 get filteredCategories() {
                     if (!this.search) return this.categories;

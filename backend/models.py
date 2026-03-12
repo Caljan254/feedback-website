@@ -82,8 +82,11 @@ class QuestionResponse(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     feedback_id = Column(Integer, ForeignKey("feedback.id"), index=True)
-    question_id = Column(Integer, ForeignKey("questions.id"), index=True)
+    question_id = Column(Integer, ForeignKey("questions.id"), nullable=True, index=True)
     answer = Column(String(255))
+    # Stores the actual question label visible on the form at submission time.
+    # This is the ground truth — it overrides any DB question lookup by ID.
+    question_text = Column(String(500), nullable=True)
 
     feedback = relationship("Feedback", back_populates="responses")
     question = relationship("Question", back_populates="responses")

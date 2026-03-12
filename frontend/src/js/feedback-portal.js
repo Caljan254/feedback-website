@@ -551,7 +551,57 @@ class FeedbackPortal {
     async handleDepartmentFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
+
+        // ─── CLIENT-SIDE VALIDATION ───────────────────────────────────────────
+        // 1. Check every dynamic-question-block radio group has been answered
+        const questionBlocks = document.querySelectorAll('.dynamic-question-block');
+        let firstUnanswered = null;
+
+        questionBlocks.forEach(block => {
+            const questionId = block.getAttribute('data-question-id');
+            if (!questionId) return;
+            const radioInputs = block.querySelectorAll(`input[type="radio"][name="dq_${questionId}"]`);
+            if (radioInputs.length === 0) return; // no radio buttons in this block
+
+            const isAnswered = block.querySelector(`input[name="dq_${questionId}"]:checked`);
+            if (!isAnswered) {
+                // Highlight the unanswered block
+                block.style.outline = '2px solid #ef4444';
+                block.style.borderRadius = '8px';
+                block.style.padding = '8px';
+                if (!firstUnanswered) firstUnanswered = block;
+            } else {
+                // Clear any previous highlight
+                block.style.outline = '';
+                block.style.padding = '';
+            }
+        });
+
+        // 2. Check required textareas and text inputs (non-hidden), as well as specific feedback comment fields
+        let firstEmptyRequired = null;
         
+        // Target specifically textareas that contain compliments, complaints, and suggestions, as well as any with required attr
+        const requiredSelector = 'textarea[required], input[required]:not([type="radio"]):not([type="hidden"]), ' + 
+                               'textarea[x-model="compliments"], textarea[x-model="complaints"], textarea[x-model="suggestions"]';
+        
+        form.querySelectorAll(requiredSelector).forEach(el => {
+            if (!el.value.trim()) {
+                el.style.outline = '2px solid #ef4444';
+                if (!firstEmptyRequired) firstEmptyRequired = el;
+            } else {
+                el.style.outline = '';
+            }
+        });
+
+        // 3. Report errors and stop submission if any validation failed
+        const firstError = firstUnanswered || firstEmptyRequired;
+        if (firstError) {
+            this.showNotification('⚠️ Please answer all required questions before submitting.', 'error', 5000);
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return; // Stop submission
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         const formValues = {};
         form.querySelectorAll('input, textarea, select').forEach(input => {
             if (input.type === 'radio') {
@@ -563,16 +613,33 @@ class FeedbackPortal {
             }
         });
 
-        // Collect dynamic responses
+        // Collect dynamic responses — capture both the answer AND the visible question label
         const dynamicResponses = [];
-        const questionBlocks = document.querySelectorAll('.dynamic-question-block');
         questionBlocks.forEach(block => {
             const questionId = block.getAttribute('data-question-id');
+            if (!questionId) return;
             const selectedOption = block.querySelector(`input[name="dq_${questionId}"]:checked`);
             if (selectedOption) {
+                // Extract the visible question text from the block's <p> or <td> element.
+                // This is the ground truth label shown to the user – NOT the DB question text
+                // (which may belong to a different department sharing the same question_id).
+                let visibleQuestionText = '';
+                const pEl = block.querySelector('p');
+                const tdEl = block.querySelector('td:first-child'); // for grid/table rows
+                if (pEl) {
+                    // Get the clean text of the <p> (strip child span sub-text like hints)
+                    // Clone to extract only the direct text nodes, ignoring hint spans
+                    const clone = pEl.cloneNode(true);
+                    clone.querySelectorAll('span').forEach(s => s.remove());
+                    visibleQuestionText = clone.textContent.trim().replace(/^\d+\.\s*/, ''); // strip leading "1. "
+                } else if (tdEl) {
+                    visibleQuestionText = tdEl.textContent.trim();
+                }
+
                 dynamicResponses.push({
                     question_id: parseInt(questionId),
-                    answer: selectedOption.value
+                    answer: selectedOption.value,
+                    question_text: visibleQuestionText || null
                 });
             }
         });
@@ -600,9 +667,19 @@ class FeedbackPortal {
             // Artificial delay to ensure user sees the loading state
             await new Promise(resolve => setTimeout(resolve, 2000));
 
+            // Include Authorization header if user is logged in
+            const headers = { 
+                "Content-Type": "application/json", 
+                "Accept": "application/json" 
+            };
+            const token = localStorage.getItem('token');
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
+
             const res = await fetch("/api/submit-feedback", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                headers: headers,
                 body: JSON.stringify(finalData)
             });
 
@@ -696,6 +773,33 @@ class FeedbackPortal {
         if (!office) {
             this.showNotification('Please select an office first', 'error');
             return;
+        }
+
+        // PRE-FILL for logged in users
+        const token = localStorage.getItem('token');
+        if (token) {
+            const nameEl = document.getElementById('name');
+            const emailEl = document.getElementById('email');
+            const categoryEl = document.getElementById('category');
+
+            if (nameEl && !nameEl.value) nameEl.value = localStorage.getItem('userFullname') || '';
+            if (emailEl && !emailEl.value) emailEl.value = localStorage.getItem('userEmail') || '';
+            if (categoryEl && !categoryEl.value) {
+                const role = localStorage.getItem('userRole');
+                if (role) {
+                    // Try to match the dropdown value (e.g., 'Staff', 'Student', 'Visitor')
+                    const formattedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+                    // Basic mapping
+                    const options = Array.from(categoryEl.options).map(opt => opt.value);
+                    if (options.includes(formattedRole)) {
+                        categoryEl.value = formattedRole;
+                    } else if (role.toLowerCase().includes('staff')) {
+                        categoryEl.value = 'Staff';
+                    } else if (role.toLowerCase().includes('student')) {
+                        categoryEl.value = 'Student';
+                    }
+                }
+            }
         }
         
         document.getElementById('office-section')?.classList.add('hidden');

@@ -7,8 +7,7 @@ def fix_html_files():
     replacement = r'x-effect="$nextTick(() => { $el.value = document.querySelector(\'input[name=q_4]:checked\')?.value || \'\' })"'
     
     # Also handle alternate patterns just in case
-    # Pattern 2: without space
-    # Pattern 3: maybe with another name
+   
     
     count = 0
     for filename in os.listdir(directory):

@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy.exc import SQLAlchemyError
 from models import Feedback, User, Department, ActivityLog, Question, QuestionResponse
 from schemas import (
     FeedbackCreate, FeedbackOut, UserCreate, UserOut, 
     LoginRequest, Token, FeedbackTrackRequest,
     QuestionCreate, QuestionOut, QuestionResponseCreate, FeedbackCreateExtended,
-    FeedbackOutExtended
+    FeedbackOutExtended, ForgotPasswordRequest, ResetPasswordRequest
 )
 from auth import authenticate_user, create_access_token, get_current_user, get_password_hash
 from database import get_db
@@ -140,6 +140,42 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         logger.error(f"Unexpected error in login: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
+# 🔑 Forgot Password Route
+@router.post("/forgot-password")
+def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    from auth import create_reset_token
+    from email_service import email_service
+    
+    logger.info(f"Forgot password attempt for {request.email}")
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    
+    token = create_reset_token(user.email)
+    success = email_service.send_password_reset(user.email, token)
+    if not success:
+        raise HTTPException(status_code=500, detail="Failed to send reset email.")
+        
+    return {"message": "Password reset email sent."}
+
+# 🔐 Reset Password Route
+@router.post("/reset-password")
+def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    from auth import verify_reset_token, get_password_hash
+    
+    try:
+        email = verify_reset_token(request.token)
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+            
+        user.hashed_password = get_password_hash(request.new_password)
+        db.commit()
+        return {"message": "Password updated successfully."}
+    except Exception as e:
+        db.rollback()
+        raise e
+
 # 💬 Submit Feedback Route
 @router.post("/submit-feedback", response_model=FeedbackOut)
 def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: BackgroundTasks, 
@@ -260,12 +296,13 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
         db.commit()
         db.refresh(db_feedback)
 
-        # Save dynamic responses
+        # Save dynamic responses — including question_text (the visible label from the HTML form)
         for resp in dynamic_responses:
             db_resp = QuestionResponse(
                 feedback_id=db_feedback.id,
-                question_id=resp['question_id'],
-                answer=resp['answer']
+                question_id=resp.get('question_id'),
+                answer=resp['answer'],
+                question_text=resp.get('question_text')  # Store the actual visible question label
             )
             db.add(db_resp)
         
@@ -304,15 +341,18 @@ def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends
         
         logger.info(f"Admin {current_user.email or current_user.username} fetching feedback")
         
-        # We use joinedload or simply rely on relationship lazy loading which Pydantic handles
-        query = db.query(Feedback)
+        # We use selectinload to eagerly load responses and their related questions.
+        # selectinload is preferred over joinedload for one-to-many collections
+        # because it avoids Cartesian product issues and works correctly with order_by.
+        # This ensures question_text @property on QuestionResponse is accessible.
+        from sqlalchemy.orm import selectinload
+        query = db.query(Feedback).options(
+            selectinload(Feedback.responses).selectinload(QuestionResponse.question)
+        )
         if current_user.role == "admin" and current_user.department_id:
             query = query.filter(Feedback.department_id == current_user.department_id)
             
         feedback = query.order_by(Feedback.created_at.desc()).all()
-        
-        # For each feedback, we need to populate question_text in responses if we want it in the UI
-        # But let's keep it simple for now, the UI can fetch questions separately or we can map them here.
         
         logger.info(f"Returning {len(feedback)} feedback entries")
         return feedback
@@ -527,14 +567,14 @@ def send_admin_message_to_member(
         raise HTTPException(status_code=500, detail="Database error")
 
 # 👤 User Route – View Own Feedback
-@router.get("/user/feedback", response_model=List[FeedbackOut])
+@router.get("/user/feedback", response_model=List[FeedbackOutExtended])
 def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         if not current_user:
             raise HTTPException(status_code=401, detail="Not authenticated")
             
         logger.info(f"User {current_user.email} fetching their feedback")
-        feedback = db.query(Feedback).filter(Feedback.email == current_user.email).order_by(Feedback.created_at.desc()).all()
+        feedback = db.query(Feedback).options(selectinload(Feedback.responses)).filter(Feedback.email == current_user.email).order_by(Feedback.created_at.desc()).all()
         logger.info(f"Returning {len(feedback)} feedback entries for user {current_user.email}")
         return feedback
         
@@ -543,13 +583,13 @@ def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depend
         raise HTTPException(status_code=500, detail="Database error")
 
 # 👤 Anonymous Route – Track Feedback by Email or Tracking ID
-@router.post("/feedback/track", response_model=List[FeedbackOut])
+@router.post("/feedback/track", response_model=List[FeedbackOutExtended])
 def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db)):
     try:
         if not request.email and not request.tracking_id:
             raise HTTPException(status_code=400, detail="Email or Tracking ID required")
             
-        query = db.query(Feedback)
+        query = db.query(Feedback).options(selectinload(Feedback.responses))
         if request.tracking_id:
             logger.info(f"Tracking feedback for ID: {request.tracking_id}")
             feedback = query.filter(Feedback.tracking_id == request.tracking_id).all()
@@ -672,22 +712,84 @@ def get_questions(office: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(Question).filter(Question.is_active == True)
     if office:
         # Filter by specific office or global (target_office is null)
-        query = query.filter((Question.target_office == office) | (Question.target_office == None))
+        query = query.filter((Question.target_office == office) | (Question.target_office == None) | (Question.target_office == ''))
     return query.all()
+
+def get_admin_target_office(user: User, db: Session):
+    """Helper to determine the target_office slug for a department admin."""
+    if not user.department_id:
+        return None # Global admin
+    
+    dept = db.query(Department).filter(Department.id == user.department_id).first()
+    if not dept:
+        return None
+    
+    mapping = {
+        'ICT Services': 'ict-services',
+        'Dept of Computing & IT': 'ict-services',
+        'Finance Department': 'finance',
+        'Library Services': 'library',
+        'Admissions Office': 'admissions',
+        'Hostel / Accommodation': 'hostel',
+        'Catering Services': 'catering',
+        'Security Department': 'security',
+        'Transport': 'transport',
+        'Health Unit / Clinic': 'health-unit',
+        'Department of Mathematics': 'dept-math',
+        'Dept of Physical Sciences': 'dept-physical',
+        'Dept of Biological Sciences': 'dept-biological',
+        'Dean, School of Sci & Comp': 'ssc-dean',
+        'Dean of Students Office': 'dean-students'
+    }
+    
+    # Try direct mapping
+    if dept.name in mapping:
+        return mapping[dept.name]
+    
+    # Try fuzzy mapping
+    d_low = dept.name.lower()
+    if 'ict' in d_low or 'computing' in d_low: return 'ict-services'
+    if 'finance' in d_low: return 'finance'
+    if 'library' in d_low: return 'library'
+    if 'admission' in d_low: return 'admissions'
+    if 'hostel' in d_low or 'accommodation' in d_low: return 'hostel'
+    if 'catering' in d_low: return 'catering'
+    if 'security' in d_low: return 'security'
+    if 'math' in d_low: return 'dept-math'
+    if 'physical' in d_low: return 'dept-physical'
+    if 'biological' in d_low: return 'dept-biological'
+    if 'dean' in d_low and 'students' in d_low: return 'dean-students'
+    
+    return dept.name.lower().replace(' ', '-').replace('&', '').replace(',', '')
 
 @router.get("/admin/questions/all", response_model=List[QuestionOut])
 def get_all_questions_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     
-    return db.query(Question).filter(Question.is_active == True).all()
+    target_office = get_admin_target_office(current_user, db)
+    
+    query = db.query(Question).filter(Question.is_active == True)
+    if target_office:
+        # Dept admin only sees their questions + global ones? 
+        # Actually, instructions imply they should manage THEIR department's questions.
+        query = query.filter(Question.target_office == target_office)
+    
+    return query.all()
 
 @router.post("/admin/questions", response_model=QuestionOut)
 def add_question(question: QuestionCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     
-    db_question = Question(**question.dict())
+    target_office = get_admin_target_office(current_user, db)
+    
+    # Enforce target_office if user is a department admin
+    db_data = question.dict()
+    if target_office:
+        db_data['target_office'] = target_office
+        
+    db_question = Question(**db_data)
     db.add(db_question)
     db.commit()
     db.refresh(db_question)
@@ -698,9 +800,15 @@ def delete_question(question_id: int, db: Session = Depends(get_db), current_use
     if not current_user or current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     
-    db_question = db.query(Question).filter(Question.id == question_id).first()
+    target_office = get_admin_target_office(current_user, db)
+    
+    query = db.query(Question).filter(Question.id == question_id)
+    if target_office:
+        query = query.filter(Question.target_office == target_office)
+        
+    db_question = query.first()
     if not db_question:
-        raise HTTPException(status_code=404, detail="Question not found")
+        raise HTTPException(status_code=404, detail="Question not found or access denied")
     
     # Soft delete by marking inactive
     db_question.is_active = False

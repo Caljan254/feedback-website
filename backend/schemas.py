@@ -117,6 +117,7 @@ class QuestionOut(BaseModel):
 class QuestionResponseCreate(BaseModel):
     question_id: int
     answer: str
+    question_text: Optional[str] = None  # The actual visible label from the HTML form
 
 class QuestionResponseOut(BaseModel):
     id: int

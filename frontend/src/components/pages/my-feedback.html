@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>South Eastern Kenya University (SEKU) Feedback System</title>
-    <link rel="icon" type="image/x-icon" href="../../../public/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -802,6 +802,14 @@
 
         function getRatingStars(rating) {
             if (!rating) return '';
+            const r = rating.toLowerCase();
+            if (r.includes('excellent') || r.includes('very satisfied')) return '★★★★★';
+            if (r.includes('very good') || r.includes('satisfied')) return '★★★★☆';
+            if (r.includes('good')) return '★★★☆☆';
+            if (r.includes('fair') || r.includes('average')) return '★★☆☆☆';
+            if (r.includes('poor')) return '★☆☆☆☆';
+
+            // Legacy mapping
             const stars = {
                 'Poor': '★☆☆☆☆',
                 'Fair': '★★☆☆☆',
@@ -810,6 +818,22 @@
                 'Excellent': '★★★★★'
             };
             return stars[rating] || '';
+        }
+
+        function getDerivedRating(item) {
+            let displayRating = item.rating || item.q_4 || '';
+
+            if ((!displayRating || displayRating === 'N/A') && item.responses && item.responses.length > 0) {
+                const overallResp = item.responses.find(r => {
+                    // Check explicitly for standard ID 23
+                    if (r.question_id === 23) return true;
+                    const qt = (r.question_text || "").toLowerCase();
+                    return (qt.includes("overall") && (qt.includes("rate") || qt.includes("experience") || qt.includes("satisfaction")));
+                });
+                if (overallResp) displayRating = overallResp.answer;
+            }
+
+            return displayRating || '';
         }
 
         // Show notification
@@ -1218,9 +1242,11 @@
                 // Rating
                 const ratingDisplay = clone.querySelector('.rating-display');
                 const ratingText = clone.querySelector('.rating-text');
-                if (item.rating) {
-                    ratingDisplay.textContent = getRatingStars(item.rating);
-                    ratingText.textContent = item.rating;
+                const derivedRating = getDerivedRating(item);
+
+                if (derivedRating && derivedRating !== 'N/A') {
+                    ratingDisplay.textContent = getRatingStars(derivedRating);
+                    ratingText.textContent = derivedRating;
                 } else {
                     ratingDisplay.innerHTML = '';
                     ratingText.textContent = 'No rating';
@@ -1270,13 +1296,18 @@
             const modal = document.getElementById('feedback-modal');
             const content = document.getElementById('feedback-details-content');
 
-            const standardFields = ['id', 'name', 'email', 'category', 'office', 'rating', 'message',
-                'created_at', 'timestamp', 'anonymous', 'replied_at', 'reply_message',
-                'is_read', 'read_at'];
+            const derivedRating = getDerivedRating(item);
 
-            const questionFields = Object.keys(item)
-                .filter(key => !standardFields.includes(key) && item[key] !== null && item[key] !== '')
-                .map(key => ({ key, value: item[key] }));
+            // Generate responses HTML
+            let responsesHtml = '';
+            if (item.responses && item.responses.length > 0) {
+                responsesHtml = item.responses.map(resp => `
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-lg border-l-4 border-gray-400">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${resp.question_text || `Question #${resp.question_id}`}</p>
+                        <p class="font-bold text-sm text-gray-700 dark:text-gray-300">${resp.answer}</p>
+                    </div>
+                `).join('');
+            }
 
             let detailsHTML = `
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1345,32 +1376,25 @@
                     </div>
                     
                     <div class="space-y-4">
-                        ${item.rating ? `
+                        ${derivedRating ? `
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                             <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
                                 <i class="fas fa-star mr-2 text-yellow-500"></i>Rating
                             </h4>
                             <div class="flex items-center">
-                                <span class="text-2xl text-yellow-500 mr-2">${getRatingStars(item.rating)}</span>
-                                <span class="text-gray-900 dark:text-white font-medium">${item.rating}</span>
+                                <span class="text-2xl text-yellow-500 mr-2">${getRatingStars(derivedRating)}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">${derivedRating}</span>
                             </div>
                         </div>
                         ` : ''}
                         
-                        ${questionFields.length > 0 ? `
+                        ${responsesHtml ? `
                         <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                             <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
                                 <i class="fas fa-question-circle mr-2 text-purple-500"></i>Your Responses
                             </h4>
-                            <div class="space-y-3">
-                                ${questionFields.map(({ key, value }) => `
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            ${key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                                        </p>
-                                        <p class="text-gray-900 dark:text-white break-words">${escapeHtml(value)}</p>
-                                    </div>
-                                `).join('')}
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${responsesHtml}
                             </div>
                         </div>
                         ` : ''}
