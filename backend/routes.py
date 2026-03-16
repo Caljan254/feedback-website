@@ -248,7 +248,7 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
                 'staff-welfare': "Staff Welfare",
                 'training-dev': "Training & Development",
                 'library': "Library",
-                'ict-services': "ICT Services",
+                'ict-services': "Directorate Of ICT",
                 'health-unit': "Health Unit",
                 'hostel': "Hostel / Accommodation",
                 'catering': "Catering",
@@ -298,9 +298,17 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
 
         # Save dynamic responses — including question_text (the visible label from the HTML form)
         for resp in dynamic_responses:
+            q_id = resp.get('question_id')
+            if q_id:
+                # 🛡️ Safety check: Verify ID exists in questions table to avoid IntegrityError (1452)
+                # Some forms use hardcoded IDs that might not be in the DB yet
+                exists = db.query(Question.id).filter(Question.id == q_id).first()
+                if not exists:
+                    q_id = None
+            
             db_resp = QuestionResponse(
                 feedback_id=db_feedback.id,
-                question_id=resp.get('question_id'),
+                question_id=q_id,
                 answer=resp['answer'],
                 question_text=resp.get('question_text')  # Store the actual visible question label
             )
@@ -725,7 +733,7 @@ def get_admin_target_office(user: User, db: Session):
         return None
     
     mapping = {
-        'ICT Services': 'ict-services',
+        'Directorate Of ICT': 'ict-services',
         'Dept of Computing & IT': 'ict-services',
         'Finance Department': 'finance',
         'Library Services': 'library',

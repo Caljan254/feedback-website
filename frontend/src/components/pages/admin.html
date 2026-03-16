@@ -129,6 +129,57 @@
         .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
+        /* Hide contact info and redundant Admin link in admin panel */
+        header .flex.flex-wrap.justify-end.items-center,
+        header [href*="admin.html"] {
+            display: none !important;
+        }
+
+        /* Enhance header welcome text for admin */
+        #header-welcome-text {
+            font-size: 1.1rem !important;
+            letter-spacing: 0.1em !important;
+            padding: 0.25rem 0;
+            width: 100% !important;
+            text-align: center !important;
+        }
+
+        @media (min-width: 768px) {
+            #header-welcome-text {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        /* Professional table styling */
+        thead th {
+            background-color: #f9fafb !important;
+            color: #111827 !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .dark thead th {
+            background-color: #1f2937 !important;
+            color: #f3f4f6 !important;
+            border-bottom-color: #374151;
+        }
+
+        /* Stats Card Polish */
+        .stats-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .stats-card {
+            border-color: rgba(255, 255, 255, 0.05);
+        }
     </style>
 </head>
 
@@ -138,12 +189,12 @@
     <div id="header-placeholder"></div>
 
     <!-- MAIN CONTENT -->
-    <main class="w-full max-w-7xl mx-auto pt-24 px-4 pb-10">
+    <main class="w-full max-w-7xl mx-auto pt-44 px-4 pb-10">
         <div
-            class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-8 border-green-600">
+            class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-8 border-green-600 transition-all hover:shadow-xl">
             <div>
                 <div class="flex items-center space-x-3 text-green-700 dark:text-green-400 mb-1">
-                    <i class="fas fa-building text-2xl"></i>
+                    <i class="fas fa-user-shield text-2xl"></i>
                     <h2 class="text-3xl font-extrabold" id="dept-title">Department Admin</h2>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400">
@@ -182,28 +233,28 @@
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div
-                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-blue-500 transform transition hover:scale-105">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-blue-500">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-inbox mr-2"></i>Total Messages
                 </h3>
                 <p id="total-feedback" class="text-4xl font-bold text-blue-600 mt-2">0</p>
             </div>
             <div
-                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-yellow-500 transform transition hover:scale-105">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-yellow-500">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-clock mr-2"></i>Pending Read
                 </h3>
                 <p id="unread-feedback" class="text-4xl font-bold text-yellow-600 mt-2">0</p>
             </div>
             <div
-                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-green-500 transform transition hover:scale-105">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-green-500">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-check-double mr-2"></i>Replied
                 </h3>
                 <p id="replied-feedback" class="text-4xl font-bold text-green-600 mt-2">0</p>
             </div>
             <div
-                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-purple-500 transform transition hover:scale-105">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-purple-500">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-calendar-day mr-2"></i>New Today
                 </h3>
@@ -586,7 +637,7 @@
                                     <option value="admissions">Admissions</option>
                                     <option value="finance">Finance Department</option>
                                     <option value="library">Library Services</option>
-                                    <option value="ict-services">ICT Services</option>
+                                    <option value="ict-services">Directorate Of ICT</option>
                                     <option value="hostel">Hostel / Accommodation</option>
                                     <option value="catering">Catering Services</option>
                                     <option value="security">Security Department</option>
@@ -646,6 +697,14 @@
 
         async function init() {
             document.getElementById("admin-name").textContent = localStorage.getItem("userFullname") || "Admin";
+
+            // Update header text for admin panel
+            setTimeout(() => {
+                const headerText = document.getElementById("header-welcome-text");
+                if (headerText) {
+                    headerText.textContent = "WELCOME TO ADMIN PANEL, CUSTOMER FEEDBACK SYSTEM";
+                }
+            }, 100);
 
             // Fetch department name
             try {
@@ -713,59 +772,70 @@
 
         /**
          * Derived Rating & Prioritization Logic
-         * Checks specific department questions for the "Service Rate" and
-         * scans all responses for negative sentiment to flag Top Concerns.
+         * Scans actual rating answers for clear dissatisfaction to flag Top Concerns.
+         * Excludes open-ended improvement/suggestion questions.
          */
         function getDerivedStatus(f) {
-            const negativeKeywords = [
-                'crash', 'crashed', 'crashing',
-                'freeze', 'frozen', 'freezing',
-                'stuck', 'hang', 'hanging',
-                'unresponsive', 'dead', 'not responding',
-                'broken', 'not working', "doesn't work",
-                'error', 'failure', 'malfunction',
-                'urgent', 'asap', 'immediately',
-                'emergency', 'critical', 'desperate',
-                'serious', 'major', 'severe',
-                'furious', 'angry', 'frustrated',
-                'unacceptable', 'ridiculous', 'horrible',
-                'useless', 'worthless', 'terrible',
-                'slow', 'sluggish', 'lag', 'delay',
-                'loading', 'buffering', 'timeout',
-                'glitch', 'choppy', 'stutter',
-                'difficult', 'hard', 'confusing',
-                'complicated', 'complex', 'unclear',
-                'frustrating', 'annoying', 'irritating',
-                'missing', 'not there', "can't find",
-                "doesn't have", 'no option', 'need',
-                'not intuitive', 'cumbersome', 'cluttered',
-                'overwhelming', 'awkward', 'inconvenient',
-                'tedious', 'inefficient', 'poor', 'dissatisfied', 'no'
+            // Free-text keywords that indicate a critical issue (msg body only)
+            const criticalKeywords = [
+                'crash', 'freeze', 'unresponsive', 'broken', 'not working',
+                'urgent', 'asap', 'emergency', 'critical', 'furious', 'angry',
+                'unacceptable', 'horrible', 'terrible', 'useless', 'worthless'
             ];
 
-            // 1. Identify "Main Service Rating" for the table column
-            // Priority: f.rating (set from the "Overall Experience" question in all forms) > responses > q_4 fallback
-            let mainRating = 'N/A';
-            const office = f.office || '';
+            // Rating triggers specifically requested by the user
+            // These will match if the answer starts with any of these (e.g. "Poor (Unprofessional)")
+            const negativeTriggers = [
+                'poor',
+                'no coverage',
+                'n/a',
+                'not applicable',
+                'fair',
+                'dissatisfied',
+                'very dissatisfied',
+                'very difficult',
+                'unprofessional'
+            ];
 
+            // Questions to exclude from Top Concern logic
+            const excludedKeywords = ['improvement', 'recommend', 'suggestion', 'comments', 'additional', 'which areas', 'area', 'purpose'];
+
+            // 1. Identify "Main Service Rating"
+            let mainRating = 'Unrated';
             if (f.rating && f.rating !== 'N/A' && f.rating.trim() !== '') {
-                // All modern department forms store the overall rating in f.rating
                 mainRating = f.rating;
             } else {
-                // Fallback for legacy entries or forms without a hidden rating field
-                mainRating = f.q_4 || f.q_3 || f.q_2 || 'N/A';
+                mainRating = f.q_4 || f.q_3 || f.q_2 || 'Unrated';
             }
 
-            // 2. Determine "Top Concern" status (Keyword matching)
+            // 2. Determine "Top Concern"
             let isTopConcern = false;
-            const fullContent = (
-                (f.message || '') + ' ' +
-                (f.rating || '') + ' ' +
-                (f.q_0 || '') + ' ' + (f.q_1 || '') + ' ' + (f.q_2 || '') + ' ' + (f.q_3 || '') + ' ' + (f.q_4 || '')
-            ).toLowerCase();
 
-            if (negativeKeywords.some(keyword => fullContent.includes(keyword.toLowerCase()))) {
-                isTopConcern = true;
+            // 2a. Message scan
+            const msg = (f.message || '').toLowerCase();
+            if (criticalKeywords.some(kw => msg.includes(kw))) isTopConcern = true;
+
+            // 2b. Responses scan
+            if (!isTopConcern && f.responses && f.responses.length > 0) {
+                for (const resp of f.responses) {
+                    const qText = (resp.question_text || '').toLowerCase();
+                    if (excludedKeywords.some(kw => qText.includes(kw))) continue;
+
+                    const ans = (resp.answer || '').toLowerCase().trim();
+                    // Check if answer starts with a trigger (handles "Poor (Unprofessional)")
+                    if (negativeTriggers.some(trig => ans === trig || ans.startsWith(trig + ' ') || ans.startsWith(trig + '('))) {
+                        isTopConcern = true;
+                        break;
+                    }
+                }
+            }
+
+            // 2c. Main rating scan
+            if (!isTopConcern && mainRating !== 'Unrated') {
+                const rLow = mainRating.toLowerCase().trim();
+                if (negativeTriggers.some(trig => rLow === trig || rLow.startsWith(trig + ' ') || rLow.startsWith(trig + '('))) {
+                    isTopConcern = true;
+                }
             }
 
             return { mainRating, isTopConcern };
@@ -790,26 +860,8 @@
                 return matchesSearch && matchesStatus;
             });
 
-            // Prioritize Poor > Good > Excellent
-            const ratingPriority = {
-                'poor': 1,
-                'dissatisfied': 1,
-                'very dissatisfied': 1,
-                'difficult': 1,
-                'very difficult': 1,
-                'neutral': 2,
-                'good': 3,
-                'satisfied': 3,
-                'easy': 3,
-                'excellent': 4,
-                'very satisfied': 4,
-                'very easy': 4
-            };
-
-            filteredFeedback.sort((a, b) => {
-                // Strictly sort by date (newest first)
-                return new Date(b.created_at) - new Date(a.created_at);
-            });
+            // Sort by newest first (time-based only)
+            filteredFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             currentPage = 1;
             renderTable();
@@ -1080,10 +1132,10 @@
             document.getElementById("reply-name-display").value = f.anonymous === "true" ? "Anonymous User" : (f.name || "User");
             const deptTitle = document.getElementById("dept-title").textContent.replace(' Panel', '').trim();
             document.getElementById("reply-subject").value = `RE: Feedback regarding ${f.office || 'University Services'}`;
-            
+
             let signOff = `Best Regards,\n${localStorage.getItem("userFullname")}`;
-            if (deptTitle.toLowerCase().includes("ict services") || deptTitle.toLowerCase() === "ict") {
-                signOff = `Regards\nICT Services Help Desk`;
+            if (deptTitle.toLowerCase().includes("directorate of ict") || deptTitle.toLowerCase().includes("ict services") || deptTitle.toLowerCase() === "ict") {
+                signOff = `Regards\nDirectorate Of ICT Help Desk`;
             }
 
             document.getElementById("reply-message").value = `Dear ${f.name || 'User'},\n\nThank you for reaching out to the ${deptTitle}. We have received your feedback and wanted to inform you that...\n\n${signOff}`;
@@ -1341,10 +1393,10 @@
         function openComposeModal() {
             const deptTitle = document.getElementById("dept-title").textContent.replace(' Panel', '').trim();
             const adminName = localStorage.getItem("userFullname") || "Admin";
-            
+
             let signOff = `Best Regards, \n${adminName} \n${deptTitle} `;
-            if (deptTitle.toLowerCase().includes("ict services") || deptTitle.toLowerCase() === "ict") {
-                signOff = `Regards\nICT Services Help Desk`;
+            if (deptTitle.toLowerCase().includes("directorate of ict") || deptTitle.toLowerCase().includes("ict services") || deptTitle.toLowerCase() === "ict") {
+                signOff = `Regards\nDirectorate Of ICT Help Desk`;
             }
 
             document.getElementById("compose-subject").value = `Official Notice from ${deptTitle} `;
@@ -1406,7 +1458,7 @@
             console.log("Restricting questions for department:", deptName);
 
             const mapping = {
-                'ICT Services': 'ict-services',
+                'Directorate Of ICT': 'ict-services',
                 'Dept of Computing & IT': 'ict-services',
                 'Finance Department': 'finance',
                 'Library Services': 'library',

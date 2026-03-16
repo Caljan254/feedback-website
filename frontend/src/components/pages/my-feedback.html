@@ -321,9 +321,10 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
     <!-- Header placeholder -->
     <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
 
     <!-- Content Wrapper -->
-    <div class="content-wrapper max-w-6xl mx-auto px-4 pt-24 pb-8">
+    <div class="content-wrapper max-w-6xl mx-auto px-4 pt-4 pb-8">
         <!-- Notification Container -->
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
@@ -509,7 +510,7 @@
                             <option value="procurement">Procurement</option>
                             <option value="hr-office">HR Office</option>
                             <option value="library">Library</option>
-                            <option value="ict-services">ICT Services</option>
+                            <option value="ict-services">Directorate Of ICT</option>
                             <option value="health-unit">Health Unit</option>
                             <option value="hostel">Hostel</option>
                             <option value="catering">Catering</option>
@@ -782,7 +783,7 @@
                 'staff-welfare': "Staff Welfare Office",
                 'training-dev': "Training & Development",
                 'library': "Library Services",
-                'ict-services': "ICT Services",
+                'ict-services': "Directorate Of ICT",
                 'health-unit': "Health Unit / Clinic",
                 'hostel': "Accommodation / Hostel",
                 'catering': "Catering Services",
@@ -1531,6 +1532,42 @@
                 trackGuestFeedback();
             }
         }
+    </script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        // Use ResizeObserver for more accuracy if available
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
     </script>
 </body>
 

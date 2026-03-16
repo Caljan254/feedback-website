@@ -115,13 +115,13 @@ class QuestionOut(BaseModel):
         from_attributes = True
 
 class QuestionResponseCreate(BaseModel):
-    question_id: int
+    question_id: Optional[int] = None
     answer: str
     question_text: Optional[str] = None  # The actual visible label from the HTML form
 
 class QuestionResponseOut(BaseModel):
     id: int
-    question_id: int
+    question_id: Optional[int] = None
     answer: str
     question_text: Optional[str] = None
 

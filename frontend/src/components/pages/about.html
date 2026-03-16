@@ -11,12 +11,12 @@
         /* Copy necessary styles from home.html or include a common stylesheet */
         .section-container {
             min-height: calc(100vh - 4rem);
-            padding: 2rem 1rem;
+            padding: 2rem 1rem 2rem;
         }
 
         @media (min-width: 768px) {
             .section-container {
-                padding: 6rem 2rem 4rem;
+                padding: 2rem 2rem 4rem;
             }
         }
 
@@ -48,24 +48,255 @@
         .back-arrow {
             cursor: pointer;
         }
+
+        /* Style for the long descriptive text */
+        .director-message {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 4px solid #10b981;
+            /* emerald-500 */
+        }
+
+        .director-message p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Timeline/process styling */
+        .process-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .process-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 2.5rem;
+            right: -1.5rem;
+            width: 2rem;
+            height: 2px;
+            background: #d1d5db;
+            /* gray-300 */
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .process-step:not(:last-child)::after {
+                display: block;
+            }
+        }
+
+        .step-icon {
+            width: 4rem;
+            height: 4rem;
+            background-color: rgba(16, 185, 129, 0.1);
+            /* green-500 with opacity */
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: #10b981;
+            font-size: 1.5rem;
+            border: 2px solid #10b981;
+            transition: all 0.2s;
+        }
+
+        .dark .step-icon {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+            border-color: #34d399;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
     <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
 
     <div class="content-wrapper">
         <section
             class="section-container bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
             <div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
 
-
                 <h1
                     class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 dark:text-green-400 mb-8 sm:mb-12">
-                    About South Eastern Kenya University (SEKU) Feedback System
+                    Welcome to the Directorate of Information and Communication Technology
                 </h1>
 
-                <div class="about-grid">
+                <div class="director-message bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8 mb-10 sm:mb-14">
+                    <p class="text-gray-700 dark:text-gray-300">
+                        ICT is a key pillar in the twenty first century institutional management. And just like the
+                        evolution of the human race, today’s organisations have evolved with ICT being a pivotal
+                        propeller of this advancement. We as a university have been toe to toe with this global and
+                        necessary metamorphosis.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        The fundamental objective of the Directorate of ICT at SEKU is to provide effective service
+                        delivery and address connectivity geared towards promoting innovation in education and
+                        transforming lives. We believe in a future full of challenges and opportunities where harnessing
+                        the power of information technology would empower academia in terms of information access thus
+                        promoting quality education. This we have continued to achieve and even beat through continual
+                        improvement of our ICT infrastructure and related Standard Operating Procedures (SOPs).
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        In the year 2017 for example, through KENET, the university embarked on a mega project to
+                        implement a 16.8 Km fiber optic link from Kwa Vonza through to Main Campus server room. The
+                        successfully completion and commissioning of this project on 29th November, 2017 has enabled a
+                        direct link of the university ICT infrastructure to the National Fiber Optic Backbone
+                        Infrastructure. Through this brave but worthwhile undertaking, we now have more reliable
+                        internet connectivity and improved internet speeds and by extension, improved service delivery
+                        within the university units that are ICT dependent.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        Due to the critical role played by internet access, the University has also increased bandwidth
+                        capacity from 102 Mbps to 175 Mbps. We have also installed 40 wireless hotspots across our
+                        Campuses. This has not only de-congested our Computer laboratories across campuses but also
+                        increased access to online learning materials.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        With the emerging trends in ICT, we are committed to continue providing the best possible
+                        technological experience to our students through keeping in pace with the global ICT
+                        environment. Students are now able to access ICT services and resources online. This includes
+                        access to academic records (results), self-reporting, unit registration, fee statement, online
+                        academic periodicals like journals, and books. In addition, an online complaints and corruption
+                        reporting system has also been commissioned and currently in use.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        In collaboration with the National Bank of Kenya (NBK), the Directorate of ICT successfully
+                        managed to integrate the ERP system to the NBK System. Students are now receipted at the bank
+                        and their fee accounts updated real-time. Needless to say, this has improved significantly on
+                        fees collection, while at the same time improved the quality service delivery to our students.
+                        Over the same period, over 80% of our students were issued with smart cards for identification
+                        and banking services through the same partnership with National Bank.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        In the latest Webometric rankings of the best Universities in Kenya, SEKU maintains top position
+                        according to the January 2018 editon. For the second year running, SEKU beat notable giants to
+                        take position eight overall in Kenya. This is a further indication of our commitment to quality
+                        service delivery and a learning environment that is grounded in intellectual and academic
+                        freedom, teamwork and quest for academic excellence.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        As a part of our future plan geared towards improving service delivery, the Directorate of ICT
+                        will soon be rolling out a Customer Support System that will be used as a tool to address and
+                        track user support request. This will help serve better both internal and external customers by
+                        directing complaints, inquiries, and complements to the concerned factions.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300">
+                        We as a Directorate are committed to continue working in tandem with the management, staff and
+                        students in offering support on innovations as well as offering ICT support to various sections
+                        of the university to enable them deliver on their promise to our clients. We are also committed
+                        to continuous benchmarking with global best practice of ICT in Education.
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 font-semibold text-green-700 dark:text-green-400">
+                        The future can only be better!
+                    </p>
+                    <p class="text-gray-700 dark:text-gray-300 mt-2">
+                        Director ICT
+                    </p>
+                </div>
+
+                <!-- Strategic Pillars Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <!-- Our Mission -->
+                    <div
+                        class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border-t-4 border-green-500 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-green-600 dark:text-green-400 text-3xl mb-4 text-center">
+                            <i class="fas fa-bullseye"></i>
+                        </div>
+                        <h3
+                            class="text-xl font-bold text-center text-gray-800 dark:text-white mb-4 uppercase tracking-wider">
+                            Our Mission</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-center leading-relaxed italic">
+                            "To use ICT optimally with the view of increasing efficiency within the university as we
+                            endeavor to fit into the new global information and knowledge based economies."
+                        </p>
+                    </div>
+
+                    <!-- Our Vision -->
+                    <div
+                        class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border-t-4 border-blue-500 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-blue-600 dark:text-blue-400 text-3xl mb-4 text-center">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <h3
+                            class="text-xl font-bold text-center text-gray-800 dark:text-white mb-4 uppercase tracking-wider">
+                            Our Vision</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-center leading-relaxed italic">
+                            "To become a global center of excellence where the potential of ICT is harnessed to serve as
+                            a catalyst for effective teaching, research and replenishment aimed at the promotion of
+                            innovation in education technology and transforming lives."
+                        </p>
+                    </div>
+
+                    <!-- Our Goal -->
+                    <div
+                        class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg border-t-4 border-yellow-500 transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-yellow-600 dark:text-yellow-400 text-3xl mb-4 text-center">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <h3
+                            class="text-xl font-bold text-center text-gray-800 dark:text-white mb-4 uppercase tracking-wider">
+                            Our Goal</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-center leading-relaxed italic">
+                            "Our goal is to provide the technology services, systems, and support to all students and
+                            staff."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Service Delivery Charter Section -->
+                <div
+                    class="bg-gradient-to-r from-green-600 to-green-800 rounded-2xl shadow-xl p-8 mb-14 text-white overflow-hidden relative">
+                    <div class="absolute -right-10 -bottom-10 opacity-10 transform rotate-12">
+                        <i class="fas fa-file-contract text-9xl"></i>
+                    </div>
+                    <div class="relative z-10 text-center">
+                        <h2 class="text-3xl font-black mb-6 uppercase tracking-widest">Service Delivery Charter</h2>
+                        <p class="text-lg mb-8 text-green-50 max-w-2xl mx-auto">
+                            We are committed to the highest standards of transparency and accountability in our service
+                            delivery.
+                        </p>
+                        <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                            <p class="text-green-100 italic">"Click here to view our commitments to doing business with
+                                others."</p>
+                            <a href="services.html"
+                                class="inline-flex items-center px-6 py-3 bg-white text-green-700 font-bold rounded-lg hover:bg-yellow-400 hover:text-green-900 transition shadow-lg group">
+                                View our Service Charter
+                                <i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NEW SECTION: Customer Feedback Process (Detailed) -->
+                <div class="mt-8 sm:mt-12 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 sm:p-8">
+                    <h2
+                        class="text-2xl sm:text-3xl font-bold text-center text-green-700 dark:text-green-400 mb-6 sm:mb-8">
+                        <i class="fas fa-comment-dots mr-2"></i>Customer Feedback Process
+                    </h2>
+                    <p class="text-center text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10">
+                        Your voice drives improvement. Our structured feedback process ensures every submission is
+                        acknowledged, reviewed, and acted upon promptly.
+                    </p>
+                    <main class="flex-grow w-full max-w-6xl mx-auto px-4">
+                        <div class="w-full flex justify-center my-2">
+                            <div
+                                class="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-lg w-full max-w-2xl ring-2 sm:ring-4 ring-blue-200">
+                                <button onclick="startFeedbackProcess()"
+                                    class="text-blue-700 text-xl sm:text-3xl font-extrabold hover:underline cursor-pointer block text-center hover:text-blue-900 transition duration-300 w-full">
+                                    Give Feedback
+                                </button>
+                            </div>
+                        </div>
+
+                </div>
+
+                <!-- The original three cards (Purpose, Confidentiality, Impact) -->
+                <div class="about-grid mt-8 sm:mt-12">
                     <div class="about-card bg-white dark:bg-gray-700 shadow-lg">
                         <div class="text-green-600 dark:text-green-400 text-3xl sm:text-4xl mb-3 sm:mb-4">
                             <i class="fas fa-bullhorn"></i>
@@ -107,23 +338,26 @@
                     </div>
                 </div>
 
+                <!-- The original four-step process (kept for continuity) -->
                 <div class="mt-8 sm:mt-12 bg-white dark:bg-gray-700 rounded-xl shadow-lg p-6 sm:p-8">
                     <h2
                         class="text-2xl sm:text-3xl font-bold text-center text-green-700 dark:text-green-400 mb-4 sm:mb-6">
-                        Our Process</h2>
+                        Our Process </h2>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                         <div class="text-center">
                             <div
                                 class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
-                                1</div>
-                            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Submit Feedback</h3>
+                                1
+                            </div>
+                            <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">ICT Feedback</h3>
                             <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">Share your experience through
                                 our secure portal</p>
                         </div>
                         <div class="text-center">
                             <div
                                 class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
-                                2</div>
+                                2
+                            </div>
                             <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Review</h3>
                             <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">Our team analyzes and
                                 categorizes your feedback</p>
@@ -131,7 +365,8 @@
                         <div class="text-center">
                             <div
                                 class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
-                                3</div>
+                                3
+                            </div>
                             <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Action</h3>
                             <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">Relevant departments
                                 implement improvements</p>
@@ -139,7 +374,8 @@
                         <div class="text-center">
                             <div
                                 class="bg-green-100 dark:bg-gray-600 w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full flex items-center justify-center text-green-700 dark:text-green-400 text-xl sm:text-2xl mb-2 sm:mb-3">
-                                4</div>
+                                4
+                            </div>
                             <h3 class="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Follow-up</h3>
                             <p class="text-gray-600 dark:text-gray-300 text-xs sm:text-sm">We monitor changes and may
                                 request additional input</p>
@@ -153,6 +389,46 @@
     <div id="footer-placeholder"></div>
     <script src="../../js/load-components.js"></script>
     <script src="../../js/feedback-portal.js"></script>
+    <script>
+        function startFeedbackProcess() {
+            window.location.href = 'submit-feedback.html';
+        }
+
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        // Use ResizeObserver for more accuracy if available
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
 </body>
 
 </html>

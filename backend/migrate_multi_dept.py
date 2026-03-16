@@ -82,7 +82,7 @@ def migrate_and_seed():
             "Staff Welfare": "welfare",
             "Training & Development": "training",
             "Library": "library",
-            "ICT Services": "ict",
+            "Directorate Of ICT": "ict",
             "Health Unit": "health",
             "Hostel / Accommodation": "hostel",
             "Catering": "catering",

@@ -28,6 +28,9 @@ async function loadComponent(elementId, filePath) {
 
         document.getElementById(elementId).innerHTML = tempDiv.innerHTML;
         
+        // Dispatch event for other scripts to know the component is ready
+        window.dispatchEvent(new CustomEvent('componentLoaded', { detail: { id: elementId } }));
+        
         // Re-initialize any components that need it (themes, mobile menu, etc.)
         if (typeof initTheme === 'function') initTheme();
         if (typeof setupMobileMenu === 'function') setupMobileMenu();

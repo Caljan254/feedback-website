@@ -16,7 +16,33 @@ class FeedbackPortal {
         this.highlightActiveNavLink();
         this.hidePublicNavLinks();
         this.startTimestampUpdater();
+        this.updateLogoForOffice();
         console.log('Feedback Portal initialized');
+    }
+
+    // Update logo based on office
+    updateLogoForOffice() {
+        // Wait for header to load
+        setTimeout(() => {
+            const headerLogo = document.getElementById('main-header-logo');
+            if (!headerLogo) return;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlOffice = urlParams.get('office');
+            const storedOffice = window.selectedOfficeValue || sessionStorage.getItem('selectedOffice')?.value;
+            
+            const officeId = urlOffice || storedOffice || 'ict-services';
+            
+            if (officeId === 'ict-services' || officeId === 'ict' || officeId === 'dept-ict') {
+                headerLogo.src = '/uploads/ict-logo.png';
+                headerLogo.classList.remove('h-10', 'w-10', 'sm:h-12', 'sm:w-12', 'rounded-full', 'shadow', 'bg-white', 'h-12', 'sm:h-14', 'w-12', 'sm:w-14', 'h-14', 'sm:h-16', 'h-20');
+                headerLogo.classList.add('h-12', 'sm:h-20', 'md:h-28', 'w-auto', 'max-w-[250px]', 'sm:max-w-[350px]', 'md:max-w-xl', 'object-contain', 'py-1');
+            } else {
+                headerLogo.src = '/uploads/logo.png';
+                headerLogo.classList.add('h-12', 'w-12', 'sm:h-14', 'sm:w-14', 'rounded-full', 'shadow');
+                headerLogo.classList.remove('h-10', 'sm:h-12', 'h-12', 'sm:h-20', 'md:h-28', 'w-auto', 'max-w-[250px]', 'sm:max-w-[350px]', 'md:max-w-xl', 'object-contain', 'py-1');
+            }
+        }, 300);
     }
 
     // Reinitialize components after dynamic content load
@@ -27,6 +53,7 @@ class FeedbackPortal {
         this.highlightActiveNavLink();
         this.hidePublicNavLinks();
         this.updateAllTimestamps();
+        this.updateLogoForOffice();
     }
 
     // Initialize functions specific to current page
@@ -93,7 +120,9 @@ class FeedbackPortal {
             const officeName = this.getOfficeName(office);
             document.title = `${officeName} Feedback - University Feedback Portal`;
             const titleEl = document.getElementById('department-title');
-            if (titleEl) titleEl.textContent = `${officeName} Feedback`;
+            if (titleEl && !titleEl.textContent.trim().includes("CUSTOMER FEEDBACK")) {
+                titleEl.textContent = `${officeName} Feedback`;
+            }
             
             this.injectQuestions(office);
         }
@@ -288,7 +317,7 @@ class FeedbackPortal {
             'staff-welfare': "Staff Welfare Office",
             'training-dev': "Training & Development Office",
             'library': "Library Services",
-            'ict-services': "ICT Services",
+            'ict-services': "Directorate Of ICT",
             'health-unit': "Health Unit / Clinic",
             'hostel': "Accommodation / Hostel Office",
             'catering': "Catering Services",
@@ -526,11 +555,27 @@ class FeedbackPortal {
         
         displayDiv.classList.remove('hidden');
         
+        // Special welcome message for ICT feedback
+        const urlParams = new URLSearchParams(window.location.search);
+        const office = urlParams.get('office') || '';
+        
+        if (office === 'ict-services' || office === 'ict') {
+            displayDiv.innerHTML = `
+                <div class="flex justify-center items-center py-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl mb-6">
+                    <h2 class="text-2xl font-bold text-blue-700 dark:text-blue-400">Welcome ICT Customer feedback</h2>
+                </div>
+            `;
+            return;
+        }
+        
         let infoHtml = '<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">';
         infoHtml += '<div><span class="font-semibold">Feedback for:</span> ' + (userInfo.name || 'Anonymous User') + '</div>';
-        if (userInfo.category) {
+        
+        // Remove Category: Anonymous as per user request
+        if (userInfo.category && userInfo.category !== 'Anonymous') {
             infoHtml += '<div><span class="font-semibold">Category:</span> ' + userInfo.category + '</div>';
         }
+        
         if (userInfo.email && !userInfo.anonymous) {
             infoHtml += '<div><span class="font-semibold">Email:</span> ' + userInfo.email + '</div>';
         }
@@ -553,52 +598,71 @@ class FeedbackPortal {
         const form = e.target;
 
         // ─── CLIENT-SIDE VALIDATION ───────────────────────────────────────────
-        // 1. Check every dynamic-question-block radio group has been answered
-        const questionBlocks = document.querySelectorAll('.dynamic-question-block');
+        // 1. Check every dynamic-question-block radio group (Validate all in form)
+        const allQuestionBlocks = Array.from(document.querySelectorAll('.dynamic-question-block'));
+        const visibleQuestionBlocks = allQuestionBlocks.filter(block => block.offsetParent !== null);
+        
         let firstUnanswered = null;
 
-        questionBlocks.forEach(block => {
+        allQuestionBlocks.forEach(block => {
             const questionId = block.getAttribute('data-question-id');
             if (!questionId) return;
-            const radioInputs = block.querySelectorAll(`input[type="radio"][name="dq_${questionId}"]`);
-            if (radioInputs.length === 0) return; // no radio buttons in this block
+            
+            const inputs = block.querySelectorAll(`input[type="radio"], input[type="checkbox"]`);
+            const textarea = block.querySelector(`textarea`);
+            const visibleTextInputs = block.querySelectorAll(`input[type="text"]`);
+            
+            let answered = true;
+            
+            if (inputs.length > 0) {
+                const isChecked = Array.from(inputs).some(i => i.checked);
+                if (!isChecked) {
+                    answered = false;
+                } else {
+                    // Check visible text inputs within this block (e.g. for "Other" options)
+                    visibleTextInputs.forEach(ti => {
+                        if (ti.offsetParent !== null && !ti.value.trim()) {
+                            answered = false;
+                        }
+                    });
+                }
+            } else if (textarea) {
+                if (!textarea.value.trim()) answered = false;
+            }
 
-            const isAnswered = block.querySelector(`input[name="dq_${questionId}"]:checked`);
-            if (!isAnswered) {
-                // Highlight the unanswered block
-                block.style.outline = '2px solid #ef4444';
-                block.style.borderRadius = '8px';
-                block.style.padding = '8px';
-                if (!firstUnanswered) firstUnanswered = block;
+            if (!answered) {
+                // Highlight only if visible
+                if (block.offsetParent !== null) {
+                    block.classList.add('ring-2', 'ring-red-500', 'p-2', 'rounded-lg');
+                    if (!firstUnanswered) firstUnanswered = block;
+                }
             } else {
-                // Clear any previous highlight
-                block.style.outline = '';
-                block.style.padding = '';
+                block.classList.remove('ring-2', 'ring-red-500', 'p-2');
             }
         });
 
-        // 2. Check required textareas and text inputs (non-hidden), as well as specific feedback comment fields
+        // 2. Check required textareas and text inputs
         let firstEmptyRequired = null;
+        const requiredInputs = Array.from(form.querySelectorAll('textarea[required], input[required]:not([type="radio"]):not([type="hidden"])'))
+            .filter(el => el.offsetParent !== null); // Standard check for visible fields
         
-        // Target specifically textareas that contain compliments, complaints, and suggestions, as well as any with required attr
-        const requiredSelector = 'textarea[required], input[required]:not([type="radio"]):not([type="hidden"]), ' + 
-                               'textarea[x-model="compliments"], textarea[x-model="complaints"], textarea[x-model="suggestions"]';
-        
-        form.querySelectorAll(requiredSelector).forEach(el => {
+        requiredInputs.forEach(el => {
             if (!el.value.trim()) {
-                el.style.outline = '2px solid #ef4444';
+                el.classList.add('ring-2', 'ring-red-500');
                 if (!firstEmptyRequired) firstEmptyRequired = el;
             } else {
-                el.style.outline = '';
+                el.classList.remove('ring-2', 'ring-red-500');
             }
         });
 
-        // 3. Report errors and stop submission if any validation failed
-        const firstError = firstUnanswered || firstEmptyRequired;
-        if (firstError) {
-            this.showNotification('⚠️ Please answer all required questions before submitting.', 'error', 5000);
-            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return; // Stop submission
+        // 3. Report errors (Only for VISIBLE fields on the final step, assuming Alpine handled previous ones)
+        if (firstUnanswered || firstEmptyRequired) {
+             // If Alpine is used for steps, standard validation usually catches this, 
+             // but we keep it as a safety net for visible fields.
+             if (firstUnanswered || firstEmptyRequired) {
+                this.showNotification('⚠️ Please answer all questions on this page.', 'error');
+                return;
+             }
         }
         // ─────────────────────────────────────────────────────────────────────
 
@@ -613,33 +677,57 @@ class FeedbackPortal {
             }
         });
 
-        // Collect dynamic responses — capture both the answer AND the visible question label
         const dynamicResponses = [];
-        questionBlocks.forEach(block => {
+        allQuestionBlocks.forEach(block => {
             const questionId = block.getAttribute('data-question-id');
             if (!questionId) return;
-            const selectedOption = block.querySelector(`input[name="dq_${questionId}"]:checked`);
-            if (selectedOption) {
-                // Extract the visible question text from the block's <p> or <td> element.
-                // This is the ground truth label shown to the user – NOT the DB question text
-                // (which may belong to a different department sharing the same question_id).
-                let visibleQuestionText = '';
-                const pEl = block.querySelector('p');
-                const tdEl = block.querySelector('td:first-child'); // for grid/table rows
-                if (pEl) {
-                    // Get the clean text of the <p> (strip child span sub-text like hints)
-                    // Clone to extract only the direct text nodes, ignoring hint spans
-                    const clone = pEl.cloneNode(true);
-                    clone.querySelectorAll('span').forEach(s => s.remove());
-                    visibleQuestionText = clone.textContent.trim().replace(/^\d+\.\s*/, ''); // strip leading "1. "
-                } else if (tdEl) {
-                    visibleQuestionText = tdEl.textContent.trim();
-                }
 
+            // 1. Get visible question text (ground truth label)
+            let visibleQuestionText = '';
+            const pEl = block.querySelector('p');
+            const tdEl = block.querySelector('td:first-child');
+            if (pEl) {
+                const clone = pEl.cloneNode(true);
+                clone.querySelectorAll('span').forEach(s => s.remove());
+                visibleQuestionText = clone.textContent.trim().replace(/^\d+\.\s*/, '');
+            } else if (tdEl) {
+                visibleQuestionText = tdEl.textContent.trim();
+            }
+            if (!visibleQuestionText) visibleQuestionText = `Question #${questionId}`;
+
+            let answer = null;
+
+            // 2. Determine Answer based on input types
+            const radios = block.querySelectorAll('input[type="radio"]');
+            const checks = block.querySelectorAll('input[type="checkbox"]');
+            const textarea = block.querySelector('textarea');
+
+            if (radios.length > 0) {
+                const checkedRadio = block.querySelector('input[type="radio"]:checked');
+                if (checkedRadio) answer = checkedRadio.value;
+            } else if (checks.length > 0) {
+                const checkedOnes = Array.from(checks).filter(c => c.checked).map(c => c.value);
+                if (checkedOnes.length > 0) {
+                    // Include 'Other' text if present
+                    const otherInput = block.querySelector('input[type="text"]');
+                    const formattedAnswers = checkedOnes.map(v => {
+                        if (v === 'other' && otherInput && otherInput.value.trim()) {
+                            return otherInput.value.trim();
+                        }
+                        return v;
+                    }).filter(v => v !== 'other');
+                    
+                    if (formattedAnswers.length > 0) answer = formattedAnswers.join(', ');
+                }
+            } else if (textarea) {
+                if (textarea.value.trim()) answer = textarea.value.trim();
+            }
+
+            if (answer) {
                 dynamicResponses.push({
                     question_id: parseInt(questionId),
-                    answer: selectedOption.value,
-                    question_text: visibleQuestionText || null
+                    answer: answer,
+                    question_text: visibleQuestionText
                 });
             }
         });

@@ -91,7 +91,7 @@
             { name: "Hostels", file: "hostel-feedback.html", type: "support" },
             { name: "Human Resources", file: "hr-office-feedback.html", type: "admin" },
             { name: "ICT Office", file: "ict-feedback.html", type: "admin" },
-            { name: "ICT Services", file: "ict-services-feedback.html", type: "admin" },
+            { name: "Directorate Of ICT", file: "ict-services-feedback.html", type: "admin" },
             { name: "Industrial Attachment", file: "industrial-attachment-feedback.html", type: "academic" },
             { name: "Innovation Office", file: "innovation-office-feedback.html", type: "admin" },
             { name: "Internal Audit", file: "internal-audit-feedback.html", type: "admin" },
@@ -127,7 +127,9 @@
 
             filtered.sort((a, b) => a.name.localeCompare(b.name)).forEach(dept => {
                 const card = document.createElement('a');
-                card.href = dept.file;
+                // Derive slug from filename: remove '-feedback.html'
+                const slug = dept.file.replace('-feedback.html', '');
+                card.href = `${dept.file}?office=${slug}`;
                 card.className = "bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-green-500 transition-all group flex justify-between items-center";
 
                 const typeIcon = dept.type === 'academic' ? 'fa-graduation-cap text-blue-500' :

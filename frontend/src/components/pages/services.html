@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Our Services - SEKU ICT Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <style>
+        /* compact spacing overhaul (preserved from original) */
+        .section-container {
+            min-height: calc(100vh - 4rem);
+            padding: 1rem 1rem 3rem;
+        }
+
+        .service-card {
+            /* SEKU Green Theme: Light Emerald Gradient */
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7); 
+            border-radius: 0.75rem;
+            padding: 1.5rem 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(5, 150, 105, 0.1), 0 4px 6px -2px rgba(5, 150, 105, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #b7e4c7; 
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center horizontally */
+            text-align: center;  /* Center text */
+        }
+
+        /* Unified Green Accents to match About Page */
+        .service-card.support, .service-card.training, .service-card.infrastructure, .service-card.network, .service-card.mobile {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-left: 4px solid #10b981;
+            border-color: #b7e4c7;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px -10px rgba(5, 150, 105, 0.15);
+            border-color: #10b981;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #059669, #facc15);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .icon-box {
+            width: 3.5rem;
+            height: 3.5rem;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            border-radius: 9999px; /* Circle like About Page */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: #10b981;
+            transition: all 0.2s ease;
+        }
+
+        .service-card:hover .icon-box {
+            background-color: #10b981;
+            color: white !important;
+            transform: scale(1.1);
+        }
+
+        /* Category color themes */
+        .service-card.support .icon-box {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .service-card.support h3 {
+            color: #0284c7;
+        }
+
+        .service-card.support:hover .icon-box {
+            background: #0369a1;
+            color: white !important;
+        }
+
+        .service-card.training .icon-box {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .service-card.training h3 {
+            color: #d97706;
+        }
+
+        .service-card.training:hover .icon-box {
+            background: #d97706;
+            color: white !important;
+        }
+
+        .service-card.infrastructure .icon-box {
+            background: #dcfce7;
+            color: #059669;
+        }
+
+        .service-card.infrastructure h3 {
+            color: #059669;
+        }
+
+        .service-card.infrastructure:hover .icon-box {
+            background: #059669;
+            color: white !important;
+        }
+
+        .service-card.network .icon-box {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .service-card.network h3 {
+            color: #dc2626;
+        }
+
+        .service-card.network:hover .icon-box {
+            background: #dc2626;
+            color: white !important;
+        }
+
+        .service-card.mobile .icon-box {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        .service-card.mobile h3 {
+            color: #9333ea;
+        }
+
+        .service-card.mobile:hover .icon-box {
+            background: #9333ea;
+            color: white !important;
+        }
+
+        /* Category badges */
+        .category-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            padding: 0.2rem 0.9rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .badge-support {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .badge-training {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-infrastructure {
+            background: #dcfce7;
+            color: #059669;
+        }
+
+        .badge-network {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .badge-mobile {
+            background: #f3e8ff;
+            color: #9333ea;
+        }
+
+        /* Dark mode adjustments */
+        @media (prefers-color-scheme: dark) {
+            .dark .service-card {
+                /* Professional Deep Green Dark Mode */
+                background: linear-gradient(135deg, rgba(6, 78, 59, 0.9), rgba(17, 24, 39, 0.95)) !important;
+                border-color: rgba(16, 185, 129, 0.3);
+                backdrop-filter: blur(12px);
+            }
+
+            .dark .service-card.support, .dark .service-card.training { 
+                background: linear-gradient(135deg, rgba(6, 78, 59, 0.9), rgba(17, 24, 39, 0.95)) !important; 
+            }
+
+            .dark .service-card h3 {
+                color: #f9fafb !important;
+            }
+
+            .dark .service-card p {
+                color: #d1d5db !important;
+            }
+
+            .dark .icon-box {
+                background-color: rgba(16, 185, 129, 0.2);
+                color: #34d399;
+                border-color: #34d399;
+            }
+
+            .dark .category-badge {
+                opacity: 0.9;
+            }
+        }
+
+        /* Category headers */
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 2rem 0 1.2rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .category-header:first-of-type {
+            margin-top: 0.5rem;
+        }
+
+        .category-icon {
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #10b981;
+        }
+
+        .category-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #15803d;
+            /* Match About Page green-700 */
+        }
+
+        .dark .category-title {
+            color: #f9fafb;
+        }
+
+        .dark .category-header {
+            border-bottom-color: #374151;
+        }
+
+        /* grid gaps reduced */
+        .grid {
+            gap: 1rem;
+        }
+
+        /* hero header */
+        .text-center.mb-16 {
+            margin-bottom: 2.5rem;
+        }
+
+        .mt-16 {
+            margin-top: 3rem;
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+
+        .p-6 {
+            padding: 1.2rem;
+        }
+
+        h3.text-2xl {
+            font-size: 1.35rem;
+            margin-bottom: 0.5rem !important;
+        }
+
+        p {
+            margin-bottom: 0.25rem;
+            line-height: 1.5;
+        }
+
+        .service-card .mb-6 {
+            margin-bottom: 0.75rem;
+        }
+
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <div class="content-wrapper">
+        <!-- Full Width Theme: Stretching to touch far left and right -->
+        <section class="section-container bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900 w-full px-4 py-4">
+            <div class="w-full">
+                <!-- Hero Header - compact -->
+                <div class="text-center mb-10">
+                    <h1 class="text-xl font-bold text-green-700 dark:text-green-400 mb-3 uppercase tracking-wider">
+                        <span class="bg-green-100 dark:bg-green-900/40 px-5 py-1.5 rounded-full">Our
+                            Services</span>
+                    </h1>
+                    <div class="w-20 h-0.5 bg-gradient-to-r from-green-600 to-yellow-400 mx-auto mb-4 rounded-full">
+                    </div>
+                    <p class="max-w-4xl mx-auto text-gray-600 dark:text-gray-400 leading-relaxed text-base">
+                        We are committed to continue working in tandem with the management, staff and students in
+                        offering
+                        support on innovations as well as offering ICT support to various sections of the university to
+                        enable them deliver on their promise to our clients.
+                    </p>
+                </div>
+
+                <!-- Support Services Category -->
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-life-ring"></i>
+                    </div>
+                    <h2 class="category-title">Support Services</h2>
+                </div>
+
+                <!-- grid with gap-4 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- ICT Support -->
+                    <div class="service-card support">
+                        <span class="category-badge badge-support">Support</span>
+                        <div class="icon-box">
+                            <i class="fas fa-headset text-xl"></i>
+                        </div>
+                        <h3 class="font-black mb-2">ICT Support</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                            The directorate provides comprehensive ICT-related support to both staff and students,
+                            available
+                            through in-person consultations and our 24/7 online portal.
+                        </p>
+                    </div>
+
+                    <!-- ICT Training -->
+                    <div class="service-card training">
+                        <span class="category-badge badge-training">Training</span>
+                        <div class="icon-box">
+                            <i class="fas fa-user-graduate text-xl"></i>
+                        </div>
+                        <h3 class="font-black mb-2">ICT Training</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                            Continuous training on ERP systems, student and staff portals, and the Online Learning
+                            Management System to ensure digital literacy across the university.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Infrastructure Category -->
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <h2 class="category-title">Infrastructure</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- Hardware Acquisition -->
+                    <div class="service-card infrastructure">
+                        <span class="category-badge badge-infrastructure">Hardware</span>
+                        <div class="icon-box">
+                            <i class="fas fa-laptop-house text-xl"></i>
+                        </div>
+                        <h3 class="font-black mb-2">Hardware Acquisition</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                            Facilitating the acquisition of high-performance computers, printers, and modern projectors
+                            to
+                            support teaching, research, and administration.
+                        </p>
+                    </div>
+
+                    <!-- ICT Laboratories -->
+                    <div class="service-card infrastructure">
+                        <span class="category-badge badge-infrastructure">Facilities</span>
+                        <div class="icon-box">
+                            <i class="fas fa-microchip text-xl"></i>
+                        </div>
+                        <h3 class="font-black mb-2">ICT Laboratories</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                            Access modern computer labs in Tuition Block I, Research & Office Block, and Digital
+                            Libraries,
+                            equipped with high-speed specialized software.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Connectivity Category -->
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <h2 class="category-title">Connectivity</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- Broadband & Wi-Fi -->
+                    <div class="service-card network">
+                        <span class="category-badge badge-network">Network</span>
+                        <div class="icon-box">
+                            <i class="fas fa-satellite-dish text-xl"></i>
+                        </div>
+                        <h3 class="font-black mb-2">Broadband & Wi-Fi</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                            Free high-speed internet across all campuses. Strategic Wi-Fi hotspots are located at
+                            hostels,
+                            libraries, and common student gathering areas.
+                        </p>
+                    </div>
+
+                    <!-- SEKU Mobile App -->
+                    <div class="service-card mobile">
+                        <span class="category-badge badge-mobile">Digital</span>
+                        <div class="icon-box">
+                            <i class="fas fa-mobile-alt text-xl"></i>
+                        </div>
+                        <h3 class="font-black mb-2">SEKU Mobile App</h3>
+                        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base mb-3">
+                            Access all university news, fee statements, and academic records on the go with our official
+                            mobile application.
+                        </p>
+                        <a href="#"
+                            class="inline-flex items-center px-5 py-2 bg-gradient-to-r from-green-600 to-yellow-400 text-white font-bold rounded-lg hover:from-green-700 hover:to-yellow-500 transition-all shadow-md text-sm">
+                            Download App
+                            <i class="fas fa-arrow-down ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Summary Stats -->
+                <div class="mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+                        <div class="text-2xl font-bold text-green-600">24/7</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Support Available</div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+                        <div class="text-2xl font-bold text-blue-600">5+</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Computer Labs</div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+                        <div class="text-2xl font-bold text-yellow-600">100%</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">Campus Coverage</div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-lg">
+                        <div class="text-2xl font-bold text-purple-600">1 App</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">All-in-One Access</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
+</body>
+
+</html>

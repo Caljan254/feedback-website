@@ -121,17 +121,18 @@
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
     <!-- Header placeholder -->
     <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
 
     <!-- Content Wrapper -->
-    <div class="content-wrapper max-w-4xl mx-auto px-4 pt-24 pb-8">
+    <div class="content-wrapper max-w-4xl mx-auto px-4 pt-4 pb-8">
         <!-- Notification Container -->
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
 
         <!-- Page Title -->
         <div class="text-center mb-8">
-            <h1 class="text-3xl sm:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">Submit Feedback</h1>
-            <p class="text-gray-600 dark:text-gray-300">Select the office you were served by and share your experience
+            <h1 class="text-3xl sm:text-4xl font-bold text-green-700 dark:text-green-400 mb-4">ICT Feedback</h1>
+            <p class="text-gray-600 dark:text-gray-300">Give us your feedback and share your experience
             </p>
         </div>
 
@@ -139,7 +140,14 @@
             class="bg-white dark:bg-gray-700 rounded-xl shadow p-4 sm:p-6 mb-6 sm:mb-8 max-w-2xl mx-auto" x-data="{
                 open: false,
                 search: '',
-                selectedOffice: null,
+                selectedOffice: { value: 'ict-services', name: 'Directorate Of ICT' },
+                init() {
+                    window.selectedOfficeValue = 'ict-services';
+                    setTimeout(() => {
+                        const btn = document.getElementById('continue-to-user-info');
+                        if (btn) btn.classList.remove('hidden');
+                    }, 100);
+                },
                 categories: [
                     /*
                     {
@@ -223,7 +231,7 @@
                         name: 'Support Services',
                         offices: [
                             /* { value: 'library', name: 'Library Services' }, */
-                            { value: 'ict-services', name: 'ICT Services' }
+                            { value: 'ict-services', name: 'Directorate Of ICT' }
                             /* { value: 'health-unit', name: 'Health Unit / Clinic' },
                             { value: 'hostel', name: 'Accommodation / Hostel Office' },
                             { value: 'catering', name: 'Catering Services' },
@@ -255,15 +263,14 @@
                     })).filter(cat => cat.offices.length > 0);
                 }
             }">
-            <h2 class="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-3 sm:mb-4">Select the
-                Office You Were Served By</h2>
+            <h2 class="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-3 sm:mb-4">Give Us Your
+                Feedback</h2>
 
-            <button @click="open = !open"
-                class="w-full flex justify-between items-center bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200 ring-2 ring-green-500 shadow-md">
+            <button @click="open = false" title="Currently dormant for other offices"
+                class="w-full flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200 ring-2 ring-green-500 shadow-md opacity-80 cursor-not-allowed">
                 <span x-text="selectedOffice ? selectedOffice.name : 'Click to Select an Office...'"
                     class="text-gray-800 dark:text-gray-200 text-sm sm:text-base font-bold"></span>
-                <i :class="{'transform rotate-180': open}"
-                    class="fas fa-chevron-down text-gray-600 dark:text-gray-300 transition-transform duration-200"></i>
+                <i class="fas fa-lock text-gray-500 dark:text-gray-400 transition-transform duration-200"></i>
             </button>
 
             <div x-show="open" @click.away="open = false"
@@ -376,6 +383,41 @@
     <script>
         // Make selectedOfficeValue available globally for feedback-portal.js
         window.selectedOfficeValue = null;
+
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        // Use ResizeObserver for more accuracy if available
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
     </script>
 </body>
 

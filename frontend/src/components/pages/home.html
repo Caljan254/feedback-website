@@ -100,7 +100,7 @@
 
         .section-container {
             min-height: calc(100vh - 4rem);
-            padding: 2rem 1rem;
+            padding: 5rem 1rem 2rem;
         }
 
         @media (min-width: 768px) {
@@ -209,37 +209,19 @@
 
         <!-- HOME SECTION -->
         <section id="home-section" class="w-full">
-            <div id="carousel" class="relative w-full h-[50vh] sm:h-[45vh] overflow-hidden shadow-lg group">
+            <div id="carousel" class="relative w-full h-[70vh] sm:h-[75vh] md:h-[80vh] overflow-hidden shadow-lg group">
                 <img src="/uploads/slide1.png" alt="University Campus"
                     class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     loading="eager" />
-
-                <!-- Animated Text Overlay (Reduced opacity for brightness) -->
-                <div class="absolute inset-0 bg-black bg-opacity-10 flex items-center justify-center">
-                    <div class="text-center px-6">
-                        <h2
-                            class="text-white text-3xl sm:text-5xl md:text-6xl font-black tracking-tight drop-shadow-[0_8px_8px_rgba(0,0,0,0.8)]">
-                            <span id="hero-typing-text" class="text-green-500"></span><span
-                                class="animate-pulse text-white">|</span>
-                        </h2>
-                        <div class="mt-4 flex flex-col items-center">
-                            <div class="h-1.5 w-32 bg-green-500 rounded-full mb-3 shadow-lg"></div>
-                            <p
-                                class="text-white text-sm sm:text-xl font-bold tracking-widest uppercase bg-black/60 backdrop-blur-sm px-6 py-2 rounded-full border-2 border-green-500/50 shadow-xl">
-                                Institutional Feedback System
-                            </p>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <main class="flex-grow w-full max-w-6xl mx-auto px-4">
-                <div class="w-full flex justify-center my-4">
+                <div class="w-full flex justify-center my-2">
                     <div
-                        class="bg-yellow-100 dark:bg-yellow-900 p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-2xl animate-pulse ring-2 sm:ring-4 ring-yellow-300 dark:ring-yellow-500">
+                        class="bg-blue-50 p-2 sm:p-3 rounded-lg shadow-lg w-full max-w-2xl ring-2 sm:ring-4 ring-blue-200">
                         <button onclick="startFeedbackProcess()"
-                            class="text-green-700 dark:text-green-100 text-xl sm:text-3xl font-extrabold hover:underline cursor-pointer block text-center hover:text-green-800 transition duration-300 w-full">
-                            ✨ Click Here to Give Your Feedback ✨
+                            class="text-blue-700 text-xl sm:text-3xl font-extrabold hover:underline cursor-pointer block text-center hover:text-blue-900 transition duration-300 w-full">
+                            Give Feedback
                         </button>
                     </div>
                 </div>
@@ -475,7 +457,14 @@
             x-data="{
                 open: false,
                 search: '',
-                selectedOffice: null,
+                selectedOffice: { value: 'ict-services', name: 'Directorate Of ICT' },
+                init() {
+                    window.selectedOfficeValue = 'ict-services';
+                    setTimeout(() => {
+                        const btn = document.getElementById('continue-to-user-info');
+                        if (btn) btn.classList.remove('hidden');
+                    }, 100);
+                },
                 categories: [
                     /*
                     {
@@ -559,7 +548,7 @@
                         name: 'Support Services',
                         offices: [
                             /* { value: 'library', name: 'Library Services' }, */
-                            { value: 'ict-services', name: 'ICT Services' }
+                            { value: 'ict-services', name: 'Directorate Of ICT' }
                             /* { value: 'health-unit', name: 'Health Unit / Clinic' },
                             { value: 'hostel', name: 'Accommodation / Hostel Office' },
                             { value: 'catering', name: 'Catering Services' },
@@ -591,15 +580,14 @@
                     })).filter(cat => cat.offices.length > 0);
                 }
             }">
-            <h2 class="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-3 sm:mb-4">Select the
-                Office You Were Served By</h2>
+            <h2 class="text-lg sm:text-xl font-semibold text-green-700 dark:text-green-400 mb-3 sm:mb-4">Give Us Your
+                Feedback</h2>
 
-            <button @click="open = !open"
-                class="w-full flex justify-between items-center bg-gray-100 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200 ring-2 ring-green-500 shadow-md">
+            <button @click="open = false" title="Currently dormant for other offices"
+                class="w-full flex justify-between items-center bg-gray-100 dark:bg-gray-600 px-4 py-2 sm:py-3 rounded-lg transition-colors duration-200 ring-2 ring-green-500 shadow-md opacity-80 cursor-not-allowed">
                 <span x-text="selectedOffice ? selectedOffice.name : 'Click to Select an Office...'"
                     class="text-gray-800 dark:text-gray-200 text-sm sm:text-base font-bold"></span>
-                <i :class="{'transform rotate-180': open}"
-                    class="fas fa-chevron-down text-gray-600 dark:text-gray-300 transition-transform duration-200"></i>
+                <i class="fas fa-lock text-gray-500 dark:text-gray-400 transition-transform duration-200"></i>
             </button>
 
             <div x-show="open" @click.away="open = false"
@@ -705,51 +693,6 @@
     <script>
         // Make selectedOfficeValue available globally
         window.selectedOfficeValue = null;
-
-        // Typewriter Animation Logic (Word-by-Word)
-        const phrases = [
-            "Your Voice Shapes SEKU Excellence",
-            "Professional Feedback, Real Improvements",
-            "Bridging Communication For Growth",
-            "Transforming Our University Together"
-        ];
-
-        const typingText = document.getElementById('hero-typing-text');
-        let phraseIndex = 0;
-        let wordIndex = 0;
-        let isDeleting = false;
-        let delay = 1500;
-
-        function typeWords() {
-            const currentPhrase = phrases[phraseIndex];
-            const words = currentPhrase.split(' ');
-
-            if (isDeleting) {
-                // Remove one word at a time (Much Slower)
-                wordIndex--;
-                typingText.textContent = words.slice(0, wordIndex).join(' ');
-                delay = 600;
-            } else {
-                // Add one word at a time (Very slowly/deliberately)
-                wordIndex++;
-                typingText.textContent = words.slice(0, wordIndex).join(' ');
-                delay = 1200;
-            }
-
-            if (!isDeleting && wordIndex === words.length) {
-                // Finished typing the phrase - long pause for reading
-                isDeleting = true;
-                delay = 5000;
-            } else if (isDeleting && wordIndex === 0) {
-                // Finished deleting
-                isDeleting = false;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                delay = 1500;
-            }
-
-            setTimeout(typeWords, delay);
-        }
-
         // Scroll Reveal Logic
         function reveal() {
             const reveals = document.querySelectorAll(".reveal");
@@ -770,18 +713,40 @@
             const header = document.querySelector('header');
             const spacer = document.getElementById('header-dynamic-spacer');
             if (header && spacer) {
-                spacer.style.height = header.offsetHeight + 'px';
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+                console.log('Header spacer adjusted to:', height);
             }
         }
 
-        // Run on load and on resize
+        // Run on various triggers
         window.addEventListener('load', adjustHeaderSpacer);
         window.addEventListener('resize', adjustHeaderSpacer);
-        // Start animation after small delay
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        // Use ResizeObserver for more accuracy if available
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(typeWords, 1000);
-            reveal(); // Initial check
-            setTimeout(adjustHeaderSpacer, 100);
+            reveal();
+            adjustHeaderSpacer();
         });
     </script>
 </body>
