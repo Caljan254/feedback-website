@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Internship/Attachment Application | SEKU</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
+        .form-input {
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--seku-green);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+            outline: none;
+        }
+
+        .btn-seku {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            border: 2px solid var(--seku-gold);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-seku:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.3);
+            background: linear-gradient(135deg, var(--seku-green-light), var(--seku-green));
+        }
+
+        .btn-outline {
+            border: 2px solid var(--seku-green);
+            color: var(--seku-green);
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background: rgba(21, 128, 61, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .step-indicator {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #9ca3af;
+        }
+
+        .step-indicator.active {
+            border-color: var(--seku-green);
+            background: var(--seku-green);
+            color: white;
+            box-shadow: 0 0 15px rgba(21, 128, 61, 0.3);
+        }
+
+        .step-indicator.completed {
+            border-color: var(--seku-gold);
+            background: var(--seku-gold);
+            color: var(--seku-green);
+        }
+
+        .progress-line {
+            height: 2px;
+            background: #e5e7eb;
+            flex-grow: 1;
+            margin: 0 0.5rem;
+        }
+
+        .progress-line.completed {
+            background: var(--seku-gold);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800" x-data="formHandler()">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <div class="content-wrapper max-w-4xl mx-auto px-4 py-12 w-full">
+        <!-- Title & Intro -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-black text-green-800 mb-2 uppercase tracking-tight">APPLICATION FOR INTERNSHIP/ATTACHMENT</h1>
+            <div class="w-24 h-1 bg-gradient-to-r from-green-700 to-yellow-500 mx-auto rounded-full"></div>
+            <p class="mt-4 text-gray-600 font-medium italic">Please complete this form in BLOCK LETTERS and submit to the Registrar, Administration and Human Resource.</p>
+        </div>
+
+        <!-- Form Container -->
+        <div class="bg-white rounded-3xl shadow-2xl border-2 border-green-50/50 overflow-hidden">
+            <!-- Progress Bar -->
+            <div class="bg-green-50 px-6 py-8 border-b-2 border-yellow-400/30">
+                <div class="flex items-center justify-between max-w-2xl mx-auto overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
+                    <template x-for="i in 7">
+                        <div class="flex items-center" :class="i < 7 ? 'flex-grow' : ''">
+                            <div class="step-indicator" :class="{ 'active': step === i, 'completed': step > i }" x-text="i"></div>
+                            <div x-show="i < 7" class="progress-line" :class="{ 'completed': step > i }"></div>
+                        </div>
+                    </template>
+                </div>
+                <div class="text-center mt-4">
+                    <span class="text-[10px] uppercase font-black text-green-700 tracking-widest bg-yellow-400/20 px-3 py-1 rounded-full">Step <span x-text="step"></span> of 7</span>
+                </div>
+            </div>
+
+            <!-- Form Content -->
+            <form id="applicationForm" class="p-6 md:p-10" @submit.prevent="submitForm">
+                
+                <!-- STEP 1: Basic Info -->
+                <div x-show="step === 1" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-user-circle"></i> Personal Details (1/4)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Full Name (BLOCK LETTERS)</label>
+                            <input type="text" x-model="formData.fullName" required class="form-input w-full px-4 py-3 uppercase font-medium" placeholder="JOHN DOE">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Date of Birth</label>
+                            <input type="date" x-model="formData.dob" required class="form-input w-full px-4 py-3">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Identity Card Number</label>
+                            <input type="text" x-model="formData.idNumber" required class="form-input w-full px-4 py-3" placeholder="12345678">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2: Gender & PIN -->
+                <div x-show="step === 2" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-venus-mars"></i> Personal Details (2/4)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Gender</label>
+                            <div class="flex flex-wrap gap-4 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-xl hover:border-green-500 transition-all border-gray-100 bg-gray-50 flex-grow">
+                                    <input type="radio" name="gender" value="Female" x-model="formData.gender" class="w-4 h-4 accent-green-600">
+                                    <span class="font-bold">Female</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-xl hover:border-green-500 transition-all border-gray-100 bg-gray-50 flex-grow">
+                                    <input type="radio" name="gender" value="Male" x-model="formData.gender" class="w-4 h-4 accent-green-600">
+                                    <span class="font-bold">Male</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-xl hover:border-green-500 transition-all border-gray-100 bg-gray-50 flex-grow">
+                                    <input type="radio" name="gender" value="Intersex" x-model="formData.gender" class="w-4 h-4 accent-green-600">
+                                    <span class="font-bold">Intersex</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Personal Identification Number (PIN)</label>
+                            <input type="text" x-model="formData.pin" class="form-input w-full px-4 py-3 uppercase font-medium" placeholder="A012345678Z">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Contact Details -->
+                <div x-show="step === 3" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-address-book"></i> Personal Details (3/4)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Postal Address</label>
+                            <input type="text" x-model="formData.postalAddress" class="form-input w-full px-4 py-3 uppercase" placeholder="P.O. Box 123">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Postal Code</label>
+                            <input type="text" x-model="formData.postalCode" class="form-input w-full px-4 py-3" placeholder="90200">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Town</label>
+                            <input type="text" x-model="formData.town" class="form-input w-full px-4 py-3 uppercase" placeholder="KITUI">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">E-mail Address</label>
+                            <input type="email" x-model="formData.email" required class="form-input w-full px-4 py-3" placeholder="john@example.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Mobile Number</label>
+                            <input type="tel" x-model="formData.mobile" required class="form-input w-full px-4 py-3" placeholder="+254 712 345 678">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 4: Background -->
+                <div x-show="step === 4" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-globe-africa"></i> Personal Details (4/4)
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Home County</label>
+                            <input type="text" x-model="formData.homeCounty" class="form-input w-full px-4 py-3 uppercase" placeholder="KITUI">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Sub-County</label>
+                            <input type="text" x-model="formData.subCounty" class="form-input w-full px-4 py-3 uppercase" placeholder="KITUI CENTRAL">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Ethnicity</label>
+                            <input type="text" x-model="formData.ethnicity" class="form-input w-full px-4 py-3 uppercase" placeholder="KAMBA">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Do you have any form of Disability?</label>
+                            <div class="flex gap-4 mt-2">
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-xl hover:border-green-500 transition-all border-gray-100 bg-gray-50 w-1/2">
+                                    <input type="radio" value="No" x-model="formData.hasDisability" class="w-4 h-4 accent-green-600">
+                                    <span class="font-bold">No</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer p-3 border-2 rounded-xl hover:border-green-500 transition-all border-gray-100 bg-gray-50 w-1/2">
+                                    <input type="radio" value="Yes" x-model="formData.hasDisability" class="w-4 h-4 accent-green-600">
+                                    <span class="font-bold">Yes</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div x-show="formData.hasDisability === 'Yes'" class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">If yes, please provide the nature of disability:</label>
+                            <textarea x-model="formData.disabilityNature" class="form-input w-full px-4 py-3" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 5: Educational Qualifications -->
+                <div x-show="step === 5" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-graduation-cap"></i> Educational/Professional Qualifications
+                    </h2>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-green-700 text-white">
+                                    <th class="p-3 text-sm font-black uppercase round-tl-xl">Qualification</th>
+                                    <th class="p-3 text-sm font-black uppercase">University/Institution</th>
+                                    <th class="p-3 text-sm font-black uppercase">Year</th>
+                                    <th class="p-3 text-sm font-black uppercase">Class/Grade</th>
+                                    <th class="p-3 text-sm font-black uppercase rounded-tr-xl">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <template x-for="(edu, index) in formData.education" :key="index">
+                                    <tr class="border-b border-gray-100">
+                                        <td class="p-2"><input type="text" x-model="edu.qualification" class="form-input w-full px-2 py-2 text-sm" placeholder="e.g. Bsc. IT"></td>
+                                        <td class="p-2"><input type="text" x-model="edu.institution" class="form-input w-full px-2 py-2 text-sm" placeholder="SEKU"></td>
+                                        <td class="p-2"><input type="text" x-model="edu.year" class="form-input w-full px-2 py-2 text-sm" placeholder="2024"></td>
+                                        <td class="p-2"><input type="text" x-model="edu.grade" class="form-input w-full px-2 py-2 text-sm" placeholder="First Class"></td>
+                                        <td class="p-2 text-center">
+                                            <button type="button" @click="removeEducation(index)" class="text-red-500 hover:text-red-700 p-2">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                    <button type="button" @click="addEducation" class="btn-outline text-sm py-2 px-4">
+                        <i class="fas fa-plus"></i> Add Qualification
+                    </button>
+                </div>
+
+                <!-- STEP 6: Internship Choice -->
+                <div x-show="step === 6" x-transition x-cloak class="space-y-6">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-briefcase"></i> Attachment Details
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Internship Position Applied for:</label>
+                            <input type="text" x-model="formData.position" required class="form-input w-full px-4 py-3" placeholder="e.g. Software Developer Intern">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Area of Specialization:</label>
+                            <input type="text" x-model="formData.specialization" required class="form-input w-full px-4 py-3" placeholder="e.g. Web Development">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Duty Station:</label>
+                            <input type="text" x-model="formData.dutyStation" class="form-input w-full px-4 py-3" placeholder="e.g. Main Campus, Kitui">
+                            <p class="text-xs text-gray-500 mt-2 italic">(The Commission reserves the right to deploy an intern to any of its offices)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 7: Review & Confirm -->
+                <div x-show="step === 7" x-transition x-cloak class="space-y-8">
+                    <h2 class="text-2xl font-bold text-green-700 flex items-center gap-2">
+                        <i class="fas fa-check-double"></i> Review & Submit
+                    </h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 bg-gray-50 p-6 rounded-2xl border-2 border-dashed border-gray-200">
+                        <div>
+                            <h3 class="font-black text-xs uppercase tracking-widest text-gray-400 mb-3">Applicant Info</h3>
+                            <div class="space-y-2 text-sm">
+                                <p><strong class="text-gray-700">Name:</strong> <span x-text="formData.fullName"></span></p>
+                                <p><strong class="text-gray-700">ID:</strong> <span x-text="formData.idNumber"></span></p>
+                                <p><strong class="text-gray-700">Gender:</strong> <span x-text="formData.gender"></span></p>
+                                <p><strong class="text-gray-700">Email:</strong> <span x-text="formData.email"></span></p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-black text-xs uppercase tracking-widest text-gray-400 mb-3">Internship Info</h3>
+                            <div class="space-y-2 text-sm">
+                                <p><strong class="text-gray-700">Position:</strong> <span x-text="formData.position"></span></p>
+                                <p><strong class="text-gray-700">Area:</strong> <span x-text="formData.specialization"></span></p>
+                                <p><strong class="text-gray-700">Station:</strong> <span x-text="formData.dutyStation"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+                            <h3 class="font-bold text-green-800 mb-2">Privacy Notice</h3>
+                            <p class="text-xs text-gray-700 leading-relaxed">
+                                Your privacy and the privacy of all applicants is important to the Commission. Thus, every precaution will be taken to protect the information you provide through this application process. All information including personal information requested for, and collected shall be stored and processed in strict compliance with the Laws of the Republic of Kenya. Further, the information provided will not be shared with any Institution and will not be used for any commercial purpose.
+                            </p>
+                        </div>
+
+                        <div class="flex items-start gap-4 p-4 border-2 border-green-100 rounded-2xl bg-white hover:bg-green-50 transition-colors">
+                            <input type="checkbox" x-model="formData.certified" required class="mt-1 w-5 h-5 accent-green-600">
+                            <div>
+                                <p class="text-sm font-bold text-gray-800">I certify that the above information is true to the best of my knowledge.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-black text-gray-400">Electronic Signature (Full Name)</label>
+                                        <input type="text" x-model="formData.signature" required class="form-input w-full px-3 py-2 text-sm italic" placeholder="Type your full name">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-black text-gray-400">Date</label>
+                                        <input type="text" readonly :value="new Date().toLocaleDateString()" class="form-input w-full px-3 py-2 text-sm bg-gray-50">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="mt-10 flex justify-between items-center pt-8 border-t-2 border-gray-50">
+                    <button type="button" x-show="step > 1" @click="step--" class="btn-outline flex items-center gap-2">
+                        <i class="fas fa-chevron-left"></i> Previous
+                    </button>
+                    <div x-show="step === 1" class="hidden md:block"></div>
+                    
+                    <button type="button" x-show="step < 7" @click="nextStep" class="btn-seku">
+                        Next Step <i class="fas fa-chevron-right"></i>
+                    </button>
+                    
+                    <button type="submit" x-show="step === 7" class="btn-seku bg-yellow-500 border-green-800 hover:bg-yellow-600">
+                        <i class="fas fa-paper-plane"></i> Confirm & Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Modal (shown after submit) -->
+        <div x-show="showSuccess" class="fixed inset-0 z-[200000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" x-cloak x-transition>
+            <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-2xl transform scale-100 border-4 border-yellow-400">
+                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-4xl text-green-600"></i>
+                </div>
+                <h3 class="text-2xl font-black text-green-800 mb-2">Application Received!</h3>
+                <p class="text-gray-600 mb-8">Thank you for your interest in SEKU. Your application has been successfully submitted and is being processed.</p>
+                <a href="/src/components/pages/home.html" class="btn-seku w-full">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="../../js/load-components.js"></script>
+    <script>
+        function formHandler() {
+            return {
+                step: 1,
+                showSuccess: false,
+                formData: {
+                    fullName: '',
+                    dob: '',
+                    idNumber: '',
+                    gender: '',
+                    pin: '',
+                    postalAddress: '',
+                    postalCode: '',
+                    town: '',
+                    email: '',
+                    mobile: '',
+                    homeCounty: '',
+                    subCounty: '',
+                    ethnicity: '',
+                    hasDisability: 'No',
+                    disabilityNature: '',
+                    education: [
+                        { qualification: '', institution: '', year: '', grade: '' }
+                    ],
+                    position: '',
+                    specialization: '',
+                    dutyStation: '',
+                    certified: false,
+                    signature: ''
+                },
+                addEducation() {
+                    this.formData.education.push({ qualification: '', institution: '', year: '', grade: '' });
+                },
+                removeEducation(index) {
+                    if (this.formData.education.length > 1) {
+                        this.formData.education.splice(index, 1);
+                    }
+                },
+                nextStep() {
+                    if (this.validateStep()) {
+                        this.step++;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                },
+                validateStep() {
+                    // Simple validation for each step
+                    if (this.step === 1) {
+                        if (!this.formData.fullName || !this.formData.dob || !this.formData.idNumber) {
+                            alert('Please fill all required fields');
+                            return false;
+                        }
+                    }
+                    if (this.step === 3) {
+                        if (!this.formData.email || !this.formData.mobile) {
+                            alert('Contact details are required');
+                            return false;
+                        }
+                    }
+                    if (this.step === 6) {
+                        if (!this.formData.position || !this.formData.specialization) {
+                            alert('Application details are required');
+                            return false;
+                        }
+                    }
+                    return true;
+                },
+                submitForm() {
+                    if (!this.formData.certified || !this.formData.signature) {
+                        alert('Please certify and sign the application');
+                        return;
+                    }
+                    console.log('Submitting Application:', this.formData);
+                    // In a real app, you'd fetch() here
+                    this.showSuccess = true;
+                }
+            }
+        }
+
+        // Handle header dynamic spacer
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                spacer.style.height = header.offsetHeight + 'px';
+            }
+        }
+
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', adjustHeaderSpacer);
+        setTimeout(adjustHeaderSpacer, 100);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>South Eastern Kenya University (SEKU) Feedback System - Downloads</title>
+    <!-- Tailwind + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+    <style>
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <div class="content-wrapper bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-950 min-h-[70vh] py-20 flex items-center justify-center">
+        <div class="text-center px-4 py-8 reveal">
+            <h1
+                class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 dark:text-green-400 mb-4 sm:mb-6 tracking-tight">
+                Downloads Page
+            </h1>
+            <h2
+                class="text-xl sm:text-2xl md:text-3xl font-semibold text-center text-gray-600 dark:text-gray-400 mb-6 sm:mb-8">
+                Download links will be available here
+            </h2>
+
+            <!-- Optional: Add a loading indicator or placeholder icon -->
+            <div class="mt-8">
+                <i class="fas fa-download text-6xl text-green-600 dark:text-green-400 opacity-50"></i>
+            </div>
+
+            <!-- Optional: Add a coming soon message -->
+            <p class="text-gray-500 dark:text-gray-500 mt-4 text-sm font-medium">
+                Resources and documents will be uploaded shortly. Stay tuned!
+            </p>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Header Spacer Logic
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                spacer.style.height = header.offsetHeight + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', () => adjustHeaderSpacer());
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+            // Scroll Reveal Logic
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>
