@@ -4,12 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CUSTOMER FEEDBACK - SEKU Feedback</title>
+    <title>ICT Customer Feedback - SEKU Feedback System</title>
     <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
+        /* SEKU Official Theme Colors */
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
         .notification {
             position: fixed;
             top: 50%;
@@ -35,7 +43,7 @@
         }
 
         .notification.success {
-            background-color: #10B981;
+            background-color: var(--seku-green);
             color: #fff
         }
 
@@ -45,8 +53,8 @@
         }
 
         .notification.warning {
-            background-color: #F59E0B;
-            color: #fff
+            background-color: var(--seku-gold);
+            color: var(--seku-green)
         }
 
         .notification.info {
@@ -75,14 +83,15 @@
         }
 
         .form-input:focus {
-            border-color: #10B981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2)
+            border-color: var(--seku-green);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2)
         }
 
         body {
             display: flex;
             flex-direction: column;
-            min-height: 100vh
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #fefce8 100%);
         }
 
         .content-wrapper {
@@ -103,6 +112,89 @@
             margin-bottom: 0.5rem;
         }
 
+        /* Survey card styling */
+        .survey-card {
+            background: white;
+            border-radius: 1.5rem;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 20px 35px -10px rgba(21, 128, 61, 0.1);
+        }
+
+        /* Step counter */
+        .step-counter {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: var(--seku-gold);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        /* Director message */
+        .director-message-card {
+            background: linear-gradient(135deg, #fefce8, #f0fdf4);
+            border-left: 4px solid var(--seku-gold);
+            border-radius: 1rem;
+        }
+
+        /* Radio and checkbox styling */
+        input[type="radio"]:checked,
+        input[type="checkbox"]:checked {
+            accent-color: var(--seku-green);
+        }
+
+        /* Table header styling */
+        .table-header {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+        }
+
+        .table-header th {
+            color: var(--seku-gold);
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            border: 2px solid var(--seku-gold);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.3);
+        }
+
+        .btn-secondary {
+            color: var(--seku-green);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            color: var(--seku-gold);
+            transform: translateX(-3px);
+        }
+
+        /* Question block */
+        .question-block {
+            background: #fefce8;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+
+        /* Option label hover */
+        .option-label:hover {
+            color: var(--seku-gold);
+        }
+
+        /* Table row hover */
+        .rating-table tbody tr:hover {
+            background: rgba(21, 128, 61, 0.05);
+        }
+
         /* Mobile optimizations */
         @media (max-width: 640px) {
             .content-wrapper {
@@ -112,16 +204,12 @@
                 padding-bottom: 1rem;
             }
 
-            section {
-                padding: 1.5rem !important;
+            .survey-card {
+                padding: 1.25rem !important;
             }
 
             .step-content {
                 margin-top: 0 !important;
-            }
-
-            .step-content>div {
-                margin-bottom: 1rem;
             }
 
             .dynamic-question-block {
@@ -139,12 +227,12 @@
                 line-height: 1.4 !important;
             }
 
-            .director-message {
+            .director-message-card {
                 padding: 1rem !important;
                 margin-bottom: 1rem !important;
             }
 
-            .director-message p {
+            .director-message-card p {
                 font-size: 1rem !important;
                 line-height: 1.4 !important;
             }
@@ -158,62 +246,16 @@
                 gap: 0.5rem !important;
             }
 
-            .flex-wrap label {
-                padding: 0.5rem 0.75rem !important;
-                font-size: 0.875rem !important;
-                width: 100%;
-            }
-
-            .space-y-8 {
-                margin-top: 0 !important;
-            }
-
-            .space-y-8> :not([hidden])~ :not([hidden]) {
-                margin-top: 1rem !important;
-            }
-
-            .p-8 {
-                padding: 1rem !important;
-            }
-
-            .p-6 {
-                padding: 0.75rem !important;
-            }
-
-            .px-10 {
-                padding-left: 2rem !important;
-                padding-right: 2rem !important;
-            }
-
-            .rating-table tr {
-                padding: 0.75rem !important;
-                margin-bottom: 1rem !important;
-            }
-
-            .rating-table td {
-                padding: 0.5rem 0 !important;
-            }
-
-            .bg-blue-50\/50 {
-                padding: 1rem !important;
-            }
-
-            [x-show="step === 0"] .mt-4 {
-                margin-top: 0.75rem !important;
-            }
-        }
-
-        @media (max-width: 768px) {
             .rating-table thead {
                 display: none;
             }
 
             .rating-table tr {
                 display: block;
-                background: #fff;
+                background: white;
                 border-radius: 1rem;
                 margin-bottom: 1rem;
-                border: 1px solid #e2e8f0;
+                border: 1px solid rgba(21, 128, 61, 0.2);
                 padding: 1rem;
             }
 
@@ -229,8 +271,8 @@
             .rating-table td:first-child {
                 display: block;
                 font-weight: 800;
-                color: #1e3a8a;
-                border-bottom: 2px solid #e2e8f0 !important;
+                color: var(--seku-green);
+                border-bottom: 2px solid var(--seku-gold) !important;
                 margin-bottom: 0.5rem;
                 padding-bottom: 0.75rem !important;
             }
@@ -246,47 +288,23 @@
                 color: #64748b;
             }
         }
-
-        /* Fix for empty containers */
-        .hidden:empty {
-            display: none !important;
-        }
-
-        #user-info-display:empty {
-            display: none !important;
-        }
-
-        .step-content:first-child {
-            margin-top: 0;
-        }
-
-        .director-message {
-            margin-bottom: 1.5rem;
-        }
     </style>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+<body>
     <div id="header-placeholder"></div>
-    <div class="content-wrapper max-w-4xl mx-auto px-4 py-4 sm:py-8">
+    <div id="header-dynamic-spacer"></div>
+    <div class="content-wrapper max-w-4xl mx-auto px-4 py-2 sm:py-4">
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
 
-        <!-- Back button with reduced margin -->
-        <div class="mb-3 sm:mb-4">
-            <button onclick="goBack()"
-                class="flex items-center text-blue-600 hover:text-blue-700 transition-colors text-sm sm:text-base">
-                <i class="fas fa-arrow-left mr-2"></i> ← Back to Office Selection
-            </button>
-        </div>
-
-        <!-- User info display - will be hidden when empty -->
+        <!-- User info display -->
         <div id="user-info-display"
-            class="hidden empty:hidden bg-blue-50 dark:bg-blue-900 p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 text-gray-800 dark:text-gray-200 text-sm">
+            class="hidden empty:hidden bg-green-50 border-l-4 border-yellow-500 p-3 sm:p-4 rounded-lg mb-2 sm:mb-3 text-gray-800 text-sm">
         </div>
 
-        <section x-data="window.ictSurvey"
-            class="bg-blue-50/50 dark:bg-gray-800 p-4 sm:p-8 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700">
+        <!-- Survey Card - SEKU Theme -->
+        <section x-data="window.ictSurvey" class="survey-card p-4 sm:p-8">
 
             <script>
                 window.ictSurvey = {
@@ -299,7 +317,6 @@
                     validateStep() {
                         if (this.step === 0) return true;
 
-                        // Find the step content container
                         const stepContainer = document.querySelector(`[x-show*="step === ${this.step}"]`);
                         if (!stepContainer) return true;
 
@@ -318,7 +335,6 @@
                                 if (!isChecked) {
                                     blockAnswered = false;
                                 } else {
-                                    // If checked, check if any accompanying visible text input is empty (for "Other" cases)
                                     visibleTextInputs.forEach(ti => {
                                         if (ti.offsetParent !== null && !ti.value.trim()) {
                                             blockAnswered = false;
@@ -333,9 +349,9 @@
 
                             if (!blockAnswered) {
                                 allAnswered = false;
-                                block.classList.add('ring-2', 'ring-red-500', 'p-2', 'rounded-lg');
+                                block.classList.add('ring-2', 'ring-yellow-500', 'p-2', 'rounded-lg');
                             } else {
-                                block.classList.remove('ring-2', 'ring-red-500', 'p-2');
+                                block.classList.remove('ring-2', 'ring-yellow-500', 'p-2');
                             }
                         });
 
@@ -358,26 +374,28 @@
                 };
             </script>
 
-            <!-- Step counter with reduced margin -->
-            <div class="flex flex-col items-center mb-4 sm:mb-6">
+            <!-- Step counter -->
+            <div class="flex flex-col items-center mb-4">
                 <span x-show="step > 0"
-                    class="text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full"
+                    class="step-counter text-xs sm:text-sm font-bold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full"
                     x-text="`Step ${step} of ${totalSteps}`"></span>
             </div>
 
-            <!-- Step 0: Directorate Message - COMPACT VERSION -->
+            <!-- Step 0: Welcome Message - SEKU Theme -->
             <div x-show="step === 0" x-transition class="step-content">
-                <div
-                    class="director-message bg-blue-100 dark:bg-blue-900/40 border-l-4 border-blue-600 p-4 sm:p-6 rounded-r-xl shadow-sm">
-                    <p class="text-blue-800 dark:text-blue-100 leading-relaxed font-medium text-base sm:text-xl">
+                <div class="flex justify-center items-center py-4 mb-6">
+                    <h2 class="text-2xl font-bold text-green-700">Welcome ICT Customer Feedback</h2>
+                </div>
+                <div class="director-message-card p-4 sm:p-6 shadow-sm">
+                    <p class="text-green-800 leading-relaxed font-medium text-base sm:text-xl">
                         We are committed to improve your digital experience. Your
                         feedback on our services, helps us to serve you better. Please take a
                         moment to rate us.
                     </p>
                 </div>
-                <div class="flex justify-center mt-3 sm:mt-4">
+                <div class="flex justify-center mt-4">
                     <button @click="next()"
-                        class="bg-blue-600 text-white px-8 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-all font-bold text-base sm:text-lg flex items-center gap-2">
+                        class="btn-primary px-8 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg font-bold text-base sm:text-lg flex items-center gap-2">
                         Start <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
@@ -386,34 +404,32 @@
             <form class="department-feedback-form space-y-6 sm:space-y-8"
                 @submit.prevent="window.feedbackPortal.handleDepartmentFormSubmit($event)">
 
-                <!-- Step 1: Question 1 -->
+                <!-- Step 1: Question 1 - Primary Purpose -->
                 <div x-show="step === 1" x-transition class="step-content space-y-6 sm:space-y-8">
-                    <!-- Question 1: Primary Purpose -->
                     <div class="dynamic-question-block space-y-3 sm:space-y-4 p-3 sm:p-0" data-question-id="3"
                         x-data="{ otherPurpose: false, otherText: '' }">
-                        <p class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg">1. What was the
-                            primary
-                            purpose of your visit to ICT (Select one)</p>
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">1. What was the
+                            primary purpose of your visit to ICT? (Select one)</p>
                         <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
                             <template
                                 x-for="opt in ['Unit Registration','Fees inquiry / Assistance in fees payment', 'Emails Inquiries', 'Access to the portal', 'Internet Access']">
                                 <label class="flex items-center cursor-pointer group">
                                     <input type="radio" name="dq_3" :value="opt" required @change="otherPurpose = false"
-                                        class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 focus:ring-green-500 border-gray-300">
                                     <span
-                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
+                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors"
                                         x-text="opt"></span>
                                 </label>
                             </template>
                             <label class="flex items-center cursor-pointer group">
                                 <input type="radio" name="dq_3" :value="otherText" required
                                     @change="otherPurpose = true"
-                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 focus:ring-green-500 border-gray-300">
                                 <span
-                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Other:</span>
+                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors">Other:</span>
                                 <input type="text" x-model="otherText" x-show="otherPurpose"
                                     x-bind:required="otherPurpose"
-                                    class="ml-2 border-b-2 border-gray-300 bg-transparent outline-none focus:border-blue-500 px-2 py-0.5 text-sm transition-all w-32 sm:w-auto"
+                                    class="ml-2 border-b-2 border-gray-300 bg-transparent outline-none focus:border-green-500 px-2 py-0.5 text-sm transition-all w-32 sm:w-auto"
                                     placeholder="Specify here..."
                                     x-effect="if(otherPurpose) $nextTick(() => $el.focus())">
                             </label>
@@ -421,76 +437,67 @@
                     </div>
                 </div>
 
-                <!-- Step 2: Question 2 (Grid) - Connectivity & Network Access -->
+                <!-- Step 2: Question 2 - Network Services Rating -->
                 <div x-show="step === 2" x-transition class="step-content space-y-6 sm:space-y-8">
                     <div class="space-y-3 sm:space-y-4">
-                        <p class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg">2. How would you
-                            rate the
-                            following network services?</p>
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">2. How would you
+                            rate the following network services?</p>
 
                         <div class="responsive-table-container">
                             <table class="w-full text-left border-collapse rating-table">
-                                <thead>
-                                    <tr class="bg-blue-50 dark:bg-gray-700/50">
-                                        <th
-                                            class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300">
-                                            Network Service</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold">Network
+                                            Service</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Excellent</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Good</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Average</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Poor</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             No Coverage</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <!-- Wi-Fi Coverage -->
+                                <tbody class="divide-y divide-gray-200">
                                     <tr class="dynamic-question-block" data-question-id="6">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Wi-Fi/Internet coverage across campus</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Wi-Fi/Internet coverage across campus
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Average', 'Poor', 'No Coverage']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_6_coverage" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
-
-                                    <!-- Internet Speed -->
                                     <tr class="dynamic-question-block" data-question-id="7">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Internet speed and stability</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Internet speed and stability
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Average', 'Poor', 'No Coverage']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_7_speed" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
-
-                                    <!-- Network Access -->
                                     <tr class="dynamic-question-block" data-question-id="8">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Ease of accessing University Network</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Ease of accessing University Network
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Average', 'Poor', 'No Coverage']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_8_access" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
@@ -500,87 +507,80 @@
                     </div>
                 </div>
 
-                <!-- Step 3: Question 3 (Grid) -->
+                <!-- Step 3: Question 3 - ICT Systems Rating -->
                 <div x-show="step === 3" x-transition class="step-content space-y-6 sm:space-y-8">
                     <div class="space-y-3 sm:space-y-4">
-                        <p class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg">3. How would you
-                            rate the
-                            following ICT systems?</p>
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">3. How would you
+                            rate the following ICT systems?</p>
 
                         <div class="responsive-table-container">
                             <table class="w-full text-left border-collapse rating-table">
-                                <thead>
-                                    <tr class="bg-blue-50 dark:bg-gray-700/50">
-                                        <th
-                                            class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold">
                                             System/Process</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Excellent</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Good</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Fair</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Poor</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             N/A</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <!-- System Access -->
+                                <tbody class="divide-y divide-gray-200">
                                     <tr class="dynamic-question-block" data-question-id="9">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            System Access</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            System Access
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_9" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
-                                    <!-- Portal -->
                                     <tr class="dynamic-question-block" data-question-id="11">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Student/Staff Portal Access</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Student/Staff Portal Access
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_11" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
-                                    <!-- ERP -->
                                     <tr class="dynamic-question-block" data-question-id="13">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            ERP System Functions</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            ERP System Functions
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_13" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
-                                    <!-- Exam/Result Processing -->
                                     <tr class="dynamic-question-block" data-question-id="15">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Exam/Result Processing</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Exam/Result Processing
+                                        </td>
                                         <template
                                             x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_15" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
@@ -590,56 +590,49 @@
                     </div>
                 </div>
 
-                <!-- Step 4: Question 4 (Grid) - Technical Support & Responsiveness -->
+                <!-- Step 4: Question 4 - ICT Support Team Rating -->
                 <div x-show="step === 4" x-transition class="step-content space-y-6 sm:space-y-8">
                     <div class="space-y-3 sm:space-y-4">
-                        <p class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg">4. Please rate
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">4. Please rate
                             the ICT Support Team:</p>
 
                         <div class="responsive-table-container">
                             <table class="w-full text-left border-collapse rating-table">
-                                <thead>
-                                    <tr class="bg-blue-50 dark:bg-gray-700/50">
-                                        <th
-                                            class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-300">
-                                            Metric</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold">Metric</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Excellent</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Good</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Fair</th>
-                                        <th
-                                            class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center text-gray-700 dark:text-gray-300">
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
                                             Poor</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                                    <!-- Response Time -->
+                                <tbody class="divide-y divide-gray-200">
                                     <tr class="dynamic-question-block" data-question-id="17">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Response Time</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Response Time
+                                        </td>
                                         <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_17_response" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
-
-                                    <!-- Issue Resolution -->
                                     <tr class="dynamic-question-block" data-question-id="18">
                                         <td
-                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
-                                            Issue Resolution</td>
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Issue Resolution
+                                        </td>
                                         <template x-for="val in ['Excellent', 'Good', 'Fair', 'Poor']">
                                             <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val">
                                                 <input type="radio" name="dq_18_resolution" :value="val" required
-                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600">
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600">
                                             </td>
                                         </template>
                                     </tr>
@@ -649,21 +642,20 @@
                     </div>
                 </div>
 
-                <!-- Step 5: Question 5 (Strategic Feedback & Professionalism) -->
+                <!-- Step 5: Question 5 - Professionalism Rating -->
                 <div x-show="step === 5" x-transition class="step-content space-y-6 sm:space-y-8">
                     <div class="dynamic-question-block space-y-3 sm:space-y-4 p-3 sm:p-0" data-question-id="21">
-                        <p class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg">5. How do you
-                            rate the
-                            professionalism of ICT personnel?</p>
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">5. How do you
+                            rate the professionalism of ICT personnel?</p>
 
                         <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
                             <template
                                 x-for="opt in ['Excellent (Prompt, respectful, and competent)', 'Good (Professional and helpful)', 'Fair (Inconsistent)', 'Poor (Unprofessional)']">
                                 <label class="flex items-center cursor-pointer group">
                                     <input type="radio" :name="'dq_21'" :value="opt" required
-                                        class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 border-gray-300">
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300">
                                     <span
-                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
+                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors"
                                         x-text="opt"></span>
                                 </label>
                             </template>
@@ -675,19 +667,16 @@
                 <div x-show="step === 6" x-transition class="step-content space-y-6 sm:space-y-8">
                     <!-- Question 6: Overall Rating -->
                     <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="23">
-                        <p
-                            class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg border-t pt-4 sm:pt-6">
-                            6.
-                            Overall, how would you rate your ICT experience today? *</p>
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg border-t pt-4 sm:pt-6">
+                            6. Overall, how would you rate your ICT experience today? *</p>
                         <div
                             class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-6 pl-0 sm:pl-2">
                             <template x-for="opt in ['Excellent', 'Good', 'Average', 'Poor']">
                                 <label
-                                    class="flex items-center cursor-pointer group py-2 px-3 sm:px-4 bg-white dark:bg-gray-700 rounded-xl border-2 border-transparent hover:border-blue-500 transition-all shadow-sm w-full sm:w-auto">
+                                    class="flex items-center cursor-pointer group py-2 px-3 sm:px-4 bg-white rounded-xl border-2 border-green-200 hover:border-yellow-500 transition-all shadow-sm w-full sm:w-auto">
                                     <input type="radio" :name="'dq_23'" :value="opt" required
-                                        class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 border-gray-300">
-                                    <span
-                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 font-bold"
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300">
+                                    <span class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 font-bold"
                                         x-text="opt"></span>
                                 </label>
                             </template>
@@ -699,11 +688,9 @@
                     </div>
 
                     <!-- Question 7: Improvement Areas -->
-                    <div class="dynamic-question-block space-y-3 sm:space-y-4 bg-blue-50/50 dark:bg-gray-700/30 p-4 sm:p-6 rounded-2xl border border-blue-100 dark:border-gray-700"
-                        data-question-id="25">
-                        <p class="text-gray-800 dark:text-gray-200 font-bold text-base sm:text-xl mb-3 sm:mb-4">7. Which
-                            areas would you
-                            recommend for improvement?</p>
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4 question-block" data-question-id="25">
+                        <p class="text-gray-800 font-bold text-base sm:text-xl mb-3 sm:mb-4">7. Which
+                            areas would you recommend for improvement?</p>
 
                         <div class="space-y-2 sm:space-y-3" x-data="{ otherSelected: false }">
                             <template
@@ -711,9 +698,9 @@
                                 <label class="flex items-center cursor-pointer group">
                                     <input type="checkbox" :value="opt" x-model="improvementAreas"
                                         @change="if($el.checked) improvementAreas = improvementAreas.filter(a => a !== 'none')"
-                                        class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
                                     <span
-                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors"
+                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors"
                                         x-text="opt"></span>
                                 </label>
                             </template>
@@ -721,20 +708,20 @@
                             <label class="flex items-center cursor-pointer group">
                                 <input type="checkbox" value="none" x-model="improvementAreas"
                                     @change="if($el.checked) { improvementAreas = ['none']; improvementOther = ''; otherSelected = false; }"
-                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300 rounded focus:ring-blue-500">
+                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
                                 <span
-                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-green-600 font-medium group-hover:text-green-700 transition-colors">None
+                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-green-700 font-medium group-hover:text-yellow-500 transition-colors">None
                                     / No issues encountered</span>
                             </label>
 
                             <label class="flex items-center cursor-pointer group">
                                 <input type="checkbox" value="other" x-model="improvementAreas"
                                     @change="otherSelected = improvementAreas.includes('other'); if(otherSelected) improvementAreas = improvementAreas.filter(a => a !== 'none')"
-                                    class="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300 rounded focus:ring-green-500">
                                 <span
-                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Other:</span>
+                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors">Other:</span>
                                 <input type="text" x-model="improvementOther" x-show="otherSelected"
-                                    class="ml-2 border-b-2 border-gray-300 bg-transparent outline-none focus:border-blue-500 px-2 py-0.5 text-sm transition-all flex-1"
+                                    class="ml-2 border-b-2 border-gray-300 bg-transparent outline-none focus:border-green-500 px-2 py-0.5 text-sm transition-all flex-1"
                                     placeholder="Please specify...">
                             </label>
                         </div>
@@ -745,13 +732,12 @@
 
                     <!-- Question 8: General Comments -->
                     <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="27">
-                        <label class="text-gray-800 dark:text-gray-200 font-semibold text-base sm:text-lg block">8. Do
-                            you have any
-                            general comments? <span
+                        <label class="text-gray-800 font-semibold text-base sm:text-lg block">8. Do
+                            you have any general comments? <span
                                 class="text-xs sm:text-sm font-normal text-gray-500 block mt-1 italic">*(e.g., "Library
                                 Wi-Fi is slow" or "Lab 3 printers are not working")*</span></label>
                         <textarea x-model="suggestions" rows="3"
-                            class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-3 sm:p-4 shadow-sm outline-none transition-all text-sm"
+                            class="w-full rounded-xl border-2 border-green-200 focus:border-yellow-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-3 sm:p-4 shadow-sm outline-none transition-all text-sm"
                             placeholder="Additional locations or general suggestions..."></textarea>
                     </div>
 
@@ -760,23 +746,22 @@
 
                     <div class="pt-4 sm:pt-6">
                         <button type="submit"
-                            class="bg-blue-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg hover:bg-blue-700 w-full transition-all duration-300 text-base sm:text-xl font-bold tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 sm:gap-3">
-                            <i class="fas fa-paper-plane text-xs sm:text-sm"></i> ICT Feedback
+                            class="btn-primary w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg font-bold text-base sm:text-xl tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 sm:gap-3">
+                            <i class="fas fa-paper-plane text-xs sm:text-sm"></i> Submit ICT Feedback
                         </button>
                         <p class="text-center text-xs text-gray-400 mt-3 sm:mt-4 italic">Your feedback is confidential
                             and used to improve university services.</p>
                     </div>
                 </div>
 
-                <!-- Navigation Buttons with reduced margin -->
-                <div class="flex justify-between items-center pt-6 sm:pt-8 border-t dark:border-gray-700"
-                    x-show="step > 0">
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between items-center pt-4 sm:pt-6 border-t border-gray-200" x-show="step > 0">
                     <button type="button" @click="prev()" x-show="step > 0"
-                        class="flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                        class="btn-secondary flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
                         <i class="fas fa-chevron-left text-xs sm:text-sm"></i> Previous
                     </button>
                     <button type="button" @click="next()" x-show="step > 0 && step < totalSteps"
-                        class="flex items-center gap-1 sm:gap-2 text-sm sm:text-base text-blue-600 dark:text-blue-400 font-bold hover:underline">
+                        class="btn-secondary flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
                         Next <i class="fas fa-chevron-right text-xs sm:text-sm"></i>
                     </button>
                 </div>
@@ -787,6 +772,41 @@
     <div id="footer-placeholder"></div>
     <script src="../../src/js/load-components.js"></script>
     <script src="../../src/js/feedback-portal.js"></script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
 </body>
 
 </html>

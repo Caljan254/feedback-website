@@ -1,8 +1,10 @@
 from sqlalchemy import create_engine
 from database import Base
+from config import Config
 
-engine = create_engine("mysql+pymysql://root:Aaamumo254%@localhost:3306/feedback_db")
+# Using Config for database URL
+engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
 
 Base.metadata.create_all(bind=engine)
 
-print("✅ Feedback table created successfully.")
+print("[OK] Feedback table created successfully.")

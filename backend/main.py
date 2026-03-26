@@ -4,6 +4,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from auth import get_current_user
 from routes import router
 from database import Base, engine
+from models import User
 import logging
 
 # Set up logging
@@ -14,6 +15,18 @@ logger = logging.getLogger(__name__)
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Feedback Portal API")
+
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self';"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
 
 # CORS Middleware - Configure for your frontend
 app.add_middleware(
@@ -79,9 +92,9 @@ async def serve_reset_password():
         return HTMLResponse(content="<h1>Reset password page not found</h1>", status_code=404)
 
 @app.get("/admin")
-async def serve_admin(current_user: dict = Depends(get_current_user)):
+async def serve_admin(current_user: User = Depends(get_current_user)):
     try:
-        if current_user.get("role") != "admin":
+        if not current_user or current_user.role != "admin":
             raise HTTPException(status_code=403, detail="Admin access required")
         
         with open("static/admin/admin.html", "r", encoding="utf-8") as f:

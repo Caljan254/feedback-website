@@ -15,3 +15,5 @@ Environment files
 .env.local
 .env.*.local
 .documentation.md
+.academic_project_documentation.md
+.presenation_script.md

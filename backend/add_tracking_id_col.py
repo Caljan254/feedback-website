@@ -22,12 +22,12 @@ def add_tracking_id_column():
                 print("Adding 'tracking_id' column to 'feedback' table...")
                 connection.execute(text("ALTER TABLE feedback ADD COLUMN tracking_id VARCHAR(20) UNIQUE AFTER anonymous"))
                 connection.commit()
-                print("✅ Successfully added 'tracking_id' column.")
+                print("[OK] Successfully added 'tracking_id' column.")
             else:
-                print("ℹ️ 'tracking_id' column already exists.")
+                print("[INFO] 'tracking_id' column already exists.")
                 
         except Exception as e:
-            print(f"❌ Error during migration: {str(e)}")
+            print(f"[ERROR] Error during migration: {str(e)}")
 
 if __name__ == "__main__":
     add_tracking_id_column()

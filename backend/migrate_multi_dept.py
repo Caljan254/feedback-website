@@ -31,7 +31,7 @@ def migrate_and_seed():
         
         # Specific mapping of Office Name -> Username Prefix
         admin_mapping = {
-            "Vice Chancellor’s Office": "vc",
+            "Vice Chancellor's Office": "vc",
             "Deputy Vice Chancellor (Academic)": "dvcaa",
             "Deputy Vice Chancellor (Administration)": "dvcaf",
             "Registrar (Academic Affairs)": "regacad",
@@ -47,24 +47,24 @@ def migrate_and_seed():
             "Quality Assurance": "quality",
             "Attachment & Career Services": "career",
             "e-Learning Office": "elearning",
-            "School of Science & Computing - Dean’s Office": "scideans",
+            "School of Science & Computing - Dean's Office": "scideans",
             "Mathematics Department (Chairperson)": "math",
             "Computing & IT Department": "cit",
             "Physical Sciences": "physics",
             "Biological Sciences": "bio",
-            "School of Engineering - Dean’s Office": "engdean",
+            "School of Engineering - Dean's Office": "engdean",
             "Civil Engineering": "civil",
             "Electrical Engineering": "electrical",
             "Mechanical Engineering": "mech",
-            "School of Business - Dean’s Office": "busdean",
+            "School of Business - Dean's Office": "busdean",
             "Business Administration": "ba",
             "Accounting & Finance": "accfin",
             "Economics": "econ",
-            "School of Education & Social Sciences - Dean’s Office": "edudean",
+            "School of Education & Social Sciences - Dean's Office": "edudean",
             "Educational Studies": "edu",
             "Social Sciences": "socialsci",
             "Humanities": "humanities",
-            "School of Agriculture & Environment - Dean’s Office": "agrideans",
+            "School of Agriculture & Environment - Dean's Office": "agrideans",
             "Environmental Science": "env",
             "Agricultural Sciences": "agri",
             "Dean of Students": "dean",
@@ -125,10 +125,10 @@ def migrate_and_seed():
         
         db.commit()
         print("Admin accounts seeded successfully.")
-        print("✅ Migration and seeding completed!")
+        print("[OK] Migration and seeding completed!")
         
     except Exception as e:
-        print(f"❌ Error during migration: {str(e)}")
+        print(f"[ERROR] Error during migration: {str(e)}")
         db.rollback()
     finally:
         db.close()

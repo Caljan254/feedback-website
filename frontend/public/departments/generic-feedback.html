@@ -4,12 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <title>SEKU Customer Feedback System - South Eastern Kenya University</title>
     <link rel="icon" type="image/x-icon" href="../../favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
+        /* SEKU Official Theme Colors - consistent with all feedback pages */
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
         .notification {
             position: fixed;
             top: 50%;
@@ -35,7 +43,7 @@
         }
 
         .notification.success {
-            background-color: #10B981;
+            background-color: var(--seku-green);
             color: white;
         }
 
@@ -45,8 +53,8 @@
         }
 
         .notification.warning {
-            background-color: #F59E0B;
-            color: white;
+            background-color: var(--seku-gold);
+            color: var(--seku-green);
         }
 
         .notification.info {
@@ -75,14 +83,15 @@
         }
 
         .form-input:focus {
-            border-color: #10B981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            border-color: var(--seku-green);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2);
         }
 
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #fefce8 100%);
         }
 
         .content-wrapper {
@@ -92,189 +101,553 @@
         footer {
             flex-shrink: 0;
         }
+
+        /* Office card styling */
+        .office-card {
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid rgba(21, 128, 61, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .office-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.2);
+            border-color: var(--seku-gold);
+        }
+
+        .office-card.selected {
+            border: 2px solid var(--seku-gold);
+            background: linear-gradient(135deg, #fefce8, #ffffff);
+        }
+
+        .category-header {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            border-radius: 1rem;
+            padding: 0.75rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-header h2 {
+            color: var(--seku-gold);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            border: 2px solid var(--seku-gold);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--seku-green);
+            border: 2px solid var(--seku-green);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--seku-green);
+            color: white;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+<body>
     <div id="header-placeholder"></div>
-    <div class="content-wrapper max-w-4xl mx-auto px-4 py-8">
+    <div id="header-dynamic-spacer"></div>
+    <div class="content-wrapper max-w-7xl mx-auto px-4 py-6 sm:py-8">
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
-        <div class="mb-6">
-            <button onclick="goBack()" class="flex items-center text-blue-600 hover:text-blue-700 transition-colors">
-                <i class="fas fa-arrow-left mr-2"></i> ← Back to Office Selection
+
+        <!-- Welcome Banner -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-green-700 mb-3">Customer Feedback System</h1>
+            <p class="text-gray-600 text-lg max-w-2xl mx-auto">Your feedback helps us improve our services. Please
+                select the office or department you wish to provide feedback about.</p>
+        </div>
+
+        <!-- Selected Office Display -->
+        <div id="selected-office-display" class="hidden mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-lg">
+            <div class="flex justify-between items-center flex-wrap gap-3">
+                <div>
+                    <span class="font-semibold text-green-700">Selected Office:</span>
+                    <span id="selected-office-name" class="text-gray-700 ml-2"></span>
+                </div>
+                <button onclick="clearSelection()"
+                    class="text-red-600 hover:text-red-800 text-sm flex items-center gap-1">
+                    <i class="fas fa-times-circle"></i> Change Selection
+                </button>
+            </div>
+        </div>
+
+        <!-- Office Categories - Academic & Administrative -->
+        <div class="space-y-8">
+            <!-- Academic Offices -->
+            <div>
+                <div class="category-header">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-university"></i> Academic Offices
+                    </h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="office-card p-4" data-office="Academic Registry"
+                        data-url="academic-registry-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-book-open text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Academic Registry</h3>
+                                <p class="text-xs text-gray-500">Course registration, records, transcripts</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Examinations Office"
+                        data-url="examinations-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-clipboard-list text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Examinations Office</h3>
+                                <p class="text-xs text-gray-500">Results, transcripts, exam cards</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Admissions Office"
+                        data-url="admissions-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-user-graduate text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Admissions Office</h3>
+                                <p class="text-xs text-gray-500">Applications, admission letters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Dean's Office" data-url="deans-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-chalkboard-user text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Dean's Office</h3>
+                                <p class="text-xs text-gray-500">Faculty academic matters</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Dean of Students Office"
+                        data-url="dean-of-students-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-users text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Dean of Students</h3>
+                                <p class="text-xs text-gray-500">Student welfare, accommodation</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Career Guidance & Counseling"
+                        data-url="career-guidance-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-briefcase text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Career Guidance</h3>
+                                <p class="text-xs text-gray-500">Career advice, counseling</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Chaplaincy Services" data-url="chaplaincy-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-church text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Chaplaincy Services</h3>
+                                <p class="text-xs text-gray-500">Spiritual support, pastoral care</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="E-Learning Services" data-url="e-learning-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-laptop text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">E-Learning Services</h3>
+                                <p class="text-xs text-gray-500">Online platforms, LMS support</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Departments -->
+            <div>
+                <div class="category-header">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-flask"></i> Academic Departments
+                    </h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="office-card p-4" data-office="Accounting & Finance"
+                        data-url="accounting-finance-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-chart-line text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Accounting & Finance</h3>
+                                <p class="text-xs text-gray-500">Financial studies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Agriculture" data-url="agriculture-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-seedling text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Agriculture</h3>
+                                <p class="text-xs text-gray-500">Agricultural sciences</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Biological Sciences"
+                        data-url="biological-sciences-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-dna text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Biological Sciences</h3>
+                                <p class="text-xs text-gray-500">Biology, zoology, botany</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Civil Engineering"
+                        data-url="civil-engineering-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-hard-hat text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Civil Engineering</h3>
+                                <p class="text-xs text-gray-500">Infrastructure, structures</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Economics" data-url="economics-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-chart-simple text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Economics</h3>
+                                <p class="text-xs text-gray-500">Economic studies, analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Education" data-url="education-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-chalkboard text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Education</h3>
+                                <p class="text-xs text-gray-500">Teacher training</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Electrical Engineering"
+                        data-url="electrical-engineering-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-bolt text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Electrical Engineering</h3>
+                                <p class="text-xs text-gray-500">Electronics, power systems</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Environmental Studies"
+                        data-url="environmental-studies-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-leaf text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Environmental Studies</h3>
+                                <p class="text-xs text-gray-500">Ecology, sustainability</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Humanities" data-url="humanities-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-landmark text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Humanities</h3>
+                                <p class="text-xs text-gray-500">Literature, language, arts</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Mathematics & Statistics"
+                        data-url="mathematics-statistics-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-calculator text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Mathematics & Statistics</h3>
+                                <p class="text-xs text-gray-500">Math, data analysis</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Mechanical Engineering"
+                        data-url="mechanical-engineering-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-gear text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Mechanical Engineering</h3>
+                                <p class="text-xs text-gray-500">Manufacturing, design</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Physical Sciences"
+                        data-url="physical-sciences-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-atom text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Physical Sciences</h3>
+                                <p class="text-xs text-gray-500">Physics, chemistry</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Social Sciences" data-url="social-sciences-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-globe text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Social Sciences</h3>
+                                <p class="text-xs text-gray-500">Sociology, psychology, history</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Administrative & Support Offices -->
+            <div>
+                <div class="category-header">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fas fa-building"></i> Administrative & Support Offices
+                    </h2>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="office-card p-4" data-office="Accounts Office" data-url="accounts-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-coins text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Accounts Office</h3>
+                                <p class="text-xs text-gray-500">Financial services</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Administration" data-url="administration-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-folder-open text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Administration</h3>
+                                <p class="text-xs text-gray-500">General administration</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Corporate Communications"
+                        data-url="corporate-communications-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-bullhorn text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Corporate Communications</h3>
+                                <p class="text-xs text-gray-500">Media, branding, PR</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Community Outreach"
+                        data-url="community-outreach-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-hand-holding-heart text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Community Outreach</h3>
+                                <p class="text-xs text-gray-500">Extension services</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Council Office" data-url="council-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-gavel text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Council Office</h3>
+                                <p class="text-xs text-gray-500">University governance</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Counselling Services"
+                        data-url="counselling-services-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-heart text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Counselling Services</h3>
+                                <p class="text-xs text-gray-500">Mental health support</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Catering Services"
+                        data-url="catering-services-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-utensils text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Catering Services</h3>
+                                <p class="text-xs text-gray-500">Dining, food services</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="DVC Academic Affairs"
+                        data-url="dvc-academic-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-graduation-cap text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">DVC Academic Affairs</h3>
+                                <p class="text-xs text-gray-500">Academic oversight</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="DVC Administration"
+                        data-url="dvc-administration-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-building-user text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">DVC Administration</h3>
+                                <p class="text-xs text-gray-500">Administrative oversight</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Estate Office" data-url="estate-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-hard-hat text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Estate Office</h3>
+                                <p class="text-xs text-gray-500">Facilities, maintenance</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Fees Office" data-url="fees-office-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-receipt text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Fees Office</h3>
+                                <p class="text-xs text-gray-500">Fee payments, clearance</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Finance Department"
+                        data-url="finance-department-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-chart-pie text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Finance Department</h3>
+                                <p class="text-xs text-gray-500">Budget, procurement</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="Games & Sports" data-url="games-sports-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-futbol text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">Games & Sports</h3>
+                                <p class="text-xs text-gray-500">Athletics, recreation</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="office-card p-4" data-office="ICT" data-url="ict-feedback.html">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-microchip text-green-600 text-2xl"></i>
+                            <div>
+                                <h3 class="font-semibold text-gray-800">ICT</h3>
+                                <p class="text-xs text-gray-500">IT support, network</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Continue Button -->
+        <div class="mt-10 text-center">
+            <button id="continue-btn" onclick="continueToFeedback()" disabled
+                class="btn-primary px-12 py-4 rounded-xl shadow-lg font-bold text-lg tracking-wide opacity-50 cursor-not-allowed transition-all">
+                <i class="fas fa-arrow-right mr-2"></i> Continue to Feedback Form
             </button>
         </div>
-        <div id="user-info-display"
-            class="hidden bg-blue-50 dark:bg-blue-900 p-4 rounded-lg mb-6 text-gray-800 dark:text-gray-200"></div>
-        <section
-            class="bg-blue-50/50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-blue-100 dark:border-gray-700">
-            <h3 id="department-title" class="text-3xl font-bold text-blue-900 dark:text-blue-300 mb-8">Feedback Form
-            </h3>
-
-            <form class="department-feedback-form space-y-8">
-                <!-- Dynamic Questions Container -->
-<div id="dynamic-questions" class="space-y-6"></div>
-
-<!-- Question 1 -->
-<div class="space-y-4">
-    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">1. What was the primary purpose of
-        your visit today?</p>
-    <div class="space-y-3 pl-2">
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_0" value="General Inquiry" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">General
-                Inquiry</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_0" value="Service Request" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Service
-                Request</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_0" value="Document Submission" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Document
-                Submission</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_0" value="Follow-up Visit" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Follow-up
-                Visit</span>
-        </label>
     </div>
-</div>
 
-<!-- Question 2 -->
-<div class="space-y-4">
-    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">2. How would you rate the clarity
-        of information and guidance provided?</p>
-    <div class="space-y-3 pl-2">
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_1" value="Excellent" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Excellent
-                - Very clear and helpful</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_1" value="Good" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Good
-                - Clear enough to proceed</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_1" value="Poor" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Poor
-                - Confusing or incomplete</span>
-        </label>
-    </div>
-</div>
+    <div id="footer-placeholder"></div>
+    <script src="../../src/js/load-components.js"></script>
+    <script src="../../src/js/feedback-portal.js"></script>
+    <script>
+        let selectedOffice = null;
+        let selectedUrl = null;
 
-<!-- Question 3 -->
-<div class="space-y-4">
-    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">3. How would you rate the
-        efficiency and waiting time for the service?</p>
-    <div class="space-y-3 pl-2">
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_2" value="Very Efficient" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Very
-                Efficient - Served immediately</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_2" value="Acceptable" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Acceptable
-                - Normal waiting time</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_2" value="Slow" required
-                class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Slow
-                - Long delay / Needs improvement</span>
-        </label>
-    </div>
-</div>
+        // Initialize office card click handlers
+        document.querySelectorAll('.office-card').forEach(card => {
+            card.addEventListener('click', function () {
+                // Remove selected class from all cards
+                document.querySelectorAll('.office-card').forEach(c => c.classList.remove('selected'));
+                // Add selected class to clicked card
+                this.classList.add('selected');
 
-<!-- Question 4 -->
-<div class="space-y-4">
-    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg">4. How would you rate the
-        professionalism and helpfulness of the staff?</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pl-2">
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_3" value="Exceptional" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Exceptional
-                Service</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_3" value="Helpful" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Helpful
-                & Courteous</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_3" value="Neutral" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span
-                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Neutral</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_3" value="Unhelpful" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">Needs
-                Improvement</span>
-        </label>
-    </div>
-</div>
+                selectedOffice = this.getAttribute('data-office');
+                selectedUrl = this.getAttribute('data-url');
 
-<!-- Question 5 -->
-<div class="space-y-4">
-    <p class="text-gray-800 dark:text-gray-200 font-semibold text-lg"> 5. Overall, how would you rate your experience with Feedback Form Feedback today? * </p>
-    <div class="flex flex-wrap items-center gap-8 pl-2">
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_4" value="Excellent" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span
-                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Excellent</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_4" value="Good" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span
-                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Good</span>
-        </label>
-        <label class="flex items-center cursor-pointer group">
-            <input type="radio" name="q_4" value="Poor" required class="w-5 h-5 text-blue-600 border-gray-300">
-            <span
-                class="ml-3 text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors font-medium">Poor</span>
-        </label>
-    </div>
-</div>
-<!-- Hidden input for rating -->
-<input type="hidden" name="rating" x-data
-    x-effect="$nextTick(() => { $el.value = document.querySelector(\'input[name=q_4]:checked\')?.value || \'\' })">
+                // Update display
+                document.getElementById('selected-office-name').textContent = selectedOffice;
+                document.getElementById('selected-office-display').classList.remove('hidden');
 
-<!-- Question 6 -->
-<div class="space-y-4">
-    <label class="text-gray-800 dark:text-gray-200 font-semibold text-lg block">6. Do you have any
-        general comments, suggestions, or specific feedback for this office? *</label>
-    <textarea name="comment" rows="5" required
-        class="w-full rounded-xl border-2 border-blue-100 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:border-gray-600 p-4 shadow-sm outline-none transition-all"
-        placeholder="Write your feedback here..."></textarea>
-</div>
+                // Enable continue button
+                const continueBtn = document.getElementById('continue-btn');
+                continueBtn.disabled = false;
+                continueBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            });
+        });
 
-<div class="pt-6">
-    <button type="submit"
-        class="bg-blue-600 text-white px-8 py-4 rounded-xl shadow-lg hover:bg-blue-700 w-full transition-all duration-300 text-xl font-bold tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
-        ICT Feedback
-    </button>
-</div>
-</form>
-</section>
+        function clearSelection() {
+            selectedOffice = null;
+            selectedUrl = null;
+            document.querySelectorAll('.office-card').forEach(c => c.classList.remove('selected'));
+            document.getElementById('selected-office-display').classList.add('hidden');
 
-</div>
-<div id="footer-placeholder"></div>
-<script src="../../src/js/load-components.js"></script>
-<script src="../../src/js/feedback-portal.js"></script>
+            const continueBtn = document.getElementById('continue-btn');
+            continueBtn.disabled = true;
+            continueBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function continueToFeedback() {
+            if (selectedUrl) {
+                window.location.href = selectedUrl;
+            } else {
+                window.feedbackPortal.showNotification('Please select an office or department first.', 'warning');
+            }
+        }
+
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => { adjustHeaderSpacer(); });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => { adjustHeaderSpacer(); });
+    </script>
 </body>
 
 </html>

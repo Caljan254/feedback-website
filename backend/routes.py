@@ -13,7 +13,26 @@ from database import get_db
 from datetime import datetime
 from typing import List, Optional
 import logging
+import re
+import csv
+import io
+from fastapi.responses import StreamingResponse
 from email_service import email_service
+
+def user_id_for_log(user) -> str:
+    """Helper to get a log-friendly ID for a user."""
+    if not user:
+        return "Unknown"
+    return user.email or user.username or f"ID:{user.id}"
+
+# Simple HTML sanitizer to prevent XSS
+def sanitize_html(text: str) -> str:
+    if not text:
+        return text
+    # Strip script tags and other dangerous elements
+    text = re.sub(r'<script.*?>.*?</script>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<.*?>', '', text) # Remove all HTML tags for safety
+    return text.strip()
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -57,9 +76,9 @@ def notify_admins_task(feedback_id: int):
 
 router = APIRouter()
 
-# 🧾 Register Route
+# [Register] Register Route
 @router.post("/register", response_model=UserOut)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+def register_user(user: UserCreate, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_user)):
     try:
         logger.info(f"Registration attempt for email: {user.email}")
         
@@ -69,12 +88,21 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             logger.warning(f"Email already registered: {user.email}")
             raise HTTPException(status_code=400, detail="Email already registered")
         
-        # First user becomes admin
+        # Prevent unauthorized admin registration
         user_count = db.query(User).count()
         is_first_user = user_count == 0
-        role = "admin" if is_first_user else user.role
         
-        logger.info(f"User count: {user_count}, Is first user: {is_first_user}, Assigned role: {role}")
+        assigned_role = user.role
+        if not is_first_user:
+            # Only existing admins can create other admins
+            if assigned_role == "admin":
+                if not current_user or current_user.role != "admin":
+                    logger.warning(f"Unauthorized admin registration attempt by {user.email}")
+                    assigned_role = "student" # Default to lowest role
+        else:
+            assigned_role = "admin" # First user is always admin
+        
+        logger.info(f"User registration: {user.email}, Target Role: {user.role}, Assigned Role: {assigned_role}")
 
         # Hash password
         hashed_password = get_password_hash(user.password)
@@ -84,14 +112,15 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
             fullname=user.fullname,
             email=user.email,
             hashed_password=hashed_password,
-            role=role
+            role=assigned_role,
+            department_id=user.department_id
         )
         
         db.add(new_user)
         db.commit()
         db.refresh(new_user)
         
-        logger.info(f"User registered successfully: {user.email} with role {role}")
+        logger.info(f"User registered successfully: {user.email} with role {assigned_role}")
         return new_user
         
     except SQLAlchemyError as e:
@@ -102,7 +131,7 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         logger.error(f"Unexpected error in register: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-# 👤 Login Route
+# [User] Login Route
 @router.post("/login", response_model=Token)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     try:
@@ -140,7 +169,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         logger.error(f"Unexpected error in login: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-# 🔑 Forgot Password Route
+# [Auth] Forgot Password Route
 @router.post("/forgot-password")
 def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
     from auth import create_reset_token
@@ -158,7 +187,7 @@ def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db
         
     return {"message": "Password reset email sent."}
 
-# 🔐 Reset Password Route
+# [Auth] Reset Password Route
 @router.post("/reset-password")
 def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
     from auth import verify_reset_token, get_password_hash
@@ -173,18 +202,22 @@ def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db))
         db.commit()
         return {"message": "Password updated successfully."}
     except Exception as e:
+        print(f"[ERROR] Error: {e}")
         db.rollback()
         raise e
 
-# 💬 Submit Feedback Route
+# [Feedback] Submit Feedback Route
 @router.post("/submit-feedback", response_model=FeedbackOut)
 def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: BackgroundTasks, 
                     db: Session = Depends(get_db), 
                     current_user: User = Depends(get_current_user)):
     try:
-        # Convert to dict
+        # Convert to dict and sanitize inputs
         feedback_dict = feedback.dict()
-        dynamic_responses = feedback_dict.pop('dynamic_responses', [])
+        feedback_dict['message'] = sanitize_html(feedback_dict.get('message', ''))
+        feedback_dict['name'] = sanitize_html(feedback_dict.get('name', ''))
+        
+        dynamic_responses: List[dict] = feedback_dict.pop('dynamic_responses', [])
         
         # If user is authenticated, use their email
         if current_user:
@@ -196,7 +229,7 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
             office_val = feedback_dict['office'].lower()
             # Mapping frontend slugs to DB names
             slug_map = {
-                'vc-office': "Vice Chancellor’s Office",
+                'vc-office': "Vice Chancellor's Office",
                 'dvc-academic': "Deputy Vice Chancellor (Academic)",
                 'dvc-admin': "Deputy Vice Chancellor (Administration)",
                 'registrar-academic': "Registrar (Academic Affairs)",
@@ -212,24 +245,24 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
                 'quality-assurance': "Quality Assurance",
                 'industrial-attachment': "Attachment & Career Services",
                 'elearning': "e-Learning Office",
-                'ssc-dean': "School of Science & Computing - Dean’s Office",
+                'ssc-dean': "School of Science & Computing - Dean's Office",
                 'dept-math': "Mathematics Department (Chairperson)",
                 'dept-ict': "Computing & IT Department",
                 'dept-physical': "Physical Sciences",
                 'dept-biological': "Biological Sciences",
-                'set-dean': "School of Engineering - Dean’s Office",
+                'set-dean': "School of Engineering - Dean's Office",
                 'dept-civil': "Civil Engineering",
                 'dept-elec': "Electrical Engineering",
                 'dept-mech': "Mechanical Engineering",
-                'sbe-dean': "School of Business - Dean’s Office",
+                'sbe-dean': "School of Business - Dean's Office",
                 'dept-admin': "Business Administration",
                 'dept-accounting': "Accounting & Finance",
                 'dept-economics': "Economics",
-                'seh-dean': "School of Education & Social Sciences - Dean’s Office",
+                'seh-dean': "School of Education & Social Sciences - Dean's Office",
                 'dept-edu': "Educational Studies",
                 'dept-social': "Social Sciences",
                 'dept-humanities': "Humanities",
-                'sanr-dean': "School of Agriculture & Environment - Dean’s Office",
+                'sanr-dean': "School of Agriculture & Environment - Dean's Office",
                 'dept-env': "Environmental Science",
                 'dept-agri': "Agricultural Sciences",
                 'dean-students': "Dean of Students",
@@ -262,11 +295,21 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
             }
             dept_name = slug_map.get(office_val, office_val)
             # Handle different apostrophes (straight vs curly)
-            dept_name_alt = dept_name.replace("’", "'") if "’" in dept_name else dept_name.replace("'", "’")
-            
-            dept = db.query(Department).filter(
-                (Department.name.ilike(dept_name)) | (Department.name.ilike(dept_name_alt))
-            ).first()
+            # Check if dept_name is not None or empty before attempting replace
+            if dept_name:
+                dept_name_variants = [dept_name]
+                # Replace possible curly apostrophes from frontend with straight ones for DB matching
+                # Hex 2019 is curly ’, 0027 is straight '
+                if "'" in dept_name:
+                    dept_name_variants.append(dept_name.replace("'", "\u2019"))
+                if "\u2019" in dept_name:
+                    dept_name_variants.append(dept_name.replace("\u2019", "'"))
+                
+                dept = db.query(Department).filter(
+                    Department.name.in_(dept_name_variants)
+                ).first()
+            else:
+                dept = None
             
             if dept:
                 feedback_dict['department_id'] = dept.id
@@ -292,16 +335,24 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
         filtered_feedback_dict = {k: v for k, v in feedback_dict.items() if k in allowed_keys}
         
         db_feedback = Feedback(**filtered_feedback_dict)
+        
+        # MIRROR: Populate legacy columns q_0 through q_4 from dynamic responses 
+        # for easier viewing in the main feedback table
+        for i, resp in enumerate(dynamic_responses[:5]):
+            field_name = f'q_{i}'
+            if field_name in allowed_keys and not filtered_feedback_dict.get(field_name):
+                setattr(db_feedback, field_name, resp['answer'])
+
         db.add(db_feedback)
+
         db.commit()
         db.refresh(db_feedback)
 
-        # Save dynamic responses — including question_text (the visible label from the HTML form)
+        # Save all dynamic responses (the full detailed set)
         for resp in dynamic_responses:
             q_id = resp.get('question_id')
             if q_id:
-                # 🛡️ Safety check: Verify ID exists in questions table to avoid IntegrityError (1452)
-                # Some forms use hardcoded IDs that might not be in the DB yet
+                # [Safety Cache] Verify ID exists in questions table to avoid IntegrityError (1452)
                 exists = db.query(Question.id).filter(Question.id == q_id).first()
                 if not exists:
                     q_id = None
@@ -310,7 +361,7 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
                 feedback_id=db_feedback.id,
                 question_id=q_id,
                 answer=resp['answer'],
-                question_text=resp.get('question_text')  # Store the actual visible question label
+                question_text=resp.get('question_text')
             )
             db.add(db_resp)
         
@@ -330,13 +381,12 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
         import traceback
         error_msg = str(e)
         stack_trace = traceback.format_exc()
-        logger.error(f"Database error in submit_feedback: {error_msg}\n{stack_trace}")
-        print(f"❌ DATABASE ERROR: {error_msg}")
-        print(f"DATA ATTEMPTED: {feedback_dict}")
+        logger.error(f"Database error in submit-feedback: {error_msg}\n{stack_trace}")
+        print(f"[ERROR] DATABASE ERROR: {error_msg}")
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {error_msg[:100]}")
 
-# 👀 Admin Route – View All Feedback
+# [Admin] Admin Route - View All Feedback
 @router.get("/admin/feedback", response_model=List[FeedbackOutExtended])
 def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
@@ -345,15 +395,10 @@ def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends
             
         if current_user.role != "admin":
             logger.warning(f"Non-admin {current_user.email} attempted to access admin feedback")
-            raise HTTPException(status_code=403, detail="Forbidden – Admins only")
+            raise HTTPException(status_code=403, detail="Forbidden - Admins only")
         
         logger.info(f"Admin {current_user.email or current_user.username} fetching feedback")
         
-        # We use selectinload to eagerly load responses and their related questions.
-        # selectinload is preferred over joinedload for one-to-many collections
-        # because it avoids Cartesian product issues and works correctly with order_by.
-        # This ensures question_text @property on QuestionResponse is accessible.
-        from sqlalchemy.orm import selectinload
         query = db.query(Feedback).options(
             selectinload(Feedback.responses).selectinload(QuestionResponse.question)
         )
@@ -369,7 +414,7 @@ def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends
         logger.error(f"Database error in get_all_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
 
-# ✅ Mark feedback as read
+# [Admin] Mark feedback as read
 @router.post("/admin/feedback/{feedback_id}/read")
 def mark_feedback_as_read(
     feedback_id: int, 
@@ -378,14 +423,14 @@ def mark_feedback_as_read(
 ):
     try:
         if not current_user or current_user.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden – Admins only")
+            raise HTTPException(status_code=403, detail="Forbidden - Admins only")
         
         feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
         if not feedback:
             raise HTTPException(status_code=404, detail="Feedback not found")
         
         if current_user.department_id and feedback.department_id != current_user.department_id:
-             raise HTTPException(status_code=403, detail="Forbidden – Not your department")
+             raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
         feedback.is_read = True
         feedback.read_at = datetime.now()
@@ -408,7 +453,7 @@ def mark_feedback_as_read(
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
-# ✅ Mark feedback as answered
+# [Admin] Mark feedback as answered
 @router.post("/admin/feedback/{feedback_id}/answered")
 def mark_feedback_as_answered(
     feedback_id: int, 
@@ -417,14 +462,14 @@ def mark_feedback_as_answered(
 ):
     try:
         if not current_user or current_user.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden – Admins only")
+            raise HTTPException(status_code=403, detail="Forbidden - Admins only")
         
         feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
         if not feedback:
             raise HTTPException(status_code=404, detail="Feedback not found")
         
         if current_user.department_id and feedback.department_id != current_user.department_id:
-             raise HTTPException(status_code=403, detail="Forbidden – Not your department")
+             raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
         feedback.replied_at = datetime.now()
         
@@ -446,7 +491,7 @@ def mark_feedback_as_answered(
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
-# 📧 Send Reply Route
+# [Admin] Send Reply Route
 @router.post("/send-reply")
 def send_reply(
     request: dict,
@@ -455,7 +500,7 @@ def send_reply(
 ):
     try:
         if not current_user or current_user.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden – Admins only")
+            raise HTTPException(status_code=403, detail="Forbidden - Admins only")
 
         email = request.get("email")
         subject = request.get("subject")
@@ -471,7 +516,7 @@ def send_reply(
             raise HTTPException(status_code=404, detail="Feedback not found")
             
         if current_user.department_id and feedback.department_id != current_user.department_id:
-             raise HTTPException(status_code=403, detail="Forbidden – Not your department")
+             raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
         feedback.replied_at = datetime.now()
         feedback.reply_message = message
@@ -506,14 +551,14 @@ def send_reply(
             except Exception as e:
                 logger.error(f"Error calling email service: {str(e)}")
 
-        return {"message": "✅ Reply sent successfully and feedback marked as answered"}
+        return {"message": "[OK] Reply sent successfully and feedback marked as answered"}
         
     except SQLAlchemyError as e:
         logger.error(f"Database error in send_reply: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
-# 📨 Admin → Member: Send proactive message to registered user
+# [Admin] Admin -> Member: Send proactive message to registered user
 @router.post("/admin/send-message")
 def send_admin_message_to_member(
     request: dict,
@@ -522,7 +567,7 @@ def send_admin_message_to_member(
 ):
     try:
         if not current_user or current_user.role != "admin":
-            raise HTTPException(status_code=403, detail="Forbidden – Admins only")
+            raise HTTPException(status_code=403, detail="Forbidden - Admins only")
 
         recipient_email = request.get("recipient_email", "").strip()
         subject = request.get("subject", "").strip()
@@ -549,7 +594,7 @@ def send_admin_message_to_member(
             message=f"Subject: {subject}\n\n{message}",
             anonymous="false",
             tracking_id=tracking_id,
-            department_id=current_user.department_id or feedback.department_id,
+            department_id=current_user.department_id,
             is_read=False,
             reply_message=message,
             replied_at=datetime.now(),   # Mark as already answered since admin composed it
@@ -567,14 +612,14 @@ def send_admin_message_to_member(
         db.commit()
 
         logger.info(f"Admin {user_id_for_log(current_user)} sent message to {recipient_email}")
-        return {"message": f"✅ Message sent to {recipient_email} successfully"}
+        return {"message": f"[OK] Message sent to {recipient_email} successfully"}
 
     except SQLAlchemyError as e:
         logger.error(f"Database error in send_admin_message: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
-# 👤 User Route – View Own Feedback
+# [User] User Route - View Own Feedback
 @router.get("/user/feedback", response_model=List[FeedbackOutExtended])
 def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
@@ -590,7 +635,7 @@ def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depend
         logger.error(f"Database error in get_user_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
 
-# 👤 Anonymous Route – Track Feedback by Email or Tracking ID
+# [User] Anonymous Route - Track Feedback by Email or Tracking ID
 @router.post("/feedback/track", response_model=List[FeedbackOutExtended])
 def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db)):
     try:
@@ -612,7 +657,7 @@ def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db))
         logger.error(f"Database error in track_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
 
-# 👤 Get single feedback
+# [User] Get single feedback
 @router.get("/user/feedback/{feedback_id}", response_model=FeedbackOut)
 def get_single_user_feedback(
     feedback_id: int, 
@@ -635,7 +680,7 @@ def get_single_user_feedback(
         logger.error(f"Database error in get_single_user_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
 
-# 👤 Mark feedback as read (user)
+# [User] Mark feedback as read (user)
 @router.post("/user/feedback/{feedback_id}/read")
 def mark_user_feedback_as_read(
     feedback_id: int, 
@@ -666,12 +711,12 @@ def mark_user_feedback_as_read(
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
 
-# 🏢 Get Departments List
+# [System] Get Departments List
 @router.get("/departments")
 def get_departments(db: Session = Depends(get_db)):
     return db.query(Department).all()
 
-# 📋 Activity Logs
+# [Admin] Activity Logs
 @router.get("/admin/activity-logs")
 def get_activity_logs(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
@@ -683,29 +728,49 @@ def get_activity_logs(db: Session = Depends(get_db), current_user: User = Depend
     
     return query.order_by(ActivityLog.timestamp.desc()).limit(50).all()
 
-# 📥 Export CSV
+# [Admin] Export CSV
 @router.get("/admin/export-csv")
 def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admins only")
     
-    import csv
-    import io
-    from fastapi.responses import StreamingResponse
+    output = io.StringIO()
+    writer = csv.writer(output)
 
     query = db.query(Feedback)
     if current_user.department_id:
         query = query.filter(Feedback.department_id == current_user.department_id)
     
     feedback = query.all()
-
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["ID", "Name", "Email", "Message", "Rating", "Created At", "Status"])
+    
+    # Enhanced header
+    writer.writerow(["ID", "Tracking ID", "Name", "Email", "Category", "Office", "Message", "Rating", "Detailed Responses", "Created At", "Status"])
     
     for f in feedback:
         status = "Replied" if f.replied_at else ("Read" if f.is_read else "Unread")
-        writer.writerow([f.id, f.name, f.email, f.message, f.rating, f.created_at, status])
+        
+        # Format detailed responses as a single string for CSV
+        resp_summary = ""
+        if hasattr(f, 'responses') and f.responses:
+            resp_list: List[str] = []
+            for r in f.responses:
+                q_text = r.question_text or (r.question.text if r.question else f"Q#{r.question_id}")
+                resp_list.append(str(f"{q_text}: {r.answer}"))
+            resp_summary = " | ".join(resp_list)
+            
+        writer.writerow([
+            f.id, 
+            f.tracking_id,
+            f.name or "Anonymous", 
+            f.email or "N/A", 
+            f.category or "General",
+            f.office or "General",
+            f.message, 
+            f.rating or "Unrated", 
+            resp_summary,
+            f.created_at.strftime("%Y-%m-%d %H:%M:%S") if f.created_at else "", 
+            status
+        ])
 
     output.seek(0)
     return StreamingResponse(
@@ -714,7 +779,7 @@ def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depe
         headers={"Content-Disposition": f"attachment; filename=feedback_dept_{current_user.department_id}.csv"}
     )
 
-# 🙋‍♂️ Question Management Routes
+# [Admin] Question Management Routes
 @router.get("/questions", response_model=List[QuestionOut])
 def get_questions(office: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(Question).filter(Question.is_active == True)
@@ -823,7 +888,7 @@ def delete_question(question_id: int, db: Session = Depends(get_db), current_use
     db.commit()
     return {"message": "Question deleted successfully"}
 
-# 🔐 Get Current User Info
+# [User] Get Current User Info
 @router.get("/user/me")
 def get_user_profile(current_user: User = Depends(get_current_user)):
     if not current_user:

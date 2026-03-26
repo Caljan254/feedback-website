@@ -324,13 +324,13 @@
     <div id="header-dynamic-spacer"></div>
 
     <!-- Content Wrapper -->
-    <div class="content-wrapper max-w-6xl mx-auto px-4 pt-4 pb-8">
+    <div class="content-wrapper max-w-6xl mx-auto px-4 pt-4 pb-4">
         <!-- Notification Container -->
         <div id="notification-container"
             class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
 
         <!-- Page Title with Refresh Button -->
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-3xl sm:text-4xl font-bold text-green-700 dark:text-green-400 mb-2">My Feedback History
                 </h1>
@@ -364,7 +364,7 @@
 
         <!-- Guest Tracking Form (shown when not logged in) -->
         <div id="guest-tracking-section"
-            class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border-t-4 border-green-500">
+            class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border-t-4 border-green-500">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div class="flex-1">
                     <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Track Guest Feedback</h2>
@@ -389,9 +389,14 @@
 
             <!-- Recent Tracking IDs (Help for users who forgot to save them) -->
             <div id="recent-tracking-ids" class="mt-6 pt-6 border-t dark:border-gray-700 hidden">
-                <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-                    <i class="fas fa-history mr-2"></i>Recent Reference Numbers (Autosaved)
-                </h3>
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <i class="fas fa-history mr-2"></i>Recent Reference Numbers (Autosaved)
+                    </h3>
+                    <button onclick="clearAllRecentIds()" class="text-[10px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-bold uppercase tracking-tighter transition-colors">
+                        <i class="fas fa-trash-alt mr-1"></i>Clear History
+                    </button>
+                </div>
                 <div id="recent-ids-container" class="flex flex-wrap gap-2">
                     <!-- Loaded via JS -->
                 </div>
@@ -401,7 +406,7 @@
         </div>
 
         <!-- Stats Cards (shown when logged in) -->
-        <div id="stats-cards" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div id="stats-cards" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-blue-500">
                 <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Feedback</h3>
                 <p id="user-total-feedback" class="text-3xl font-bold text-blue-600">0</p>
@@ -1508,19 +1513,47 @@
                 if (history && history.length > 0 && container && section) {
                     section.classList.remove('hidden');
                     container.innerHTML = history.map(item => `
-                        <button onclick="trackRecentId('${item.id}')" 
-                                class="flex items-center gap-2 bg-gray-100 hover:bg-green-50 dark:bg-gray-700 dark:hover:bg-green-900/30 border border-gray-200 dark:border-gray-600 px-3 py-2 rounded-lg transition-all group">
-                            <i class="fas fa-ticket-alt text-green-600 dark:text-green-400 opacity-60 group-hover:opacity-100"></i>
-                            <div class="text-left">
-                                <div class="text-xs font-bold font-mono text-gray-800 dark:text-gray-200">${item.id}</div>
-                                <div class="flex justify-between items-center gap-2">
-                                    <div class="text-[10px] text-gray-400 truncate max-w-[80px]">${item.officeName || 'Office'}</div>
-                                    <div class="text-[9px] text-gray-500 whitespace-nowrap" data-timestamp="${item.date || ''}">${formatDate(item.date)}</div>
+                        <div class="group relative">
+                            <button onclick="trackRecentId('${item.id}')" 
+                                    class="flex items-center gap-2 bg-gray-100 hover:bg-green-50 dark:bg-gray-700 dark:hover:bg-green-900/30 border border-gray-200 dark:border-gray-600 px-3 py-2 rounded-lg transition-all pr-8">
+                                <i class="fas fa-ticket-alt text-green-600 dark:text-green-400 opacity-60 group-hover:opacity-100"></i>
+                                <div class="text-left">
+                                    <div class="text-xs font-bold font-mono text-gray-800 dark:text-gray-200">${item.id}</div>
+                                    <div class="flex justify-between items-center gap-2">
+                                        <div class="text-[10px] text-gray-400 truncate max-w-[80px]">${item.officeName || 'Office'}</div>
+                                        <div class="text-[9px] text-gray-500 whitespace-nowrap" data-timestamp="${item.date || ''}">${formatDate(item.date)}</div>
+                                    </div>
                                 </div>
-                            </div>
-                        </button>
+                            </button>
+                            <button onclick="deleteRecentId('${item.id}', event)" 
+                                    class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Remove from history">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
                     `).join('');
                     if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+                } else if (section) {
+                    section.classList.add('hidden');
+                }
+            }
+        }
+
+        function deleteRecentId(id, event) {
+            if (event) event.stopPropagation();
+            if (window.feedbackPortal) {
+                window.feedbackPortal.removeFromTrackingHistory(id);
+                loadRecentTrackingIds();
+                showNotification('Removed from history', 'info');
+            }
+        }
+
+        function clearAllRecentIds() {
+            if (confirm('Are you sure you want to clear all recently saved reference numbers?')) {
+                if (window.feedbackPortal) {
+                    window.feedbackPortal.clearTrackingHistory();
+                    loadRecentTrackingIds();
+                    showNotification('History cleared', 'info');
                 }
             }
         }

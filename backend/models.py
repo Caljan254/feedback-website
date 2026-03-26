@@ -102,3 +102,20 @@ class ActivityLog(Base):
     action = Column(String(100))  # e.g., 'read_message', 'reply_message'
     details = Column(Text, nullable=True)
     timestamp = Column(DateTime, default=datetime.now)
+
+
+class ServiceCharter(Base):
+    """ICT Service Charter entries as stored in the database."""
+    __tablename__ = "service_charter"
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(Integer, primary_key=True, index=True)
+    service_number = Column(Integer, nullable=False, unique=True)
+    service_name = Column(String(200), nullable=False)
+    requirements = Column(Text, nullable=False)
+    charges = Column(String(100), default="Nil")
+    timelines = Column(String(100), nullable=False)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+

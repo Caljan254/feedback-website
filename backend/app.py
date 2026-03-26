@@ -5,23 +5,56 @@ import jwt
 from datetime import datetime, timedelta
 from functools import wraps
 import hashlib
+import bcrypt
+from config import Config
 from email_service import email_service
+import re
 
 app = Flask(__name__)
 CORS(app)
 
+# Simple HTML sanitizer to prevent XSS
+def sanitize_html(text: str) -> str:
+    if not text:
+        return text
+    # Strip script tags and other dangerous elements
+    text = re.sub(r'<script.*?>.*?</script>', '', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<.*?>', '', text) # Remove all HTML tags for safety
+    return text.strip()
+
 # Configuration
-app.config['SECRET_KEY'] = 'your-secret-key-change-this-in-production'
+app.config['SECRET_KEY'] = Config.JWT_SECRET_KEY
 app.config['JWT_EXPIRATION_HOURS'] = 24
 
-# MySQL connection
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="Aaamumo254%",
-    database="feedback_portal"
-)
+# Security Headers
+@app.after_request
+def add_security_headers(response):
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Content-Security-Policy'] = "default-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self';"
+    return response
 
+# Standardized DB Connection helper
+def get_db_connection():
+    import urllib.parse
+    uri = Config.SQLALCHEMY_DATABASE_URI
+    result = urllib.parse.urlparse(uri)
+    username = result.username
+    password = result.password
+    # Safely get database name
+    db_name = result.path.lstrip('/') if result.path else "feedback_portal"
+    hostname = result.hostname
+    
+    return mysql.connector.connect(
+        host=hostname or "localhost",
+        user=username or "root",
+        password=password or "",
+        database=db_name
+    )
+
+db = get_db_connection()
 cursor = db.cursor(dictionary=True)
 
 # Ensure database has required columns
@@ -115,27 +148,34 @@ def register():
     if existing_user:
         return jsonify({'error': 'Email already registered'}), 400
     
-    # Check if first user (becomes admin)
+    # Prevent unauthorized admin registration
     cursor.execute("SELECT COUNT(*) as count FROM users")
     count_result = cursor.fetchone()
     is_first_user = count_result['count'] == 0
     
-    role = 'admin' if is_first_user else data.get('role', 'student')
+    assigned_role = data.get('role', 'student')
+    if not is_first_user:
+        if assigned_role == 'admin':
+            # Deny admin role in public registration
+            assigned_role = 'student'
+    else:
+        assigned_role = 'admin'
     
-    # Hash password
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    # Hash password with bcrypt
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
     
-    # Insert user
+    # Insert user - using 'hashed_password' column name from models.py
     cursor.execute(
-        "INSERT INTO users (fullname, email, password, role) VALUES (%s, %s, %s, %s)",
-        (fullname, email, hashed_password, role)
+        "INSERT INTO users (fullname, email, hashed_password, role) VALUES (%s, %s, %s, %s)",
+        (fullname, email, hashed_password, assigned_role)
     )
     db.commit()
     
     # Generate token
     token = jwt.encode({
         'email': email,
-        'role': role,
+        'role': assigned_role,
         'exp': datetime.utcnow() + timedelta(hours=app.config['JWT_EXPIRATION_HOURS'])
     }, app.config['SECRET_KEY'])
     
@@ -145,7 +185,7 @@ def register():
         'token_type': 'bearer',
         'email': email,
         'fullname': fullname,
-        'role': role
+        'role': assigned_role
     }), 201
 
 # Login
@@ -159,14 +199,11 @@ def login():
     email = data['email']
     password = data['password']
     
-    # Hash password for comparison
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    
     # Get user
-    cursor.execute("SELECT * FROM users WHERE email = %s AND password = %s", (email, hashed_password))
+    cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
     user = cursor.fetchone()
     
-    if not user:
+    if not user or not bcrypt.checkpw(password.encode('utf-8'), user['hashed_password'].encode('utf-8')):
         return jsonify({'error': 'Invalid credentials'}), 401
     
     # Generate token
@@ -204,15 +241,15 @@ def submit_feedback():
         except:
             pass
     
-    name = data.get('name')
+    name = sanitize_html(data.get('name'))
     email = data.get('email', user_email)  # Use token email if available
-    category = data.get('category', 'Anonymous')
-    office = data.get('office', 'general')
-    rating = data.get('rating')
-    message = data.get('message', '')
+    category = sanitize_html(data.get('category', 'Anonymous'))
+    office = sanitize_html(data.get('office', 'general'))
+    rating = sanitize_html(data.get('rating'))
+    message = sanitize_html(data.get('message', ''))
     anonymous = data.get('anonymous', 'false')
     
-    if not name and not anonymous:
+    if not name and not anonymous == 'true':
         name = 'Anonymous'
     
     # Insert feedback with status fields

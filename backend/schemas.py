@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal, Optional
 
 # User Registration
@@ -15,7 +15,8 @@ class UserCreate(BaseModel):
 class UserOut(BaseModel):
     id: int
     fullname: str
-    email: str
+    username: Optional[str] = None
+    email: Optional[str] = None
     role: str
     created_at: Optional[datetime] = None
 
@@ -135,13 +136,12 @@ class FeedbackCreateExtended(FeedbackCreate):
 class FeedbackOutExtended(FeedbackOut):
     responses: list[QuestionResponseOut] = []
     
-    class Config:
-        from_attributes = True
+    # Inherits Config from FeedbackOut
 
 # Optional: Add a schema for marking feedback as read
 class FeedbackReadUpdate(BaseModel):
     is_read: bool = True
-    read_at: datetime = datetime.now()
+    read_at: datetime = Field(default_factory=datetime.now)
 
 
 # Optional: Add a schema for replying to feedback

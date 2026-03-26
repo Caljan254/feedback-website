@@ -2,6 +2,8 @@
 
 class FeedbackPortal {
     constructor() {
+        // Expose instance EARLY so methods called during init can find it
+        window.feedbackPortal = this;
         this.init();
     }
 
@@ -17,7 +19,95 @@ class FeedbackPortal {
         this.hidePublicNavLinks();
         this.startTimestampUpdater();
         this.updateLogoForOffice();
+        this.adjustHeaderSpacer();
+        this.initializeContentProtection();
         console.log('Feedback Portal initialized');
+    }
+
+    // Initialize content protection to prevent copying
+    initializeContentProtection() {
+        const isFormElement = (el) => {
+            if (!el) return false;
+            const tag = el.tagName;
+            return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
+        };
+
+        // Inject CSS to disable text selection globally
+        const style = document.createElement('style');
+        style.innerHTML = `
+            body {
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            input, textarea, select, [contenteditable] {
+                -webkit-touch-callout: default;
+                -webkit-user-select: auto;
+                -khtml-user-select: auto;
+                -moz-user-select: auto;
+                -ms-user-select: auto;
+                user-select: auto;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Disable right-click
+        document.addEventListener('contextmenu', e => {
+            if (!isFormElement(e.target)) e.preventDefault();
+        });
+        
+        // Disable text selection via JS as a fallback
+        document.addEventListener('selectstart', e => {
+            if (!isFormElement(e.target)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Disable dragging of images and text
+        document.addEventListener('dragstart', e => {
+            if (e.target.tagName === 'IMG' || !isFormElement(e.target)) {
+                e.preventDefault();
+            }
+        });
+        
+        // Disable copy and cut
+        document.addEventListener('copy', e => {
+            if (!isFormElement(e.target)) e.preventDefault();
+        });
+        document.addEventListener('cut', e => {
+            if (!isFormElement(e.target)) e.preventDefault();
+        });
+        
+        // Disable common inspect shortcuts and copy shortcuts
+        document.addEventListener('keydown', e => {
+            // F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+            
+            if (e.ctrlKey || e.metaKey) {
+                const key = e.key.toLowerCase();
+                // Prevent View Source (Ctrl+U), Print (Ctrl+P), Save (Ctrl+S) globally
+                if (['u', 'p', 's'].includes(key)) {
+                    e.preventDefault();
+                }
+                
+                // Prevent Copy (Ctrl+C), Cut (Ctrl+X), Select All (Ctrl+A) if not in form element
+                if (['c', 'x', 'a'].includes(key)) {
+                    if (!isFormElement(e.target)) {
+                        e.preventDefault();
+                    }
+                }
+                
+                // Prevent Developer Tools (Ctrl+Shift+I/J/C)
+                if (e.shiftKey && ['i', 'j', 'c'].includes(key)) {
+                    e.preventDefault();
+                }
+            }
+        });
     }
 
     // Update logo based on office
@@ -27,21 +117,9 @@ class FeedbackPortal {
             const headerLogo = document.getElementById('main-header-logo');
             if (!headerLogo) return;
             
-            const urlParams = new URLSearchParams(window.location.search);
-            const urlOffice = urlParams.get('office');
-            const storedOffice = window.selectedOfficeValue || sessionStorage.getItem('selectedOffice')?.value;
-            
-            const officeId = urlOffice || storedOffice || 'ict-services';
-            
-            if (officeId === 'ict-services' || officeId === 'ict' || officeId === 'dept-ict') {
-                headerLogo.src = '/uploads/ict-logo.png';
-                headerLogo.classList.remove('h-10', 'w-10', 'sm:h-12', 'sm:w-12', 'rounded-full', 'shadow', 'bg-white', 'h-12', 'sm:h-14', 'w-12', 'sm:w-14', 'h-14', 'sm:h-16', 'h-20');
-                headerLogo.classList.add('h-12', 'sm:h-20', 'md:h-28', 'w-auto', 'max-w-[250px]', 'sm:max-w-[350px]', 'md:max-w-xl', 'object-contain', 'py-1');
-            } else {
-                headerLogo.src = '/uploads/logo.png';
-                headerLogo.classList.add('h-12', 'w-12', 'sm:h-14', 'sm:w-14', 'rounded-full', 'shadow');
-                headerLogo.classList.remove('h-10', 'sm:h-12', 'h-12', 'sm:h-20', 'md:h-28', 'w-auto', 'max-w-[250px]', 'sm:max-w-[350px]', 'md:max-w-xl', 'object-contain', 'py-1');
-            }
+            // Reverted conditional logic: ALWAYS use ICT logo for consistent branding across all feedback offices
+            headerLogo.src = '/uploads/ict-logo.png';
+            headerLogo.className = 'h-10 sm:h-16 md:h-24 w-auto max-w-[180px] sm:max-w-[400px] md:max-w-2xl object-contain py-1';
         }, 300);
     }
 
@@ -387,52 +465,64 @@ class FeedbackPortal {
     // ===== MOBILE MENU =====
     initializeMobileMenu() {
         this.mobileMenu = document.getElementById('mobileMenu');
+        this.mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
         this.hamburgerBtn = document.getElementById('hamburgerBtn');
         
         if (this.hamburgerBtn) {
             this.hamburgerBtn.removeEventListener('click', this.toggleMobileMenuHandler);
-            this.toggleMobileMenuHandler = () => this.toggleMobileMenu();
+            this.toggleMobileMenuHandler = (e) => {
+                e.preventDefault();
+                this.toggleMobileMenu();
+            };
             this.hamburgerBtn.addEventListener('click', this.toggleMobileMenuHandler);
         }
     }
 
     toggleMobileMenu() {
-        if (!this.mobileMenu) return;
+        if (!this.mobileMenu || !this.mobileMenuOverlay) return;
         
-        const isHidden = this.mobileMenu.classList.contains('translate-x-full');
+        const isCurrentlyVisible = this.mobileMenu.style.display !== 'none';
         
-        if (isHidden) {
-            this.mobileMenu.classList.remove('translate-x-full', 'hidden');
-            this.mobileMenu.classList.add('slide-in-right');
+        if (!isCurrentlyVisible) {
+            // SHOW THE MENU
+            this.mobileMenu.style.display = 'block';
+            this.mobileMenuOverlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
             
-            if (this.hamburgerBtn) {
-                this.hamburgerBtn.setAttribute('aria-expanded', 'true');
-                const spans = this.hamburgerBtn.children;
-                if (spans[0]) spans[0].classList.add('transform', 'rotate-45', 'translate-y-2');
-                if (spans[1]) spans[1].classList.add('opacity-0');
-                if (spans[2]) spans[2].classList.add('transform', '-rotate-45', '-translate-y-2');
-            }
-        } else {
-            this.mobileMenu.classList.add('translate-x-full');
-            this.mobileMenu.classList.remove('slide-in-right');
-            
-            if (this.hamburgerBtn) {
-                this.hamburgerBtn.setAttribute('aria-expanded', 'false');
-                const spans = this.hamburgerBtn.children;
-                if (spans[0]) spans[0].classList.remove('transform', 'rotate-45', 'translate-y-2');
-                if (spans[1]) spans[1].classList.remove('opacity-0');
-                if (spans[2]) spans[2].classList.remove('transform', '-rotate-45', '-translate-y-2');
-            }
-            
+            // Allow display change to settle before animating
             setTimeout(() => {
-                this.mobileMenu.classList.add('hidden');
+                this.mobileMenu.classList.remove('translate-x-full');
+            }, 10);
+            
+            if (this.hamburgerBtn) this.hamburgerBtn.setAttribute('aria-expanded', 'true');
+        } else {
+            // HIDE THE MENU
+            this.mobileMenu.classList.add('translate-x-full');
+            this.mobileMenuOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            if (this.hamburgerBtn) this.hamburgerBtn.setAttribute('aria-expanded', 'false');
+            
+            // Wait for transition to finish before hiding display
+            setTimeout(() => {
+                this.mobileMenu.style.display = 'none';
             }, 300);
         }
     }
 
     closeMobileMenu() {
-        if (this.mobileMenu && !this.mobileMenu.classList.contains('translate-x-full')) {
+        if (this.mobileMenu && this.mobileMenu.style.display !== 'none') {
             this.toggleMobileMenu();
+        }
+    }
+
+    // New Header Spacer logic moved into FeedbackPortal
+    adjustHeaderSpacer() {
+        const header = document.querySelector('header');
+        const spacer = document.getElementById('header-dynamic-spacer');
+        if (header && spacer) {
+            const height = Math.min(header.offsetHeight, 180);
+            spacer.style.height = height + 'px';
         }
     }
 
@@ -502,7 +592,7 @@ class FeedbackPortal {
         if (!document.getElementById('notification-container')) {
             const container = document.createElement('div');
             container.id = 'notification-container';
-            container.className = 'fixed inset-0 z-50 flex items-center justify-center pointer-events-none';
+            container.className = 'fixed inset-0 z-[100000] flex items-center justify-center pointer-events-none';
             document.body.appendChild(container);
         }
     }
@@ -555,18 +645,7 @@ class FeedbackPortal {
         
         displayDiv.classList.remove('hidden');
         
-        // Special welcome message for ICT feedback
-        const urlParams = new URLSearchParams(window.location.search);
-        const office = urlParams.get('office') || '';
-        
-        if (office === 'ict-services' || office === 'ict') {
-            displayDiv.innerHTML = `
-                <div class="flex justify-center items-center py-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl mb-6">
-                    <h2 class="text-2xl font-bold text-blue-700 dark:text-blue-400">Welcome ICT Customer feedback</h2>
-                </div>
-            `;
-            return;
-        }
+
         
         let infoHtml = '<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">';
         infoHtml += '<div><span class="font-semibold">Feedback for:</span> ' + (userInfo.name || 'Anonymous User') + '</div>';
@@ -685,14 +764,16 @@ class FeedbackPortal {
             // 1. Get visible question text (ground truth label)
             let visibleQuestionText = '';
             const pEl = block.querySelector('p');
+            const labelEl = block.querySelector('label.font-semibold, label.block');
             const tdEl = block.querySelector('td:first-child');
-            if (pEl) {
-                const clone = pEl.cloneNode(true);
-                clone.querySelectorAll('span').forEach(s => s.remove());
+            
+            const targetEl = pEl || labelEl || tdEl;
+            if (targetEl) {
+                const clone = targetEl.cloneNode(true);
+                clone.querySelectorAll('span, i, .text-xs, .text-gray-500').forEach(s => s.remove());
                 visibleQuestionText = clone.textContent.trim().replace(/^\d+\.\s*/, '');
-            } else if (tdEl) {
-                visibleQuestionText = tdEl.textContent.trim();
             }
+            
             if (!visibleQuestionText) visibleQuestionText = `Question #${questionId}`;
 
             let answer = null;
@@ -736,18 +817,34 @@ class FeedbackPortal {
         const urlParams = new URLSearchParams(window.location.search);
         const office = urlParams.get('office') || 'unknown';
 
+        // Improved data aggregation
         const finalData = {
+            // Spread formValues first, so explicit properties below can override them
+            ...formValues,
             name: userInfo?.anonymous ? null : (userInfo?.name || null),
             email: userInfo?.anonymous ? null : (userInfo?.email || null),
             category: userInfo?.category || '',
             office: office,
             anonymous: userInfo?.anonymous ? "true" : "false",
-            rating: formValues.rating || formValues.q_4 || '',
-            message: formValues.comment || '',
+            // Priority for rating: explicit rating field -> q_4 field -> fallbacks
+            rating: formValues.rating || formValues.q_4 || formValues.dq_23 || '',
+            message: formValues.comment || formValues.message || '',
             dynamic_responses: dynamicResponses,
-            ...formValues,
             timestamp: new Date().toISOString()
         };
+
+        // Advanced Fallback for rating: check dynamic responses if still empty
+        if (!finalData.rating || finalData.rating === '') {
+            const ratingResponse = dynamicResponses.find(r => 
+                r.question_id === 23 || 
+                (r.question_text && r.question_text.toLowerCase().includes('overall'))
+            );
+            if (ratingResponse) finalData.rating = ratingResponse.answer;
+        }
+
+        // Clean up: Ensure q_4 and other fields are also populated if missing but rating exists
+        if (finalData.rating && !finalData.q_4) finalData.q_4 = finalData.rating;
+
 
         try {
             const loadingNotification = this.showNotification('Submitting your feedback...', 'info', 0);
@@ -1153,6 +1250,24 @@ class FeedbackPortal {
         }
     }
 
+    // Remove a single tracking ID from history
+    removeFromTrackingHistory(id) {
+        try {
+            let history = JSON.parse(localStorage.getItem('feedback_history') || '[]');
+            history = history.filter(item => item.id !== id);
+            localStorage.setItem('feedback_history', JSON.stringify(history));
+            return history;
+        } catch (e) {
+            console.error('Failed to remove from tracking history:', e);
+            return [];
+        }
+    }
+
+    // Clear all tracking history
+    clearTrackingHistory() {
+        localStorage.removeItem('feedback_history');
+    }
+
     // Hide public navigation links in admin panel
     hidePublicNavLinks() {
         const currentPath = window.location.pathname;
@@ -1224,7 +1339,7 @@ class FeedbackPortal {
 
 // Initialize the portal when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.feedbackPortal = new FeedbackPortal();
+    new FeedbackPortal();
 });
 
 // Legacy global functions for onclick attributes

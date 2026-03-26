@@ -4,275 +4,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <title>Contact Us - SEKU ICT Feedback System</title>
     <!-- Tailwind + Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
     <style>
+        /* SEKU Official Theme Colors - Matching Services Page */
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
         .section-container {
             min-height: calc(100vh - 4rem);
-            padding: 2rem 1rem 2rem;
+            padding: 1rem 1rem 1rem;
         }
 
         @media (min-width: 768px) {
             .section-container {
-                padding: 2rem 2rem 4rem;
+                padding: 1.5rem 2rem 2rem;
             }
         }
 
         .contact-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            transition: transform 0.15s ease, box-shadow 0.2s;
+            background: white;
+            border-radius: 1rem;
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.1);
         }
 
         .contact-card:hover {
-            box-shadow: 0 20px 30px -10px rgba(0, 100, 0, 0.2);
-        }
-
-        .back-arrow {
-            cursor: pointer;
-        }
-
-        .office-hours-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (min-width: 640px) {
-            .office-hours-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .contact-detail-item:not(:last-child) {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            padding-bottom: 0.75rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .dark .contact-detail-item:not(:last-child) {
-            border-bottom-color: rgba(255, 255, 255, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -10px rgba(21, 128, 61, 0.2);
+            border-color: var(--seku-gold);
         }
 
         .icon-circle {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 2.2rem;
-            height: 2.2rem;
-            background: rgba(22, 163, 74, 0.15);
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, rgba(21, 128, 61, 0.1), rgba(250, 204, 21, 0.1));
             border-radius: 50%;
-            color: #16a34a;
-        }
-
-        .dark .icon-circle {
-            background: rgba(34, 197, 94, 0.2);
-            color: #4ade80;
+            color: var(--seku-green);
+            border: 1px solid rgba(21, 128, 61, 0.2);
         }
 
         .list-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 1.8rem;
-            height: 1.8rem;
-            background: rgba(22, 163, 74, 0.1);
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, rgba(21, 128, 61, 0.1), rgba(250, 204, 21, 0.1));
             border-radius: 50%;
-            color: #16a34a;
+            color: var(--seku-green);
         }
 
-        .dark .list-icon {
-            background: rgba(34, 197, 94, 0.15);
-            color: #4ade80;
+        /* Email list styling - with clickable links */
+        .email-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        /* ensure no wrapping within day label */
-        .day-label {
-            white-space: nowrap;
+        .email-list li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(21, 128, 61, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .email-list li:last-child {
+            border-bottom: none;
+        }
+
+        .email-list li:hover {
+            transform: translateX(5px);
+            background: rgba(21, 128, 61, 0.05);
+            padding-left: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .email-list i {
+            color: var(--seku-green);
+            width: 1.5rem;
+        }
+
+        .email-link {
+            color: var(--seku-green);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .email-link:hover {
+            color: var(--seku-gold);
+            text-decoration: underline;
+        }
+
+        /* Extension list styling */
+        .extension-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .extension-list li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(21, 128, 61, 0.1);
+        }
+
+        .extension-list li:last-child {
+            border-bottom: none;
+        }
+
+        .extension-name {
+            font-weight: 700;
+            color: var(--seku-green);
+        }
+
+        .extension-number {
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            background: rgba(21, 128, 61, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            color: var(--seku-green);
+        }
+
+        /* Location card */
+        .location-card {
+            background: linear-gradient(135deg, #fefce8, #ffffff);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border-left: 4px solid var(--seku-gold);
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(21, 128, 61, 0.1);
+        }
+
+        /* Work hours highlight */
+        .work-hours-highlight {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .hours-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: #fefce8;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .hours-row:hover {
+            background: #fef9e3;
+            transform: translateX(5px);
+        }
+
+        .hours-label {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--seku-green);
+        }
+
+        .hours-time {
+            font-weight: 700;
+            color: var(--seku-green-light);
+        }
+
+        .hours-closed {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        /* Social links */
+        .social-link {
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--seku-gold);
+            transform: translateY(-3px);
+        }
+
+        /* Phone link styling */
+        .phone-link {
+            color: var(--seku-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .phone-link:hover {
+            color: var(--seku-gold);
+            text-decoration: underline;
         }
     </style>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 antialiased">
+<body class="bg-gray-50 text-gray-800">
 
     <div id="header-placeholder"></div>
     <div id="header-dynamic-spacer"></div>
 
     <div class="content-wrapper">
-        <section
-            class="section-container bg-gradient-to-br from-blue-50 to-green-50 dark:from-gray-800 dark:to-gray-900">
+        <section class="section-container bg-gradient-to-br from-green-50 to-yellow-50">
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
 
-
-
                 <h1
-                    class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 dark:text-green-400 mb-10 sm:mb-14 tracking-tight">
+                    class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 mb-6 sm:mb-8 tracking-tight">
                     Contact Us
                 </h1>
 
-                <!-- two main blocks: contact info & office hours -->
+                <!-- two main blocks -->
                 <div class="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8">
 
                     <!-- LEFT CARD: GET IN TOUCH -->
-                    <div
-                        class="contact-card bg-white dark:bg-gray-800 shadow-xl border border-white/20 dark:border-gray-700/40 h-fit">
-                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
+                    <div class="contact-card">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
                             <span class="icon-circle mr-3"><i class="fas fa-paper-plane"></i></span>
                             Get in touch
                         </h2>
                         <div class="space-y-5">
-                            <!-- email block -->
-                            <div class="flex items-start contact-detail-item">
+
+                            <!-- Email block - Clickable emails that open Gmail -->
+                            <div class="flex items-start">
                                 <div class="icon-circle mr-3 flex-shrink-0">
                                     <i class="fas fa-envelope"></i>
                                 </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 text-base sm:text-lg">
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-green-700 text-base sm:text-lg mb-2">
                                         Email</h3>
-                                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base break-words">
-                                        info@seku.ac.ke</p>
+                                    <ul class="email-list">
+                                        <li>
+                                            <i class="fas fa-envelope"></i>
+                                            <a href="mailto:ict@seku.ac.ke?subject=ICT Support Request&body=Hello ICT Team,%0A%0AI would like to inquire about...%0A%0ARegards"
+                                                class="email-link" target="_blank">ict@seku.ac.ke</a>
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-envelope"></i>
+                                            <a href="mailto:ictsupport@seku.ac.ke?subject=ICT Support Request&body=Hello ICT Support,%0A%0AI need assistance with...%0A%0ARegards"
+                                                class="email-link" target="_blank">ictsupport@seku.ac.ke</a>
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-envelope"></i>
+                                            <a href="mailto:director-ict@seku.ac.ke?subject=ICT Directorate Inquiry&body=Dear Director ICT,%0A%0AI would like to...%0A%0ARegards"
+                                                class="email-link" target="_blank">director-ict@seku.ac.ke</a>
+                                        </li>
+
+                                    </ul>
                                 </div>
                             </div>
-                            <!-- phone block -->
-                            <div class="flex items-start contact-detail-item">
-                                <div class="icon-circle mr-3 flex-shrink-0">
-                                    <i class="fas fa-phone-alt"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 text-base sm:text-lg">
-                                        Phone</h3>
-                                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">+254 736 116 989
-                                    </p>
-                                </div>
-                            </div>
-                            <!-- address block -->
+
+                            <!-- Work Hours block -->
                             <div class="flex items-start">
                                 <div class="icon-circle mr-3 flex-shrink-0">
-                                    <i class="fas fa-map-marker-alt"></i>
+                                    <i class="fas fa-clock"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-semibold text-gray-800 dark:text-gray-200 text-base sm:text-lg">
-                                        Address</h3>
-                                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">SEKU Main
-                                        Campus</p>
-                                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">Kitui, Kenya</p>
-                                    <p class="text-gray-600 dark:text-gray-300 text-sm sm:text-base">P.O. Box
-                                        170-90200</p>
+                                    <h3 class="font-bold text-green-700 text-base sm:text-lg mb-2">
+                                        Work Hours</h3>
+                                    <div class="work-hours-highlight mb-2">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Monday - Friday: 8:00 AM - 5:00 PM
+                                    </div>
+                                    <p class="text-gray-600 text-sm mt-2">
+                                        <i class="fas fa-info-circle text-green-600"></i> Closed on weekends and public
+                                        holidays
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         <!-- social / quick links -->
-                        <div class="mt-8 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">Follow us</p>
+                        <div class="mt-8 pt-4 border-t border-gray-200">
+                            <p class="text-sm font-medium text-gray-500 mb-3">Follow us</p>
                             <div class="flex space-x-5">
                                 <a href="https://twitter.com/sekukenya" target="_blank"
-                                    class="text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 text-xl transition"><i
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
                                         class="fab fa-twitter"></i></a>
                                 <a href="https://www.facebook.com/sekukenya" target="_blank"
-                                    class="text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 text-xl transition"><i
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
                                         class="fab fa-facebook"></i></a>
                                 <a href="https://www.instagram.com/sekukenya/" target="_blank"
-                                    class="text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 text-xl transition"><i
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
                                         class="fab fa-instagram"></i></a>
                                 <a href="https://www.youtube.com/@SouthEasternKenyaUniversity" target="_blank"
-                                    class="text-gray-500 hover:text-green-600 dark:text-gray-400 dark:hover:text-green-400 text-xl transition"><i
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
                                         class="fab fa-youtube"></i></a>
                             </div>
                         </div>
                     </div>
 
-                    <!-- RIGHT CARD: OFFICE HOURS (Monday–Friday on one line) -->
-                    <div
-                        class="contact-card bg-white dark:bg-gray-800 shadow-xl border border-white/20 dark:border-gray-700/40">
-                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-gray-800 dark:text-white flex items-center">
-                            <span class="icon-circle mr-3"><i class="fas fa-calendar-alt"></i></span>
-                            Office hours
-                        </h2>
+                    <!-- RIGHT SIDE: Multiple Cards -->
+                    <div class="space-y-6">
+                        <!-- Physical Addresses -->
+                        <div class="contact-card">
+                            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                                <span class="icon-circle mr-3"><i class="fas fa-map-marker-alt"></i></span>
+                                Physical Locations
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="location-card">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <i class="fas fa-building text-yellow-500 text-xl"></i>
+                                        <h3 class="font-bold text-gray-800 text-lg">Central Administration Block</h3>
+                                    </div>
+                                    <p class="text-gray-600 pl-9">Ground Floor</p>
+                                </div>
 
-                        <!-- single section: Main Campus Feedback Support -->
-                        <div class="office-hours-grid">
-                            <div>
-                                <h3
-                                    class="text-lg sm:text-xl font-semibold mb-4 text-gray-800 dark:text-white flex items-center">
-                                    <span class="icon-circle mr-2" style="width:1.8rem; height:1.8rem;"><i
-                                            class="fas fa-university"></i></span>
-                                    Main Campus — Feedback Support
-                                </h3>
-                                <ul class="mt-3 space-y-4">
-                                    <!-- Monday - Friday (both label and time on single line, label now forced to one line) -->
-                                    <li
-                                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-gray-600 dark:text-gray-300 text-sm sm:text-base bg-gray-50 dark:bg-gray-700/20 p-3 rounded-lg gap-2">
-                                        <span class="font-medium flex items-center gap-2 day-label">
-                                            <span class="list-icon"><i class="fas fa-calendar-week"></i></span>
-                                            Monday – Friday
-                                        </span>
-                                        <span
-                                            class="tabular-nums bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200 px-4 py-1.5 rounded-full font-medium whitespace-nowrap self-start sm:self-auto">8:00
-                                            AM – 5:00 PM</span>
-                                    </li>
-                                    <!-- Saturday (closed) -->
-                                    <li
-                                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-gray-600 dark:text-gray-300 text-sm sm:text-base bg-gray-50 dark:bg-gray-700/20 p-3 rounded-lg gap-2">
-                                        <span class="font-medium flex items-center gap-2 day-label">
-                                            <span class="list-icon"><i class="fas fa-calendar-day"></i></span>
-                                            Saturday
-                                        </span>
-                                        <span
-                                            class="text-red-600 dark:text-red-400 font-semibold bg-red-50 dark:bg-red-900/20 px-4 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap self-start sm:self-auto"><i
-                                                class="fas fa-circle-xmark"></i> Closed</span>
-                                    </li>
-                                    <!-- Sunday (closed) -->
-                                    <li
-                                        class="flex flex-col sm:flex-row sm:items-center sm:justify-between text-gray-600 dark:text-gray-300 text-sm sm:text-base bg-gray-50 dark:bg-gray-700/20 p-3 rounded-lg gap-2">
-                                        <span class="font-medium flex items-center gap-2 day-label">
-                                            <span class="list-icon"><i class="fas fa-calendar-day"></i></span>
-                                            Sunday
-                                        </span>
-                                        <span
-                                            class="text-red-600 dark:text-red-400 font-semibold bg-red-50 dark:bg-red-900/20 px-4 py-1.5 rounded-full flex items-center gap-1 whitespace-nowrap self-start sm:self-auto"><i
-                                                class="fas fa-circle-xmark"></i> Closed</span>
-                                    </li>
-                                </ul>
+                                <div class="location-card">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <i class="fas fa-laptop-house text-green-600 text-xl"></i>
+                                        <h3 class="font-bold text-gray-800 text-lg">Tuition Block II</h3>
+                                    </div>
+                                    <p class="text-gray-600 pl-9">Ground Floor</p>
+                                </div>
+                            </div>
+                        </div>
 
-                                <!-- emergency note -->
-                                <div
-                                    class="mt-6 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-4">
-                                    <i class="fas fa-envelope-open-text text-green-600 mt-0.5"></i>
-                                    <span>After hours / emergencies: <strong
-                                            class="text-gray-700 dark:text-gray-300">info@seku.ac.ke</strong>
-                                        (24/7)</span>
+                        <!-- Phone Extensions with clickable phone link -->
+                        <div class="contact-card">
+                            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                                <span class="icon-circle mr-3"><i class="fas fa-phone-alt"></i></span>
+                                Telephone Extensions
+                            </h2>
+                            <ul class="extension-list">
+                                <li>
+                                    <span class="extension-name">Tuition Block II</span>
+                                    <span class="extension-number">254, 256</span>
+                                </li>
+                                <li>
+                                    <span class="extension-name">Central Admin Block</span>
+                                    <span class="extension-number">255, 259</span>
+                                </li>
+                                <li>
+                                    <span class="extension-name">ICT Director's Office</span>
+                                    <span class="extension-number">226</span>
+                                </li>
+                            </ul>
+
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                    <i class="fas fa-phone-alt text-green-600"></i>
+                                    <span>Main Line: <a href="tel:+254748605997" class="phone-link">+254 748 60 59
+                                            97</a></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Office Hours Summary -->
+                        <div class="contact-card">
+                            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                                <span class="icon-circle mr-3"><i class="fas fa-calendar-alt"></i></span>
+                                Office Hours
+                            </h2>
+                            <div class="space-y-3">
+                                <div class="hours-row">
+                                    <span class="hours-label">
+                                        <i class="fas fa-calendar-week text-green-600"></i>
+                                        Monday – Friday
+                                    </span>
+                                    <span class="hours-time">8:00 AM – 5:00 PM</span>
+                                </div>
+                                <div class="hours-row" style="background: #f9fafb;">
+                                    <span class="hours-label">
+                                        <i class="fas fa-calendar-day text-gray-500"></i>
+                                        Saturday
+                                    </span>
+                                    <span class="hours-closed"><i class="fas fa-times-circle"></i> Closed</span>
+                                </div>
+                                <div class="hours-row" style="background: #f9fafb;">
+                                    <span class="hours-label">
+                                        <i class="fas fa-calendar-day text-gray-500"></i>
+                                        Sunday
+                                    </span>
+                                    <span class="hours-closed"><i class="fas fa-times-circle"></i> Closed</span>
                                 </div>
                             </div>
 
-                            <!-- second grid column (hidden on small, but present for balance) -->
-                            <div class="hidden sm:block"></div>
-                        </div>
-
-                        <!-- live chat quick action
-                        <div class="mt-8 bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                            <div class="flex items-center justify-between flex-wrap gap-3">
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-200"><i
-                                        class="fas fa-headset text-green-600 mr-2 text-lg"></i>Need help during
-                                    hours?</span>
-                                <a href="#"
-                                    class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-full transition shadow-sm"><i
-                                        class="fas fa-comment mr-2"></i>Live chat</a>
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <div class="flex items-start gap-2 text-xs text-gray-500">
+                                    <i class="fas fa-envelope-open-text text-green-600 mt-0.5"></i>
+                                    <span>After hours / emergencies: <a
+                                            href="mailto:ictsupport@seku.ac.ke?subject=Emergency ICT Support&body=Hello ICT Support,%0A%0AThis is an emergency request. Please assist with...%0A%0ARegards"
+                                            class="email-link" target="_blank"><strong
+                                                class="text-green-700">ictsupport@seku.ac.ke</strong></a> (24/7
+                                        response)</span>
+                                </div>
                             </div>
-                        </div> -->
+                        </div>
                     </div>
                 </div>
 
-                <!-- bottom unified note -->
-                <div
-                    class="mt-12 text-center text-sm text-gray-500 dark:text-gray-400 max-w-2xl mx-auto border-t border-gray-200 dark:border-gray-800 pt-8">
+                <!-- bottom unified note with clickable email -->
+                <div class="mt-8 text-center text-sm text-gray-500 max-w-2xl mx-auto border-t border-gray-200 pt-6">
                     <p class="flex items-center justify-center gap-2 flex-wrap">
                         <i class="fas fa-circle-check text-green-600 text-base"></i>
-                        <span>Main campus feedback support: Mon–Fri 8:00 AM – 4:00 PM | Sat & Sun closed.</span>
+                        <span>For urgent ICT support, please contact us during office hours or email
+                            <a href="mailto:ictsupport@seku.ac.ke?subject=Urgent ICT Support&body=Hello ICT Support,%0A%0AThis is an urgent request. Please assist with...%0A%0ARegards"
+                                class="email-link" target="_blank"><strong>ictsupport@seku.ac.ke</strong></a>
+                        </span>
                     </p>
                 </div>
             </div>
@@ -299,7 +459,6 @@
             }
         });
 
-        // Use ResizeObserver for more accuracy if available
         if (window.ResizeObserver) {
             const observer = new ResizeObserver(() => {
                 adjustHeaderSpacer();

@@ -35,23 +35,25 @@
         }
 
         .status-unread {
-            background-color: #fef3c7;
-            color: #92400e;
+            background-color: rgba(250, 204, 21, 0.15); /* Gold light tint */
+            color: #b45309; /* Gold dark text */
+            border: 1px solid rgba(250, 204, 21, 0.3);
         }
 
         .dark .status-unread {
-            background-color: #78350f;
+            background-color: rgba(250, 204, 21, 0.25);
             color: #fcd34d;
         }
 
         .status-read {
-            background-color: #dbeafe;
-            color: #1e40af;
+            background-color: rgba(34, 197, 94, 0.1); /* Green light tint */
+            color: #15803d; /* Green dark text */
+            border: 1px solid rgba(34, 197, 94, 0.2);
         }
 
         .dark .status-read {
-            background-color: #1e3a8a;
-            color: #93c5fd;
+            background-color: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
         }
 
         .status-replied {
@@ -131,18 +133,69 @@
         }
 
         /* Hide contact info and redundant Admin link in admin panel */
-        header .flex.flex-wrap.justify-end.items-center,
-        header [href*="admin.html"] {
+        .header-contact-bar,
+        header [href*="admin.html"],
+        #services-menu,
+        #ict-feedback-menu {
             display: none !important;
+        }
+
+        /* Ensure welcome top bar is visible on admin panel */
+        header .hidden.sm\:block {
+            display: block !important;
+        }
+
+        /* SEKU THEME SYSTEM */
+        :root {
+            --seku-green-dark: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
+        .status-replied {
+            background-color: var(--seku-green-dark);
+            color: white;
+            border: 1px solid var(--seku-green-dark);
+        }
+
+        .dark .status-replied {
+            background-color: var(--seku-green-dark);
+            color: var(--seku-gold);
+        }
+
+        .btn-seku-primary {
+            background-color: var(--seku-green-dark);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-seku-primary:hover {
+            background-color: var(--seku-green-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-seku-gold {
+            background-color: var(--seku-gold);
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .btn-seku-gold:hover {
+            background-color: var(--seku-gold-dark);
         }
 
         /* Enhance header welcome text for admin */
         #header-welcome-text {
             font-size: 1.1rem !important;
-            letter-spacing: 0.1em !important;
+            letter-spacing: 0.15em !important;
             padding: 0.25rem 0;
             width: 100% !important;
             text-align: center !important;
+            display: block !important;
+            color: var(--seku-gold) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
         @media (min-width: 768px) {
@@ -153,17 +206,18 @@
 
         /* Professional table styling */
         thead th {
-            background-color: #f9fafb !important;
-            color: #111827 !important;
+            background-color: var(--seku-green-dark) !important;
+            color: white !important;
             font-weight: 800 !important;
             text-transform: uppercase;
-            letter-spacing: 0.025em;
+            letter-spacing: 0.1em;
+            font-size: 0.7rem;
         }
 
         .dark thead th {
-            background-color: #1f2937 !important;
-            color: #f3f4f6 !important;
-            border-bottom-color: #374151;
+            background-color: #111827 !important;
+            color: var(--seku-gold) !important;
+            border-bottom: 2px solid var(--seku-green-dark);
         }
 
         /* Stats Card Polish */
@@ -187,13 +241,15 @@
 
     <!-- Header placeholder -->
     <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
 
     <!-- MAIN CONTENT -->
-    <main class="w-full max-w-7xl mx-auto pt-44 px-4 pb-10">
+    <main class="w-full max-w-7xl mx-auto pt-4 px-4 pb-6">
         <div
-            class="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-8 border-green-600 transition-all hover:shadow-xl">
+            class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border-l-8 transition-all hover:shadow-xl"
+            style="border-left-color: var(--seku-green-dark);">
             <div>
-                <div class="flex items-center space-x-3 text-green-700 dark:text-green-400 mb-1">
+                <div class="flex items-center space-x-3 mb-1" style="color: var(--seku-green-dark);">
                     <i class="fas fa-user-shield text-2xl"></i>
                     <h2 class="text-3xl font-extrabold" id="dept-title">Department Admin</h2>
                 </div>
@@ -204,82 +260,84 @@
             </div>
             <div class="mt-4 md:mt-0 flex space-x-3 flex-wrap gap-2">
                 <button onclick="openComposeModal()"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-paper-plane mr-2"></i>Message Member
                 </button>
                 <button onclick="viewActivityLogs()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-history mr-2"></i>Logs
                 </button>
                 <button onclick="openAnalytics()"
-                    class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    class="btn-seku-gold px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-chart-pie mr-2"></i>Data Mining
                 </button>
                 <button onclick="openQuestionModal()"
-                    class="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-question-circle mr-2"></i>Manage Questions
                 </button>
                 <button onclick="openQRModal()"
-                    class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    class="btn-seku-gold px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-qrcode mr-2"></i>Print QR
                 </button>
                 <button onclick="loadFeedback()"
-                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>Refresh
                 </button>
             </div>
         </div>
 
         <!-- Stats Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
             <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-blue-500">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-green-light);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-inbox mr-2"></i>Total Messages
                 </h3>
-                <p id="total-feedback" class="text-4xl font-bold text-blue-600 mt-2">0</p>
+                <p id="total-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-dark);">0</p>
             </div>
             <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-yellow-500">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-gold);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-clock mr-2"></i>Pending Read
                 </h3>
-                <p id="unread-feedback" class="text-4xl font-bold text-yellow-600 mt-2">0</p>
+                <p id="unread-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-gold-dark);">0</p>
             </div>
             <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-green-500">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-green-dark);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-check-double mr-2"></i>Replied
                 </h3>
-                <p id="replied-feedback" class="text-4xl font-bold text-green-600 mt-2">0</p>
+                <p id="replied-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-light);">0</p>
             </div>
             <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4 border-purple-500">
+                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-green-dark);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-calendar-day mr-2"></i>New Today
                 </h3>
-                <p id="today-feedback" class="text-4xl font-bold text-purple-600 mt-2">0</p>
+                <p id="today-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-dark);">0</p>
             </div>
         </div>
 
         <!-- Search & Actions -->
-        <div class="mb-6 flex flex-col md:flex-row gap-4 items-center">
+        <div class="mb-4 flex flex-col md:flex-row gap-4 items-center">
             <div class="relative flex-grow w-full">
                 <input type="text" id="search-input" placeholder="Search by name, email, or message contents..."
-                    class="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border border-transparent focus:border-green-500 rounded-xl shadow-sm focus:ring-2 focus:ring-green-500 transition-all outline-none">
-                <i class="fas fa-search absolute left-4 top-4 text-gray-400"></i>
+                    class="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border-2 border-transparent focus:border-green-600 rounded-xl shadow-sm focus:ring-0 transition-all outline-none"
+                    style="border-color: rgba(21, 128, 61, 0.1);">
+                <i class="fas fa-search absolute left-4 top-4 text-green-700 opacity-50"></i>
             </div>
             <div class="flex space-x-2 w-full md:w-auto">
                 <select id="filter-status" onchange="applyFilters()"
-                    class="bg-white dark:bg-gray-800 border border-transparent rounded-xl px-4 py-3 shadow-sm outline-none focus:ring-2 focus:ring-green-500 w-1/2 md:w-40">
+                    class="bg-white dark:bg-gray-800 border-2 border-transparent rounded-xl px-4 py-3 shadow-sm outline-none focus:border-green-600 w-1/2 md:w-40"
+                    style="border-color: rgba(21, 128, 61, 0.1);">
                     <option value="">All Status</option>
                     <option value="unread">🟡 Unread</option>
                     <option value="read">🔵 Read</option>
                     <option value="replied">🟢 Replied</option>
                 </select>
                 <button onclick="exportToCSV()"
-                    class="bg-gray-800 hover:bg-black text-white px-6 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center w-1/2 md:w-auto">
-                    <i class="fas fa-file-csv mr-2 text-green-400"></i>Export
+                    class="btn-seku-primary px-6 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center w-1/2 md:w-auto font-bold uppercase tracking-wide text-xs">
+                    <i class="fas fa-file-csv mr-2 text-yellow-300"></i>Export CSV
                 </button>
             </div>
         </div>
@@ -291,7 +349,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr
-                            class="bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-400 uppercase text-xs font-bold">
+                            class="bg-gray-50 dark:bg-gray-700/50 uppercase text-xs font-bold text-white">
                             <th class="px-6 py-4">Sender & Office</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4">User Role</th>
@@ -326,7 +384,7 @@
     <div id="reply-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="bg-green-600 px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-reply mr-2"></i>Send Official Reply</h3>
                 <button onclick="closeReplyModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
@@ -341,21 +399,20 @@
                 <div>
                     <label class="block text-sm font-medium mb-1">Subject</label>
                     <input id="reply-subject" required
-                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-500">
+                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600">
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-1">Message Body</label>
                     <textarea id="reply-message" rows="8" required
-                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-500"></textarea>
-                </div>
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="closeReplyModal()"
-                        class="px-6 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition font-medium">Cancel</button>
-                    <button type="submit" id="send-btn"
-                        class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-md font-bold transition">Send
-                        Response</button>
+                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600"></textarea>
                 </div>
             </form>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
+                <button type="button" onclick="closeReplyModal()"
+                    class="px-6 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition font-medium">Cancel</button>
+                <button type="submit" form="reply-form" id="send-btn"
+                    class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">Send Response</button>
+            </div>
         </div>
     </div>
 
@@ -363,14 +420,14 @@
     <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white flex-shrink-0">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-paper-plane mr-2"></i>Send Message to Registered Member
                 </h3>
-                <button onclick="closeComposeModal()" class="text-2xl hover:text-indigo-200 transition">&times;</button>
+                <button onclick="closeComposeModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
                 <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    <i class="fas fa-info-circle mr-1 text-indigo-400"></i>
+                    <i class="fas fa-info-circle mr-1" style="color: var(--seku-green-dark);"></i>
                     Enter the email address of a registered member to send them an official message. They will see it in
                     their <strong>My Feedback</strong> page.
                 </p>
@@ -379,7 +436,7 @@
                         <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Recipient Email</label>
                         <div class="relative">
                             <input type="email" id="compose-email" required placeholder="member@seku.ac.ke"
-                                class="w-full px-4 py-3 pl-10 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                                class="w-full px-4 py-3 pl-10 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
                             <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
                         </div>
                         <p id="compose-email-error" class="text-red-500 text-xs mt-1 hidden">Could not send. Please
@@ -389,23 +446,23 @@
                         <label class="block text-sm font-medium mb-1">Subject</label>
                         <input type="text" id="compose-subject" required
                             placeholder="Official Notice from Administration"
-                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm">
+                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Message</label>
                         <textarea id="compose-message" rows="6" required
                             placeholder="Type your official message here..."
-                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
-                    </div>
-                    <div class="flex justify-end space-x-3 pt-2">
-                        <button type="button" onclick="closeComposeModal()"
-                            class="px-6 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition font-medium">Cancel</button>
-                        <button type="submit" id="compose-send-btn"
-                            class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 shadow-md font-bold transition">
-                            <i class="fas fa-paper-plane mr-2"></i>Send Message
-                        </button>
+                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm"></textarea>
                     </div>
                 </form>
+            </div>
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
+                <button type="button" onclick="closeComposeModal()"
+                    class="px-6 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition font-medium">Cancel</button>
+                <button type="submit" form="compose-form" id="compose-send-btn"
+                    class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Message
+                </button>
             </div>
         </div>
     </div>
@@ -413,63 +470,63 @@
     <div id="analytics-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="bg-purple-600 px-6 py-4 flex justify-between items-center text-white">
+            <div class="px-6 py-4 flex justify-between items-center text-white" style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-microchip mr-2"></i>Feedback Analytics & Data Mining</h3>
-                <button onclick="closeAnalytics()" class="text-2xl hover:text-purple-200 transition">&times;</button>
+                <button onclick="closeAnalytics()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow space-y-8" id="analytics-content">
                 <!-- Dashboard content -->
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div
-                        class="col-span-1 border rounded-xl p-4 bg-blue-50/50 dark:bg-blue-900/10 dark:border-gray-700">
-                        <h4 class="text-blue-700 dark:text-blue-400 font-semibold mb-2 text-sm flex items-center"><i
+                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(21, 128, 61, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);"><i
                                 class="fas fa-heart mr-2"></i>Sentiment</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="sentiment-value">0%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
-                            <div id="sentiment-bar" class="bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                            <div id="sentiment-bar" class="h-2 rounded-full" style="width: 0%; background-color: var(--seku-green-dark);"></div>
                         </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Positivity across all feedback</p>
                     </div>
 
                     <div
-                        class="col-span-1 border rounded-xl p-4 bg-green-50/50 dark:bg-green-900/10 dark:border-gray-700">
-                        <h4 class="text-green-700 dark:text-green-400 font-semibold mb-2 text-sm flex items-center"><i
+                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(34, 197, 94, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);"><i
                                 class="fas fa-check-circle mr-2"></i>Resolution</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="efficiency-value">0%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
-                            <div id="efficiency-bar" class="bg-green-500 h-2 rounded-full" style="width: 0%"></div>
+                            <div id="efficiency-bar" class="h-2 rounded-full" style="width: 0%; background-color: var(--seku-green-light);"></div>
                         </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Effectiveness of problem solving</p>
                     </div>
 
                     <div
-                        class="col-span-1 border rounded-xl p-4 bg-yellow-50/50 dark:bg-yellow-900/10 dark:border-gray-700">
-                        <h4 class="text-yellow-700 dark:text-yellow-400 font-semibold mb-2 text-sm flex items-center"><i
+                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(250, 204, 21, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-gold-dark);"><i
                                 class="fas fa-star mr-2"></i>Avg Rating</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="avg-rating-value">0.0</span>
                         </div>
-                        <div class="flex text-yellow-500 text-sm mt-1" id="avg-rating-stars"></div>
+                        <div class="flex text-sm mt-1" id="avg-rating-stars" style="color: var(--seku-gold-dark);"></div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Overall experience scores</p>
                     </div>
 
                     <div
-                        class="col-span-1 border rounded-xl p-4 bg-purple-50/50 dark:bg-purple-900/10 dark:border-gray-700">
-                        <h4 class="text-purple-700 dark:text-purple-400 font-semibold mb-2 text-sm flex items-center"><i
+                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(21, 128, 61, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);"><i
                                 class="fas fa-comment-dots mr-2"></i>Actionability</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="actionability-value">0%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
-                            <div id="actionability-bar" class="bg-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                            <div id="actionability-bar" class="h-2 rounded-full" style="width: 0%; background-color: var(--seku-green-dark);"></div>
                         </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Feedback with detailed comments</p>
                     </div>
@@ -491,14 +548,14 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-sm">
                         <h4 class="font-bold mb-4 flex items-center"><i
-                                class="fas fa-users mr-2 text-purple-500"></i>Category Distribution</h4>
+                                class="fas fa-users mr-2" style="color: var(--seku-green-dark);"></i>Category Distribution</h4>
                         <div class="space-y-4" id="category-stats">
                             <!-- Category stats -->
                         </div>
                     </div>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-sm">
                         <h4 class="font-bold mb-4 flex items-center"><i
-                                class="fas fa-question-circle mr-2 text-blue-500"></i>Top Concerns</h4>
+                                class="fas fa-question-circle mr-2" style="color: var(--seku-green-dark);"></i>Top Concerns</h4>
                         <div class="space-y-4" id="concern-stats">
                             <!-- Concern stats -->
                         </div>
@@ -512,16 +569,20 @@
         </div>
     </div>
 
-    <!-- ACTIVITY LOGS MODAL -->
     <div id="logs-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in max-h-[80vh]">
-            <div class="bg-blue-600 px-6 py-4 flex justify-between items-center text-white">
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in h-[85vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-history mr-2"></i>Activity Log</h3>
-                <button onclick="closeLogsModal()" class="text-2xl hover:text-blue-200 transition">&times;</button>
+                <button onclick="closeLogsModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
-            <div class="p-6 overflow-y-auto" id="logs-content">
-                <p class="text-center text-gray-400 py-10">Loading logs...</p>
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="logs-content">
+                <p class="text-center text-gray-400 py-10 italic">Loading logs...</p>
+            </div>
+            <div class="px-6 py-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
+                <button onclick="closeLogsModal()" class="btn-seku-primary px-8 py-2.5 rounded-lg shadow-xl font-black uppercase tracking-wider text-sm transition transform hover:scale-105 active:scale-95">
+                    Close Activity Log
+                </button>
             </div>
         </div>
     </div>
@@ -529,18 +590,18 @@
     <!-- MESSAGE DETAILS MODAL -->
     <div id="details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
-            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="border-b dark:border-gray-700 px-6 py-4 flex justify-between items-center flex-shrink-0">
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in h-[85vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl" id="details-title">Message Details</h3>
                 <button onclick="closeDetailsModal()"
-                    class="text-gray-400 hover:text-gray-600 text-2xl transition">&times;</button>
+                    class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="details-content">
                 <!-- Loaded via JS -->
             </div>
-            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end flex-shrink-0">
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
                 <button onclick="closeDetailsModal()"
-                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Close</button>
+                    class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">Close Details</button>
             </div>
         </div>
     </div>
@@ -550,29 +611,29 @@
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden fade-in flex flex-col">
             <div
-                class="bg-gradient-to-r from-pink-600 to-rose-600 px-6 py-4 flex justify-between items-center text-white">
+                class="px-6 py-4 flex justify-between items-center text-white" style="background-color: var(--seku-green-dark);">
                 <div>
                     <h3 class="font-bold text-xl"><i class="fas fa-qrcode mr-2"></i>Department Feedback QR</h3>
-                    <p class="text-pink-200 text-xs mt-0.5">Scan to give feedback directly</p>
+                    <p class="text-green-100 text-xs mt-0.5">Scan to give feedback directly</p>
                 </div>
-                <button onclick="closeQRModal()" class="hover:bg-pink-700 p-2 rounded-full transition"><i
+                <button onclick="closeQRModal()" class="hover:bg-green-700 p-2 rounded-full transition"><i
                         class="fas fa-times"></i></button>
             </div>
             <div class="p-6 text-center">
                 <!-- Department label -->
                 <div class="mb-4">
                     <span id="qr-dept-label"
-                        class="inline-block bg-pink-50 dark:bg-pink-900/20 text-pink-700 dark:text-pink-300 font-bold px-4 py-1.5 rounded-full text-sm border border-pink-200 dark:border-pink-800">
+                        class="inline-block bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 font-bold px-4 py-1.5 rounded-full text-sm border border-green-200 dark:border-green-800">
                         <i class="fas fa-building mr-1"></i> Loading department...
                     </span>
                 </div>
 
                 <!-- QR Display -->
                 <div
-                    class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 rounded-2xl inline-block mb-4 ring-4 ring-pink-500/20 shadow-inner">
+                    class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 rounded-2xl inline-block mb-4 ring-4 ring-green-500/20 shadow-inner">
                     <div id="qr-image-container" class="w-52 h-52 flex items-center justify-center text-gray-300">
                         <div class="flex flex-col items-center gap-3">
-                            <i class="fas fa-circle-notch fa-spin text-4xl text-pink-400"></i>
+                            <i class="fas fa-circle-notch fa-spin text-4xl" style="color: var(--seku-green-dark);"></i>
                             <span class="text-xs text-gray-400">Generating QR code...</span>
                         </div>
                     </div>
@@ -587,7 +648,7 @@
                 <!-- Action buttons -->
                 <div class="grid grid-cols-1 gap-3">
                     <button onclick="printQRCode()"
-                        class="bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                        class="btn-seku-primary font-bold py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
                         <i class="fas fa-print text-base"></i> Print QR Poster
                     </button>
                     <button onclick="closeQRModal()"
@@ -603,16 +664,16 @@
     <div id="questions-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="bg-orange-600 px-6 py-4 flex justify-between items-center text-white">
+            <div class="px-6 py-4 flex justify-between items-center text-white" style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-question-circle mr-2"></i>Manage Feedback Questions</h3>
                 <button onclick="closeQuestionModal()"
-                    class="text-2xl hover:text-orange-200 transition">&times;</button>
+                    class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow space-y-6">
                 <!-- Add Question Form -->
                 <div
-                    class="bg-orange-50 dark:bg-orange-900/10 p-4 rounded-xl border border-orange-100 dark:border-orange-800 mb-6">
-                    <h4 class="font-bold text-orange-700 dark:text-orange-400 mb-3">Add New Question</h4>
+                    class="p-4 rounded-xl border border-green-100 dark:border-green-800 mb-6" style="background-color: rgba(34, 197, 94, 0.05);">
+                    <h4 class="font-bold mb-3" style="color: var(--seku-green-dark);">Add New Question</h4>
                     <form id="add-question-form" onsubmit="saveNewQuestion(event)" class="space-y-3">
                         <div>
                             <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Question Text</label>
@@ -656,7 +717,7 @@
                             </div>
                         </div>
                         <button type="submit"
-                            class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 rounded-lg transition shadow-md">
+                            class="w-full btn-seku-primary font-bold py-2 rounded-lg transition shadow-md">
                             Add Question to Users
                         </button>
                 </div>
@@ -664,7 +725,7 @@
                 <!-- Current Questions List -->
                 <div>
                     <h4 class="font-bold mb-4 flex items-center text-gray-700 dark:text-gray-300">
-                        <i class="fas fa-list-ul mr-2 text-orange-500"></i>Active Questions
+                        <i class="fas fa-list-ul mr-2" style="color: var(--seku-green-dark);"></i>Active Questions
                     </h4>
                     <div id="questions-list" class="space-y-3">
                         <!-- Questions loaded via JS -->
@@ -702,7 +763,7 @@
             setTimeout(() => {
                 const headerText = document.getElementById("header-welcome-text");
                 if (headerText) {
-                    headerText.textContent = "WELCOME TO ADMIN PANEL, CUSTOMER FEEDBACK SYSTEM";
+                    headerText.textContent = "WELCOME TO ADMIN PANEL DASHBOARD";
                 }
             }, 100);
 
@@ -930,7 +991,7 @@
                         </div>
                         <div class="flex flex-col gap-0.5 mt-1">
                             <div class="text-[10px] text-gray-400 font-medium italic">${f.anonymous === "true" ? 'Anonymous' : (f.email || 'No email')}</div>
-                            <div class="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-tight">
+                            <div class="text-[11px] font-bold text-green-700 dark:text-green-400 uppercase tracking-tight">
                                 <i class="fas fa-building mr-1 opacity-70"></i>${f.office ? (window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office) : 'General'}
                             </div>
                         </div>
@@ -1174,23 +1235,25 @@
                 const res = await fetch("/api/admin/activity-logs", {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
-                const logs = await res.json();
+                let logs = await res.json();
+                // Limit to last 20 records for clarity and performance
+                logs = logs.slice(0, 20);
                 document.getElementById("logs-content").innerHTML = `
                 <div class="space-y-4">
                     ${logs.map(log => `
                             <div class="flex items-start space-x-3 border-b dark:border-gray-700 pb-3">
-                                <div class="p-2 bg-gray-100 dark:bg-gray-700 rounded-full mt-1">
-                                    <i class="fas ${log.action === 'reply_message' ? 'fa-reply text-green-500' : 'fa-eye text-blue-500'}"></i>
+                                <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-full mt-1">
+                                    <i class="fas ${log.action === 'reply_message' ? 'fa-reply' : 'fa-eye'}" style="color: var(--seku-green-dark);"></i>
                                 </div>
                                 <div class="flex-grow">
                                     <div class="flex justify-between">
-                                        <p class="font-bold text-sm">${log.action.replace('_', ' ').toUpperCase()}</p>
-                                        <p class="text-[10px] text-gray-500" data-timestamp="${log.timestamp}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(log.timestamp) : new Date(log.timestamp).toLocaleString()}</p>
+                                        <p class="font-bold text-sm text-gray-800 dark:text-gray-200">${log.action.replace('_', ' ').toUpperCase()}</p>
+                                        <p class="text-[10px] text-gray-400 font-medium" data-timestamp="${log.timestamp}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(log.timestamp) : new Date(log.timestamp).toLocaleString()}</p>
                                     </div>
-                                    <p class="text-xs text-gray-600 dark:text-gray-400">${log.details}</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${log.details}</p>
                                 </div>
                             </div>
-                        `).join('') || '<p class="text-center py-10">No activities recorded yet.</p>'
+                        `).join('') || '<p class="text-center py-10 text-gray-400 italic">No activities recorded yet.</p>'
                     }
                 </div>
                 `;
@@ -1936,6 +1999,41 @@
         document.getElementById("search-input").addEventListener("input", applyFilters);
 
         document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
     </script>
 </body>
 

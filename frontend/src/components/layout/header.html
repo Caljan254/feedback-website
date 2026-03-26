@@ -1,71 +1,106 @@
-<header class="fixed top-0 left-0 w-full bg-white shadow-lg z-50 overflow-hidden">
-    <!-- Dynamic Header: Welcome Text & Contacts - REDUCED HEIGHT -->
+<header class="fixed top-0 left-0 w-full bg-white shadow-lg" style="z-index: 100000;">
+    <!-- Dynamic Header: Welcome Text & Contacts - WELCOME TOP, CONTACTS BOTTOM RIGHT ON DESKTOP -->
     <div
-        class="w-full bg-gradient-to-r from-green-900 via-green-800 to-green-900 py-0.5 sm:py-1 px-4 sm:px-8 shadow-inner border-b border-green-700/50">
+        class="w-full bg-gradient-to-r from-green-900 via-green-800 to-green-900 py-1 px-2 sm:px-4 md:px-8 shadow-inner border-b border-green-700/50">
         <div class="w-full">
-            <!-- Two Column Layout: To be flush with logo and nav below -->
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0 sm:gap-1">
-                <!-- Welcome Text: Starts exactly where the logo starts below -->
-                <div class="w-full sm:w-auto">
-                    <h1 id="header-welcome-text"
-                        class="font-black text-white text-[8px] sm:text-xs md:text-sm lg:text-base uppercase tracking-widest text-center sm:text-left leading-tight">
-                        WELCOME TO DIRECTORATE OF ICT CUSTOMER FEEDBACK SYSTEM
-                    </h1>
-                </div>
 
-                <div class="w-full sm:w-auto flex justify-center sm:justify-end">
-                    <div
-                        class="flex flex-nowrap items-center justify-center sm:justify-end gap-x-1 sm:gap-x-4 text-[7px] sm:text-[10px] md:text-xs font-medium text-white">
-                        <a href="tel:+254748605997"
-                            class="flex items-center hover:text-yellow-400 transition-colors duration-300 whitespace-nowrap text-white">
-                            <i class="fas fa-phone-alt mr-1 text-[7px] sm:text-[10px] text-white"></i>
-                            <span class="text-white">+254 748 60 59 97</span>
-                        </a>
-                        <span class="text-white/50 hidden sm:inline">|</span>
-                        <a href="mailto:ictsupport@seku.ac.ke"
-                            class="flex items-center hover:text-yellow-400 transition-colors duration-300 whitespace-nowrap text-white">
-                            <i class="fas fa-envelope mr-1 text-[7px] sm:text-[10px] text-white"></i>
-                            <span class="text-white">ictsupport@seku.ac.ke</span>
-                        </a>
-                        <span class="text-white/50 hidden sm:inline">|</span>
-                        <div class="flex items-center whitespace-nowrap text-white">
-                            <i class="fas fa-clock mr-1 text-[7px] sm:text-[10px] text-white"></i>
-                            <span class="text-white">Mon - Fri 8:00 - 17:00</span>
-                        </div>
+
+
+            <!-- Contacts - Stack on mobile, flex on desktop -->
+            <div
+                class="header-contact-bar w-full flex justify-center sm:justify-end items-center mt-0 sm:mt-0.5 py-1 sm:py-0">
+                <div class="flex flex-row items-center justify-center sm:justify-end gap-1.5 sm:gap-4 text-white font-semibold whitespace-nowrap overflow-hidden"
+                    style="font-size: 7.5px !important; letter-spacing: -0.2px;">
+
+                    <!-- Phone number -->
+                    <a href="tel:+254748605997" class="flex items-center hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-phone-alt text-yellow-300" style="font-size: 8px; margin-right: 2px;"></i>
+                        <span>+254 748 60 59 97</span>
+                    </a>
+
+                    <span class="text-white/30">|</span>
+
+                    <!-- Email -->
+                    <a href="mailto:ictsupport@seku.ac.ke"
+                        class="flex items-center hover:text-yellow-400 transition-colors">
+                        <i class="fas fa-envelope text-yellow-300" style="font-size: 8px; margin-right: 2px;"></i>
+                        <span>ictsupport@seku.ac.ke</span>
+                    </a>
+
+                    <span class="text-white/30">|</span>
+
+                    <!-- Hours (Abbreviated on mobile) -->
+                    <div class="flex items-center">
+                        <i class="fas fa-clock text-yellow-300" style="font-size: 8px; margin-right: 2px;"></i>
+                        <span class="hidden sm:inline">Mon - Fri 8:00AM - 5:00PM</span>
+                        <span class="sm:hidden">Mon-Fri 8:00AM-5:00PM</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </div>
 
-    <!-- Main Header Section - REDUCED PADDING but logo same size -->
-    <div class="flex items-center justify-between w-full px-4 sm:px-8 py-1 md:py-1.5">
-        <!-- Logo (Left side) - COMPLETELY UNCHANGED size -->
-        <a href="src/components/pages/home.html" class="flex-shrink-0">
-            <img id="main-header-logo" src="/uploads/logo.png" alt="University Logo"
-                class="h-12 sm:h-20 md:h-28 w-auto object-contain transition-all duration-500" />
+    <!-- Main Header Section - UNCHANGED -->
+    <div class="flex items-center justify-between w-full px-4 sm:px-8 py-0.5 md:py-1">
+        <!-- Logo (Left side) - COMPLETELY UNCHANGED -->
+        <a href="/src/components/pages/home.html" class="flex-shrink-0">
+            <img id="main-header-logo" src="/uploads/ict-logo.png" alt="University Logo"
+                class="h-10 sm:h-16 md:h-24 w-auto max-w-[180px] sm:max-w-[400px] md:max-w-2xl object-contain py-1 transition-all duration-500" />
         </a>
 
-        <!-- Right side (Navigation) -->
+        <!-- Right side (Navigation) - UNCHANGED -->
         <div class="flex flex-col items-end">
-            <!-- Pages Row -->
             <div class="flex items-center">
-                <!-- Desktop Menu -->
-                <nav class="hidden md:flex items-center space-x-2 lg:space-x-4 xl:space-x-6">
-                    <a href="src/components/pages/home.html" data-nav="public"
+                <!-- Desktop Menu - UNCHANGED -->
+                <nav class="hidden md:flex items-center space-x-1 lg:space-x-3 xl:space-x-5">
+                    <a href="/src/components/pages/home.html" data-nav="public"
                         class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">Home</a>
                     <a href="src/components/pages/about.html" data-nav="public"
-                        class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">About</a>
-                    <a href="src/components/pages/services.html" data-nav="public"
-                        class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">Services</a>
+                        class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">About
+                        Us</a>
+                    <div class="relative group" id="services-menu">
+                        <button
+                            onclick="document.getElementById('services-dropdown-content').classList.toggle('show-dropdown')"
+                            class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition flex items-center h-full focus:outline-none">
+                            Services
+                        </button>
+                        <div id="services-dropdown-content"
+                            class="absolute left-0 mt-0 w-48 bg-white border border-gray-100 shadow-xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[10001] transform origin-top-left group-hover:translate-y-0 translate-y-2 overflow-hidden">
+                            <a href="src/components/pages/services.html" data-nav="public"
+                                class="block px-4 py-2.5 text-sm text-gray-800 hover:bg-green-50 hover:text-green-600 font-bold transition-colors">
+                                <i class="fas fa-tools mr-2 text-green-500"></i> ICT Services
+                            </a>
+                            <a href="src/components/pages/service-delivery.html" data-nav="public"
+                                class="block px-4 py-2.5 text-sm text-gray-800 hover:bg-green-50 hover:text-green-600 font-bold transition-colors border-t border-gray-50">
+                                <i class="fas fa-file-contract mr-2 text-green-500"></i> Service Delivery
+                            </a>
+                        </div>
+                    </div>
                     <a href="src/components/pages/sections.html" data-nav="public"
-                        class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">Sections</a>
-                    <a href="src/components/pages/submit-feedback.html" data-nav="public"
                         class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">ICT
-                        Feedback</a>
-                    <a href="src/components/pages/my-feedback.html" data-nav="public"
-                        class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition text-nowrap">My
-                        Feedback</a>
+                        Departments</a>
+                    <div class="relative group" id="ict-feedback-menu">
+                        <button
+                            onclick="document.getElementById('ict-dropdown-content').classList.toggle('show-dropdown')"
+                            class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition flex items-center h-full focus:outline-none">
+                            ICT Feedback
+                        </button>
+                        <div id="ict-dropdown-content"
+                            class="absolute left-0 mt-0 w-48 bg-white border border-gray-100 shadow-xl rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[10001] transform origin-top-left group-hover:translate-y-0 translate-y-2 overflow-hidden">
+                            <a href="src/components/pages/submit-feedback.html" data-nav="public"
+                                class="block px-4 py-2.5 text-sm text-gray-800 hover:bg-green-50 hover:text-green-600 font-bold transition-colors">
+                                <i class="fas fa-paper-plane mr-2 text-green-500"></i> Rate Our Services
+                            </a>
+                            <a href="src/components/pages/my-feedback.html" data-nav="public"
+                                class="block px-4 py-2.5 text-sm text-gray-800 hover:bg-green-50 hover:text-green-600 font-bold transition-colors border-t border-gray-50">
+                                <i class="fas fa-history mr-2 text-green-500"></i> Track My Feedback
+                            </a>
+                        </div>
+                    </div>
+                    <a href="src/components/pages/downloads.html" data-nav="public"
+                        class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition text-nowrap">
+                        Downloads</a>
                     <a href="src/components/pages/contact.html" data-nav="public"
                         class="nav-link text-gray-800 hover:text-green-600 px-2 py-1 text-sm font-bold transition">Contact</a>
                     <a href="src/components/pages/admin.html" data-auth="admin" style="display:none"
@@ -80,10 +115,9 @@
                         class="nav-link text-red-600 hover:text-red-800 px-2 py-1 font-black uppercase text-sm border-2 border-red-600 rounded-md ml-4 hover:bg-red-50 transition-all">Logout</a>
                 </nav>
 
-                <!-- Hamburger (Mobile) -->
+                <!-- Hamburger (Mobile) - UNCHANGED -->
                 <button id="hamburgerBtn"
                     class="md:hidden flex flex-col space-y-1.5 z-50 p-2 rounded-lg hover:bg-gray-100 transition"
-                    onclick="document.getElementById('mobileMenu').style.display = 'block'; document.getElementById('mobileMenuOverlay').style.display = 'block'; document.body.style.overflow = 'hidden'; this.setAttribute('aria-expanded', 'true');"
                     aria-label="Toggle menu" aria-expanded="false">
                     <span class="block w-6 h-0.5 bg-gray-800 rounded-full"></span>
                     <span class="block w-6 h-0.5 bg-gray-800 rounded-full"></span>
@@ -94,179 +128,277 @@
     </div>
 </header>
 
-<!-- Overlay -->
-<div id="mobileMenuOverlay"
-    onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 9998;">
-</div>
+<!-- Mobile Menu Overlay - DARKER AND BLURRED -->
+<div id="mobileMenuOverlay" class="fixed inset-0 bg-black/70 backdrop-blur-md"
+    onclick="window.feedbackPortal.closeMobileMenu()" style="display: none; z-index: 999998;"></div>
 
-<!-- MOBILE MENU - Using inline styles for guaranteed visibility -->
+<!-- Mobile Menu Sidebar - HIGHEST Z-INDEX -->
 <div id="mobileMenu"
-    style="display: none; position: fixed; top: 0; right: 0; width: 80%; max-width: 300px; height: 100%; background-color: white; z-index: 9999; overflow-y: auto; box-shadow: -2px 0 10px rgba(0,0,0,0.1);">
+    class="fixed top-0 right-0 w-[300px] h-full bg-white shadow-[0_0_50px_rgba(0,0,0,0.3)] transform translate-x-full transition-transform duration-300 ease-in-out overflow-y-auto"
+    style="display: none; z-index: 999999;">
+    <div class="p-6 flex flex-col h-full bg-white">
+        <!-- Menu Header with prominent close button -->
+        <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-100">
+            <img src="uploads/logo.png" alt="University Logo" class="h-12 w-auto object-contain" />
+            <button onclick="window.feedbackPortal.closeMobileMenu()"
+                class="w-10 h-10 flex items-center justify-center rounded-full bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all duration-200">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
 
-    <!-- Header with Close Button -->
-    <div
-        style="padding: 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; background: white; position: sticky; top: 0;">
-        <span style="font-weight: bold; color: #059669;">Menu</span>
-        <button
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = ''; document.getElementById('hamburgerBtn').setAttribute('aria-expanded', 'false');"
-            style="padding: 8px; border-radius: 50%; border: none; background: transparent; cursor: pointer;">
-            <i class="fas fa-times" style="font-size: 24px; color: #4b5563;"></i>
-        </button>
-    </div>
+        <nav class="flex flex-col space-y-1">
+            <a href="/src/components/pages/home.html"
+                class="mobile-nav-link text-gray-800 font-bold py-3.5 border-b border-gray-50 hover:text-green-600 transition-colors">Home</a>
+            <a href="/src/components/pages/about.html"
+                class="mobile-nav-link text-gray-800 font-bold py-3.5 border-b border-gray-50 hover:text-green-600 transition-colors">About
+                Us</a>
 
-    <!-- Menu Items -->
-    <div style="padding: 16px;">
-        <a href="src/components/pages/home.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-home" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Home</span>
-        </a>
+            <div class="py-4 border-b border-gray-50">
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-black mb-3">Resources & Services</p>
+                <div class="space-y-1">
+                    <a href="/src/components/pages/services.html"
+                        class="block pl-4 py-3 text-gray-700 font-semibold hover:text-green-600 transition-colors"><i
+                            class="fas fa-tools mr-3 text-green-500 w-5 text-center"></i> ICT Services Catalog</a>
+                    <a href="/src/components/pages/service-delivery.html"
+                        class="block pl-4 py-3 text-gray-700 font-semibold hover:text-green-600 transition-colors"><i
+                            class="fas fa-file-contract mr-3 text-green-500 w-5 text-center"></i> ICT Service
+                        Charter</a>
+                    <a href="/src/components/pages/sections.html"
+                        class="block pl-4 py-3 text-gray-700 font-semibold hover:text-green-600 transition-colors"><i
+                            class="fas fa-sitemap mr-3 text-green-500 w-5 text-center"></i> ICT Departments</a>
+                </div>
+            </div>
 
-        <a href="src/components/pages/about.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-info-circle" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>About</span>
-        </a>
+            <div class="py-4 border-b border-gray-50">
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-black mb-3">Feedback Portal</p>
+                <div class="space-y-1">
+                    <a href="/src/components/pages/submit-feedback.html"
+                        class="block pl-4 py-3 text-gray-700 font-semibold hover:text-green-600 transition-colors"><i
+                            class="fas fa-paper-plane mr-3 text-green-500 w-5 text-center"></i> Rate Our Services</a>
+                    <a href="/src/components/pages/my-feedback.html"
+                        class="block pl-4 py-3 text-gray-700 font-semibold hover:text-green-600 transition-colors"><i
+                            class="fas fa-history mr-3 text-green-500 w-5 text-center"></i> Track My Feedback</a>
+                </div>
+            </div>
 
-        <a href="src/components/pages/services.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-concierge-bell" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Services</span>
-        </a>
+            <a href="/src/components/pages/downloads.html"
+                class="mobile-nav-link text-gray-800 font-bold py-3.5 border-b border-gray-50 hover:text-green-600 transition-colors">Downloads
+                Center</a>
+            <a href="/src/components/pages/contact.html"
+                class="mobile-nav-link text-gray-800 font-bold py-3.5 border-b border-gray-50 hover:text-green-600 transition-colors">Contact
+                Support</a>
 
-        <a href="src/components/pages/sections.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-th-large" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Sections</span>
-        </a>
+            <div class="mt-8 pt-6 border-t border-gray-100">
+                <p class="text-[10px] uppercase tracking-widest text-gray-400 font-black mb-4">Account</p>
+                <div class="space-y-3">
+                    <a href="src/components/pages/login.html" data-auth="guest"
+                        class="block w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">Login</a>
+                    <a href="src/components/pages/signup.html" data-auth="guest"
+                        class="block w-full text-center border-2 border-green-600 text-green-600 hover:bg-green-50 font-bold py-3.5 rounded-xl transition">Sign
+                        Up</a>
+                    <a href="#" data-auth="user" data-action="logout" style="display:none"
+                        class="block w-full text-center bg-red-600 hover:bg-red-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">Logout</a>
+                </div>
+            </div>
+        </nav>
 
-        <a href="src/components/pages/submit-feedback.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-edit" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>ICT Feedback</span>
-        </a>
-
-        <a href="src/components/pages/my-feedback.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-list" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>My Feedback</span>
-        </a>
-
-        <a href="src/components/pages/contact.html" data-nav="public"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-envelope" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Contact</span>
-        </a>
-
-        <div style="height: 1px; background-color: #e5e7eb; margin: 16px 0;"></div>
-
-        <a href="src/components/pages/login.html" data-auth="guest"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-sign-in-alt" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Login</span>
-        </a>
-
-        <a href="src/components/pages/signup.html" data-auth="guest"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: flex; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-user-plus" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Sign Up</span>
-        </a>
-
-        <a href="src/components/pages/admin.html" data-auth="admin"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #1f2937; border-radius: 8px; background: white; font-size: 16px;">
-            <i class="fas fa-user-shield" style="width: 24px; color: #059669; margin-right: 12px;"></i>
-            <span>Admin Panel</span>
-        </a>
-
-        <a href="#" data-auth="user" data-action="logout"
-            onclick="document.getElementById('mobileMenu').style.display = 'none'; document.getElementById('mobileMenuOverlay').style.display = 'none'; document.body.style.overflow = '';"
-            style="display: none; align-items: center; padding: 16px; margin: 4px 0; text-decoration: none; color: #b91c1c; border-radius: 8px; background: white; font-size: 16px; font-weight: bold;">
-            <i class="fas fa-sign-out-alt" style="width: 24px; color: #b91c1c; margin-right: 12px;"></i>
-            <span>Logout</span>
-        </a>
+        <div class="mt-auto pt-6 text-center">
+            <p class="text-[10px] text-gray-400 font-medium uppercase tracking-[0.2em]">&copy; 2026 SEKU ICT</p>
+        </div>
     </div>
 </div>
 
-<!-- Dark mode support -->
+<!-- Add these responsive styles -->
 <style>
-    /* Dark mode styles */
-    @media (prefers-color-scheme: dark) {
-        .dark #mobileMenu {
-            background-color: #111827 !important;
+    /* Extra small breakpoints for fine-tuned control */
+    @media (min-width: 320px) {
+        .\32xs\:inline {
+            display: inline !important;
         }
 
-        .dark #mobileMenu a {
-            color: #e5e7eb !important;
-            background-color: #111827 !important;
+        .\32xs\:hidden {
+            display: none !important;
         }
 
-        .dark #mobileMenu a:hover {
-            background-color: #1f2937 !important;
-        }
-
-        .dark #mobileMenu .fa-times {
-            color: #9ca3af !important;
+        .\32xs\:mx-1 {
+            margin-left: 0.25rem !important;
+            margin-right: 0.25rem !important;
         }
     }
 
-    /* Hover effects for better UX */
-    #mobileMenu a:hover {
-        background-color: #f3f4f6 !important;
-    }
-
-    /* Ensure proper scrolling */
-    #mobileMenu {
-        -webkit-overflow-scrolling: touch;
-    }
-
-    /* Active Nav Link Highlighting */
-    .nav-link.active {
-        color: #059669 !important;
-        /* text-green-600 */
-        font-weight: 700 !important;
-        border-bottom: 2px solid #059669;
-    }
-
-    .dark .nav-link.active {
-        color: #34d399 !important;
-        /* text-green-400 */
-        border-bottom-color: #34d399;
-    }
-
-    /* Ensure mailto links work properly */
-    a[href^="mailto:"] {
-        cursor: pointer;
-        text-decoration: none;
-    }
-
-    /* Responsive adjustments for very small screens */
-    @media (max-width: 380px) {
-        .font-black {
+    @media (min-width: 380px) {
+        .xs\:text-\[8px\] {
             font-size: 8px !important;
         }
 
-        .flex-nowrap.items-center.justify-center {
-            font-size: 8px !important;
-            column-gap: 4px !important;
+        .xs\:text-\[9px\] {
+            font-size: 9px !important;
         }
 
-        .flex-nowrap.items-center.justify-center i {
+        .xs\:mx-1 {
+            margin-left: 0.25rem !important;
+            margin-right: 0.25rem !important;
+        }
+
+        .xs\:mr-1 {
+            margin-right: 0.25rem !important;
+        }
+
+        .xs\:gap-1\.5 {
+            gap: 0.375rem !important;
+        }
+    }
+
+    @media (min-width: 480px) {
+        .sm\:text-\[9px\] {
+            font-size: 9px !important;
+        }
+
+        .sm\:text-\[10px\] {
+            font-size: 10px !important;
+        }
+    }
+
+    @media (min-width: 640px) {
+        .md\:text-\[10px\] {
+            font-size: 10px !important;
+        }
+
+        .md\:gap-3 {
+            gap: 0.75rem !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .lg\:text-xs {
+            font-size: 0.75rem !important;
+        }
+
+        .lg\:gap-4 {
+            gap: 1rem !important;
+        }
+
+        .sm\:text-left {
+            text-align: left !important;
+        }
+
+        .sm\:justify-end {
+            justify-content: flex-end !important;
+        }
+
+        .sm\:mt-0\.5 {
+            margin-top: 0.125rem !important;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .xl\:text-base {
+            font-size: 1rem !important;
+        }
+    }
+
+    /* Extremely small devices (under 320px) */
+    @media (max-width: 319px) {
+        .text-\[7px\] {
+            font-size: 6px !important;
+        }
+
+        .text-\[8px\] {
             font-size: 7px !important;
-            margin-right: 2px !important;
+        }
+
+        .gap-1 {
+            gap: 0.2rem !important;
+        }
+
+        .fa-phone-alt,
+        .fa-envelope,
+        .fa-clock {
+            font-size: 6px !important;
+        }
+    }
+
+    /* Ensure all content stays in one line */
+    .flex-row {
+        flex-wrap: nowrap !important;
+    }
+
+    /* Keep dropdown visible on click */
+    .show-dropdown {
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: translateY(0) !important;
+    }
+
+    /* Active Nav Link Styling */
+    .nav-link.active {
+        color: #16a34a !important;
+        /* text-green-600 */
+        border-bottom: 2px solid #16a34a;
+    }
+
+    .mobile-nav-link.active {
+        color: #16a34a !important;
+        background-color: #f0fdf4;
+        border-left: 4px solid #16a34a;
+        padding-left: 1rem;
+    }
+
+    /* Make sure links are still tappable */
+    a.flex,
+    div.flex {
+        min-height: 22px;
+        min-width: 44px;
+        /* Apple's recommended minimum touch target */
+    }
+
+    /* Center on mobile, right align on desktop */
+    .justify-center {
+        justify-content: center;
+    }
+
+    @media (min-width: 640px) {
+        .sm\:justify-end {
+            justify-content: flex-end;
+        }
+    }
+
+    /* Add a subtle separator line for visual hierarchy */
+    .bg-gradient-to-r {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Print-friendly styles */
+    @media print {
+        .bg-gradient-to-r {
+            background: #065f46 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+
+    /* Ensure the header doesn't get too tall on mobile */
+    @media (max-width: 640px) {
+        .py-1 {
+            padding-top: 0.2rem !important;
+            padding-bottom: 0.2rem !important;
+        }
+    }
+
+    /* Desktop-specific adjustments */
+    @media (min-width: 1024px) {
+        .lg\:text-sm {
+            font-size: 0.875rem !important;
+        }
+
+        .gap-4 {
+            gap: 1rem !important;
         }
     }
 </style>
+
+
+
 
 <script>
     // Fix any links with typos when page loads

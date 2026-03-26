@@ -1,11 +1,12 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models import User
+from config import Config
 import bcrypt
 from datetime import datetime
 
-# Direct connection to avoid any other import issues
-SQLALCHEMY_DATABASE_URL = "mysql+pymysql://root:Aaamumo254%@localhost/feedback_db"
+# Connection to use the Config
+SQLALCHEMY_DATABASE_URL = Config.SQLALCHEMY_DATABASE_URI
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -39,13 +40,13 @@ def create_complaint_admins():
                     created_at=datetime.utcnow()
                 )
                 db.add(new_user)
-                print(f"✅ Created {admin['username']}")
+                print(f"[OK] Created {admin['username']}")
             else:
-                print(f"ℹ️ Admin {admin['username']} already exists")
+                print(f"[INFO] Admin {admin['username']} already exists")
         
         db.commit()
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[ERROR] Error: {e}")
         db.rollback()
     finally:
         db.close()
