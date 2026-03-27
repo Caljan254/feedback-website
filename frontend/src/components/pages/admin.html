@@ -35,8 +35,8 @@
         }
 
         .status-unread {
-            background-color: rgba(250, 204, 21, 0.15); /* Gold light tint */
-            color: #b45309; /* Gold dark text */
+            background-color: rgba(250, 204, 21, 0.15);
+            color: #b45309;
             border: 1px solid rgba(250, 204, 21, 0.3);
         }
 
@@ -46,8 +46,8 @@
         }
 
         .status-read {
-            background-color: rgba(34, 197, 94, 0.1); /* Green light tint */
-            color: #15803d; /* Green dark text */
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #15803d;
             border: 1px solid rgba(34, 197, 94, 0.2);
         }
 
@@ -195,7 +195,7 @@
             text-align: center !important;
             display: block !important;
             color: var(--seku-gold) !important;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
         }
 
         @media (min-width: 768px) {
@@ -245,8 +245,7 @@
 
     <!-- MAIN CONTENT -->
     <main class="w-full max-w-7xl mx-auto pt-4 px-4 pb-6">
-        <div
-            class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border-l-8 transition-all hover:shadow-xl"
+        <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border-l-8 transition-all hover:shadow-xl"
             style="border-left-color: var(--seku-green-dark);">
             <div>
                 <div class="flex items-center space-x-3 mb-1" style="color: var(--seku-green-dark);">
@@ -279,6 +278,10 @@
                     class="btn-seku-gold px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i class="fas fa-qrcode mr-2"></i>Print QR
                 </button>
+                <button onclick="openProfileModal()"
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-user-cog mr-2"></i>Profile
+                </button>
                 <button onclick="loadFeedback()"
                     class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
                     <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>Refresh
@@ -288,29 +291,29 @@
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-            <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-green-light);">
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-green-light);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-inbox mr-2"></i>Total Messages
                 </h3>
                 <p id="total-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-dark);">0</p>
             </div>
-            <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-gold);">
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-gold);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-clock mr-2"></i>Pending Read
                 </h3>
                 <p id="unread-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-gold-dark);">0</p>
             </div>
-            <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-green-dark);">
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-green-dark);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-check-double mr-2"></i>Replied
                 </h3>
                 <p id="replied-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-light);">0</p>
             </div>
-            <div
-                class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4" style="border-bottom-color: var(--seku-green-dark);">
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-green-dark);">
                 <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
                     <i class="fas fa-calendar-day mr-2"></i>New Today
                 </h3>
@@ -348,8 +351,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr
-                            class="bg-gray-50 dark:bg-gray-700/50 uppercase text-xs font-bold text-white">
+                        <tr class="bg-gray-50 dark:bg-gray-700/50 uppercase text-xs font-bold text-white">
                             <th class="px-6 py-4">Sender & Office</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4">User Role</th>
@@ -381,10 +383,11 @@
 
     <!-- MODALS (Reply, Details, Logs) -->
     <!-- [Modals remain similar to previous but with streamlined UI] -->
-    <div id="reply-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="reply-modal" class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-reply mr-2"></i>Send Official Reply</h3>
                 <button onclick="closeReplyModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
@@ -407,7 +410,8 @@
                         class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600"></textarea>
                 </div>
             </form>
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
+            <div
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
                 <button type="button" onclick="closeReplyModal()"
                     class="px-6 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition font-medium">Cancel</button>
                 <button type="submit" form="reply-form" id="send-btn"
@@ -417,10 +421,11 @@
     </div>
 
     <!-- COMPOSE MESSAGE TO MEMBER MODAL -->
-    <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="compose-modal" class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-paper-plane mr-2"></i>Send Message to Registered Member
                 </h3>
                 <button onclick="closeComposeModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
@@ -456,7 +461,8 @@
                     </div>
                 </form>
             </div>
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
+            <div
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
                 <button type="button" onclick="closeComposeModal()"
                     class="px-6 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition font-medium">Cancel</button>
                 <button type="submit" form="compose-form" id="compose-send-btn"
@@ -467,66 +473,72 @@
         </div>
     </div>
 
-    <div id="analytics-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="analytics-modal"
+        class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="px-6 py-4 flex justify-between items-center text-white" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-microchip mr-2"></i>Feedback Analytics & Data Mining</h3>
                 <button onclick="closeAnalytics()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow space-y-8" id="analytics-content">
                 <!-- Dashboard content -->
                 <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                    <div
-                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(21, 128, 61, 0.05);">
-                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);"><i
-                                class="fas fa-heart mr-2"></i>Sentiment</h4>
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(21, 128, 61, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);">
+                            <i class="fas fa-heart mr-2"></i>Sentiment</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="sentiment-value">0%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
-                            <div id="sentiment-bar" class="h-2 rounded-full" style="width: 0%; background-color: var(--seku-green-dark);"></div>
+                            <div id="sentiment-bar" class="h-2 rounded-full"
+                                style="width: 0%; background-color: var(--seku-green-dark);"></div>
                         </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Positivity across all feedback</p>
                     </div>
 
-                    <div
-                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(34, 197, 94, 0.05);">
-                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);"><i
-                                class="fas fa-check-circle mr-2"></i>Resolution</h4>
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(34, 197, 94, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);">
+                            <i class="fas fa-check-circle mr-2"></i>Resolution</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="efficiency-value">0%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
-                            <div id="efficiency-bar" class="h-2 rounded-full" style="width: 0%; background-color: var(--seku-green-light);"></div>
+                            <div id="efficiency-bar" class="h-2 rounded-full"
+                                style="width: 0%; background-color: var(--seku-green-light);"></div>
                         </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Effectiveness of problem solving</p>
                     </div>
 
-                    <div
-                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(250, 204, 21, 0.05);">
-                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-gold-dark);"><i
-                                class="fas fa-star mr-2"></i>Avg Rating</h4>
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(250, 204, 21, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-gold-dark);">
+                            <i class="fas fa-star mr-2"></i>Avg Rating</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="avg-rating-value">0.0</span>
                         </div>
-                        <div class="flex text-sm mt-1" id="avg-rating-stars" style="color: var(--seku-gold-dark);"></div>
+                        <div class="flex text-sm mt-1" id="avg-rating-stars" style="color: var(--seku-gold-dark);">
+                        </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Overall experience scores</p>
                     </div>
 
-                    <div
-                        class="col-span-1 border rounded-xl p-4 dark:border-gray-700" style="background-color: rgba(21, 128, 61, 0.05);">
-                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);"><i
-                                class="fas fa-comment-dots mr-2"></i>Actionability</h4>
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(21, 128, 61, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);">
+                            <i class="fas fa-comment-dots mr-2"></i>Actionability</h4>
                         <div class="flex items-center justify-between mb-1">
                             <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
                                 id="actionability-value">0%</span>
                         </div>
                         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
-                            <div id="actionability-bar" class="h-2 rounded-full" style="width: 0%; background-color: var(--seku-green-dark);"></div>
+                            <div id="actionability-bar" class="h-2 rounded-full"
+                                style="width: 0%; background-color: var(--seku-green-dark);"></div>
                         </div>
                         <p class="text-[10px] text-gray-500 mt-2 leading-tight">Feedback with detailed comments</p>
                     </div>
@@ -547,15 +559,15 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-sm">
-                        <h4 class="font-bold mb-4 flex items-center"><i
-                                class="fas fa-users mr-2" style="color: var(--seku-green-dark);"></i>Category Distribution</h4>
+                        <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-users mr-2"
+                                style="color: var(--seku-green-dark);"></i>Category Distribution</h4>
                         <div class="space-y-4" id="category-stats">
                             <!-- Category stats -->
                         </div>
                     </div>
                     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-sm">
-                        <h4 class="font-bold mb-4 flex items-center"><i
-                                class="fas fa-question-circle mr-2" style="color: var(--seku-green-dark);"></i>Top Concerns</h4>
+                        <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-question-circle mr-2"
+                                style="color: var(--seku-green-dark);"></i>Top Concerns</h4>
                         <div class="space-y-4" id="concern-stats">
                             <!-- Concern stats -->
                         </div>
@@ -569,18 +581,21 @@
         </div>
     </div>
 
-    <div id="logs-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="logs-modal" class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in h-[85vh] flex flex-col">
-            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-history mr-2"></i>Activity Log</h3>
                 <button onclick="closeLogsModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="logs-content">
                 <p class="text-center text-gray-400 py-10 italic">Loading logs...</p>
             </div>
-            <div class="px-6 py-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
-                <button onclick="closeLogsModal()" class="btn-seku-primary px-8 py-2.5 rounded-lg shadow-xl font-black uppercase tracking-wider text-sm transition transform hover:scale-105 active:scale-95">
+            <div
+                class="px-6 py-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
+                <button onclick="closeLogsModal()"
+                    class="btn-seku-primary px-8 py-2.5 rounded-lg shadow-xl font-black uppercase tracking-wider text-sm transition transform hover:scale-105 active:scale-95">
                     Close Activity Log
                 </button>
             </div>
@@ -588,18 +603,19 @@
     </div>
 
     <!-- MESSAGE DETAILS MODAL -->
-    <div id="details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="details-modal" class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in h-[85vh] flex flex-col">
-            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl" id="details-title">Message Details</h3>
-                <button onclick="closeDetailsModal()"
-                    class="text-2xl hover:text-green-200 transition">&times;</button>
+                <button onclick="closeDetailsModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="details-content">
                 <!-- Loaded via JS -->
             </div>
-            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
+            <div
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
                 <button onclick="closeDetailsModal()"
                     class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">Close Details</button>
             </div>
@@ -607,11 +623,11 @@
     </div>
 
     <!-- QR CODE MODAL -->
-    <div id="qr-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="qr-modal" class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden fade-in flex flex-col">
-            <div
-                class="px-6 py-4 flex justify-between items-center text-white" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
                 <div>
                     <h3 class="font-bold text-xl"><i class="fas fa-qrcode mr-2"></i>Department Feedback QR</h3>
                     <p class="text-green-100 text-xs mt-0.5">Scan to give feedback directly</p>
@@ -640,7 +656,7 @@
                 </div>
 
                 <!-- URL hint -->
-                <div class="mb-5">
+                <div class="mb-5 hidden">
                     <p class="text-[11px] text-gray-400 dark:text-gray-500 truncate" id="qr-url-hint">Preparing feedback
                         link...</p>
                 </div>
@@ -649,7 +665,7 @@
                 <div class="grid grid-cols-1 gap-3">
                     <button onclick="printQRCode()"
                         class="btn-seku-primary font-bold py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
-                        <i class="fas fa-print text-base"></i> Print QR Poster
+                        <i class="fas fa-print text-base"></i> Print QR Code
                     </button>
                     <button onclick="closeQRModal()"
                         class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2.5 rounded-xl transition-all text-sm">
@@ -660,19 +676,102 @@
         </div>
     </div>
 
+    <!-- PROFILE SETTINGS MODAL -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden fade-in flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl"><i class="fas fa-user-cog mr-2"></i>Profile Settings</h3>
+                <button onclick="closeProfileModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <div class="p-6">
+                <form id="profile-form" onsubmit="updateProfile(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Full Name</label>
+                        <input type="text" id="profile-fullname" required
+                            class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Username</label>
+                        <input type="text" id="profile-username" required
+                            class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Email (Read Only)</label>
+                        <input type="email" id="profile-email" disabled
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border rounded-lg text-gray-500 text-sm">
+                    </div>
+
+                    <div class="pt-4 border-t dark:border-gray-700">
+                        <p class="text-[10px] font-bold text-orange-500 uppercase mb-3">Security Update</p>
+
+                        <div class="mb-3">
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Current Password</label>
+                            <div class="relative">
+                                <input type="password" id="profile-current-password"
+                                    placeholder="Enter current password to make changes"
+                                    class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                                <button type="button" onclick="togglePassVisibility('profile-current-password')"
+                                    class="absolute right-3 top-2 text-gray-400">
+                                    <i class="fas fa-eye" id="profile-current-password-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">New Password</label>
+                                <div class="relative">
+                                    <input type="password" id="profile-new-password" placeholder="Min 8 characters"
+                                        class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                                    <button type="button" onclick="togglePassVisibility('profile-new-password')"
+                                        class="absolute right-3 top-2 text-gray-400">
+                                        <i class="fas fa-eye" id="profile-new-password-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Confirm New
+                                    Password</label>
+                                <div class="relative">
+                                    <input type="password" id="profile-confirm-password"
+                                        class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                                    <button type="button" onclick="togglePassVisibility('profile-confirm-password')"
+                                        class="absolute right-3 top-2 text-gray-400">
+                                        <i class="fas fa-eye" id="profile-confirm-password-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeProfileModal()"
+                            class="px-6 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition font-medium text-sm">Cancel</button>
+                        <button type="submit" id="profile-save-btn"
+                            class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition text-sm">Save
+                            Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- QUESTION MANAGEMENT MODAL -->
-    <div id="questions-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+    <div id="questions-modal"
+        class="hidden fixed inset-0 z-[200000] flex items-center justify-center p-4 modal-backdrop">
         <div
             class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
-            <div class="px-6 py-4 flex justify-between items-center text-white" style="background-color: var(--seku-green-dark);">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
                 <h3 class="font-bold text-xl"><i class="fas fa-question-circle mr-2"></i>Manage Feedback Questions</h3>
-                <button onclick="closeQuestionModal()"
-                    class="text-2xl hover:text-green-200 transition">&times;</button>
+                <button onclick="closeQuestionModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
             </div>
             <div class="p-6 overflow-y-auto flex-grow space-y-6">
                 <!-- Add Question Form -->
-                <div
-                    class="p-4 rounded-xl border border-green-100 dark:border-green-800 mb-6" style="background-color: rgba(34, 197, 94, 0.05);">
+                <div class="p-4 rounded-xl border border-green-100 dark:border-green-800 mb-6"
+                    style="background-color: rgba(34, 197, 94, 0.05);">
                     <h4 class="font-bold mb-3" style="color: var(--seku-green-dark);">Add New Question</h4>
                     <form id="add-question-form" onsubmit="saveNewQuestion(event)" class="space-y-3">
                         <div>
@@ -746,28 +845,22 @@
         let allFeedback = [];
         let filteredFeedback = [];
         let currentPage = 1;
-        let allQuestions = []; // Added for question management
+        let allQuestions = [];
         const itemsPerPage = 8;
         const token = localStorage.getItem("token");
         const deptId = localStorage.getItem("deptId");
-
-        // Auth Check & Session Handle
         if (!token) {
             window.location.href = "login.html";
         }
 
         async function init() {
             document.getElementById("admin-name").textContent = localStorage.getItem("userFullname") || "Admin";
-
-            // Update header text for admin panel
             setTimeout(() => {
                 const headerText = document.getElementById("header-welcome-text");
                 if (headerText) {
                     headerText.textContent = "WELCOME TO ADMIN PANEL DASHBOARD";
                 }
             }, 100);
-
-            // Fetch department name
             try {
                 if (deptId && deptId !== "null") {
                     const res = await fetch("/api/departments");
@@ -786,8 +879,8 @@
                 document.getElementById("dept-title").textContent = "General Admin Panel";
             }
 
-            await loadQuestions(); // Load all questions first for data mapping
-            await loadFeedback(); // Then load feedback once questions are available
+            await loadQuestions();
+            await loadFeedback();
 
             // Session Timer (30 mins activity check)
             let lastInteraction = Date.now();
@@ -837,14 +930,11 @@
          * Excludes open-ended improvement/suggestion questions.
          */
         function getDerivedStatus(f) {
-            // Free-text keywords that indicate a critical issue (msg body only)
             const criticalKeywords = [
                 'crash', 'freeze', 'unresponsive', 'broken', 'not working',
                 'urgent', 'asap', 'emergency', 'critical', 'furious', 'angry',
                 'unacceptable', 'horrible', 'terrible', 'useless', 'worthless'
             ];
-
-            // Rating triggers specifically requested by the user
             // These will match if the answer starts with any of these (e.g. "Poor (Unprofessional)")
             const negativeTriggers = [
                 'poor',
@@ -857,11 +947,7 @@
                 'very difficult',
                 'unprofessional'
             ];
-
-            // Questions to exclude from Top Concern logic
             const excludedKeywords = ['improvement', 'recommend', 'suggestion', 'comments', 'additional', 'which areas', 'area', 'purpose'];
-
-            // 1. Identify "Main Service Rating"
             let mainRating = 'Unrated';
             if (f.rating && f.rating !== 'N/A' && f.rating.trim() !== '') {
                 mainRating = f.rating;
@@ -871,19 +957,14 @@
 
             // 2. Determine "Top Concern"
             let isTopConcern = false;
-
-            // 2a. Message scan
             const msg = (f.message || '').toLowerCase();
             if (criticalKeywords.some(kw => msg.includes(kw))) isTopConcern = true;
-
-            // 2b. Responses scan
             if (!isTopConcern && f.responses && f.responses.length > 0) {
                 for (const resp of f.responses) {
                     const qText = (resp.question_text || '').toLowerCase();
                     if (excludedKeywords.some(kw => qText.includes(kw))) continue;
 
                     const ans = (resp.answer || '').toLowerCase().trim();
-                    // Check if answer starts with a trigger (handles "Poor (Unprofessional)")
                     if (negativeTriggers.some(trig => ans === trig || ans.startsWith(trig + ' ') || ans.startsWith(trig + '('))) {
                         isTopConcern = true;
                         break;
@@ -920,8 +1001,6 @@
 
                 return matchesSearch && matchesStatus;
             });
-
-            // Sort by newest first (time-based only)
             filteredFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             currentPage = 1;
@@ -940,14 +1019,9 @@
                 const isPoor = isTopConcern || mainRating.toLowerCase().includes('poor');
                 const isGood = mainRating.toLowerCase().includes('good') || mainRating.toLowerCase().includes('satisfied');
                 const isExcellent = mainRating.toLowerCase().includes('excellent') || mainRating.toLowerCase().includes('very');
-
-                // 🎯 Determine rating value (Improved fallback)
                 let displayRating = f.rating || f.q_4 || '';
-
-                // Fallback 1: Search in detailed responses for the "Overall" question
                 if ((!displayRating || displayRating === 'N/A') && f.responses && f.responses.length > 0) {
                     const overallResp = f.responses.find(r => {
-                        // Check explicitly for our standard ID 23 first
                         if (r.question_id === 23) return true;
 
                         const qObj = allQuestions.find(q => q.id === r.question_id);
@@ -962,7 +1036,7 @@
                 }
 
                 const ratingLower = displayRating.toLowerCase();
-                let ratingClass = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'; // Default
+                let ratingClass = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
                 let ratingDot = '⚪';
 
                 if (ratingLower.includes('poor')) {
@@ -1041,11 +1115,7 @@
         async function viewDetails(id) {
             const f = allFeedback.find(item => item.id == id);
             if (!f) return;
-
-            // Recalculate derived status for display
             const { mainRating, isTopConcern } = getDerivedStatus(f);
-
-            // Mark as read in backend
             if (!f.is_read) {
                 fetch(`/api/admin/feedback/${id}/read`, {
                     method: 'POST',
@@ -1058,12 +1128,9 @@
 
             if (f.responses && f.responses.length > 0) {
                 f.responses.forEach(resp => {
-                    // Use question_text from backend (populated via Question relationship)
                     // This ensures we always show the CORRECT department's question text,
-                    // not a generic question that happens to share the same DB ID.
                     let qText = resp.question_text;
                     if (!qText) {
-                        // Fallback: look up in locally cached allQuestions
                         const qObj = allQuestions.find(q => q.id === resp.question_id);
                         qText = qObj ? qObj.text : `Question #${resp.question_id}`;
                     }
@@ -1078,7 +1145,6 @@
                     `;
                 });
             } else {
-                // Fallback to old hardcoded fields if they exist (for legacy data)
                 for (let i = 0; i < 5; i++) {
                     const answer = f[`q_${i}`];
                     if (answer && answer !== 'N/A') {
@@ -1236,7 +1302,6 @@
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 let logs = await res.json();
-                // Limit to last 20 records for clarity and performance
                 logs = logs.slice(0, 20);
                 document.getElementById("logs-content").innerHTML = `
                 <div class="space-y-4">
@@ -1279,16 +1344,10 @@
 
         function calculateAnalytics() {
             if (allFeedback.length === 0) return;
-
-            // 1. Sentiment Score (Simple heuristic)
             let positiveSignals = 0;
             let totalSignals = 0;
-
-            // 2. Efficiency (Resolution Rate)
             let resolutionSignals = 0;
             let resolutionTotal = 0;
-
-            // Metrics counters
             let highlyActionableFeedback = 0;
             let anonymousFeedbackCount = 0;
 
@@ -1297,7 +1356,6 @@
             const resolutionWords = ['resolved', 'fix', 'solved', 'helpful', 'solution'];
 
             allFeedback.forEach(f => {
-                // Determine Anonymity
                 if (f.anonymous === 'true' || f.anonymous === true) {
                     anonymousFeedbackCount++;
                 }
@@ -1316,7 +1374,7 @@
 
                 // Yes/No questions (Static)
                 for (let i = 0; i < 5; i++) {
-                    const ans = f[`q_${i}`]; // Removed trailing space bug!
+                    const ans = f[`q_${i}`];
                     if (ans) {
                         totalSignals++;
                         if (positiveWords.some(w => ans.includes(w))) positiveSignals++;
@@ -1328,12 +1386,8 @@
                     f.responses.forEach(r => {
                         const ans = r.answer || '';
                         const qInfo = (r.question_text || '').toLowerCase();
-
-                        // Sentiment
                         totalSignals++;
                         if (positiveWords.some(w => ans.includes(w))) positiveSignals++;
-
-                        // Efficiency (if question seems related to resolution)
                         if (resolutionWords.some(w => qInfo.includes(w))) {
                             resolutionTotal++;
                             if (positiveWords.some(w => ans.includes(w))) resolutionSignals++;
@@ -1345,16 +1399,12 @@
             const sentimentScore = totalSignals > 0 ? Math.round((positiveSignals / totalSignals) * 100) : 0;
             document.getElementById("sentiment-value").textContent = `${sentimentScore}%`;
             document.getElementById("sentiment-bar").style.width = `${sentimentScore}%`;
-
-            // If we found specific resolution questions, use them, otherwise use a simulated fallback heuristic
             const efficiencyScore = resolutionTotal > 0
                 ? Math.round((resolutionSignals / resolutionTotal) * 100)
-                : (sentimentScore > 0 ? Math.min(100, Math.round(sentimentScore * 1.1)) : 0); // Simulated fallback
+                : (sentimentScore > 0 ? Math.min(100, Math.round(sentimentScore * 1.1)) : 0);
 
             document.getElementById("efficiency-value").textContent = `${efficiencyScore}%`;
             document.getElementById("efficiency-bar").style.width = `${efficiencyScore}%`;
-
-            // 3. Average Rating
             const validRatings = allFeedback.filter(f => f.rating && ratingValues[f.rating]);
             const avgRating = validRatings.length > 0
                 ? (validRatings.reduce((acc, f) => acc + ratingValues[f.rating], 0) / validRatings.length).toFixed(1)
@@ -1366,8 +1416,6 @@
                 starsHtml += `<i class="${i <= Math.round(avgRating) ? 'fas' : 'far'} fa-star mr-1"></i>`;
             }
             document.getElementById("avg-rating-stars").innerHTML = starsHtml;
-
-            // 4. Actionability & Anonymity
             const actionabilityScore = Math.round((highlyActionableFeedback / allFeedback.length) * 100);
             document.getElementById("actionability-value").textContent = `${actionabilityScore}%`;
             document.getElementById("actionability-bar").style.width = `${actionabilityScore}%`;
@@ -1375,8 +1423,6 @@
             const anonymityScore = Math.round((anonymousFeedbackCount / allFeedback.length) * 100);
             document.getElementById("anonymity-value").textContent = `${anonymityScore}%`;
             document.getElementById("anonymity-bar").style.width = `${anonymityScore}%`;
-
-            // 4. Category Distribution
             const categories = {};
             allFeedback.forEach(f => categories[f.category] = (categories[f.category] || 0) + 1);
 
@@ -1394,8 +1440,6 @@
                     </div>
                 `;
             }).join('');
-
-            // 5. Concern Analysis (Prioritize items flagged as "Top Concern")
             const highConcernOffices = {};
             const commonKeywords = ['slow', 'rude', 'late', 'missing', 'unhelpful', 'dirty', 'broken', 'difficult', 'poor', 'no'];
             const keywordsFound = {};
@@ -1404,11 +1448,8 @@
                 const { isTopConcern } = getDerivedStatus(f);
 
                 if (isTopConcern) {
-                    // Track by Office
                     const officeName = window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : (f.office || 'General');
                     highConcernOffices[officeName] = (highConcernOffices[officeName] || 0) + 1;
-
-                    // Track Keywords in message
                     if (f.message) {
                         commonKeywords.forEach(kw => {
                             if (f.message.toLowerCase().includes(kw)) {
@@ -1420,8 +1461,6 @@
             });
 
             let topConcernsHtml = '';
-
-            // Show top offices with high concern flags
             const sortedOffices = Object.entries(highConcernOffices).sort((a, b) => b[1] - a[1]).slice(0, 3);
             if (sortedOffices.length > 0) {
                 topConcernsHtml += '<p class="text-[10px] font-bold text-gray-400 uppercase mb-2">High Concern Offices</p>';
@@ -1539,8 +1578,6 @@
             };
 
             let targetSlug = mapping[deptName];
-
-            // Fallback: try case-insensitive mapping or substring match
             if (!targetSlug) {
                 const dLow = deptName.toLowerCase();
                 if (dLow.includes('ict') || dLow.includes('computing')) targetSlug = 'ict-services';
@@ -1557,8 +1594,7 @@
             }
 
             if (targetSlug) {
-                // Found a matching slug for this admin's department
-                window.currentDeptSlug = targetSlug; // Store globally
+                window.currentDeptSlug = targetSlug;
                 Array.from(select.options).forEach(opt => {
                     if (opt.value === targetSlug) {
                         opt.selected = true;
@@ -1585,7 +1621,6 @@
 
         async function loadQuestions() {
             try {
-                // Now fetching the enhanced admin endpoint for all questions
                 const res = await fetch("/api/admin/questions/all", {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
@@ -1593,7 +1628,6 @@
                     allQuestions = await res.json();
                     renderQuestionsList();
                 } else if (res.status === 403) {
-                    // Fallback if endpoint doesn't exist yet but public one does
                     const resPub = await fetch("/api/questions");
                     if (resPub.ok) allQuestions = await resPub.json();
                 }
@@ -1653,7 +1687,6 @@
 
                 if (res.ok) {
                     document.getElementById("add-question-form").reset();
-                    // Re-apply restriction if stored
                     if (window.currentDeptSlug) {
                         const select = document.getElementById("new-q-office");
                         if (select) select.value = window.currentDeptSlug;
@@ -1693,7 +1726,6 @@
 
         // Maps department name / slug to the feedback page filename
         const DEPT_FEEDBACK_SLUG_MAP = {
-            // By slug (used by restrictOfficeSelect)
             'vc-office': 'vc-office-feedback',
             'dvc-academic': 'dvc-academic-feedback',
             'dvc-admin': 'dvc-admin-feedback',
@@ -1760,7 +1792,6 @@
         };
 
         function getDeptFeedbackUrl() {
-            // Dynamically determine the base URL to ensure it works on any hosting environment
             // (localhost, root domain, or subdirectory)
             let basePath = '';
             const path = window.location.pathname;
@@ -1772,11 +1803,9 @@
                 const root = path.substring(0, path.indexOf('/components/pages/'));
                 basePath = window.location.origin + root + '/public/departments/';
             } else {
-                // Determine root dynamically based on current admin.html location
                 const parts = path.split('/');
-                parts.pop(); // remove current file (admin.html)
+                parts.pop();
                 let rootDir = parts.join('/');
-                // If nested in a 'pages' or 'components' directory structure when built
                 if (rootDir.endsWith('/pages')) rootDir = rootDir.replace('/pages', '');
                 if (rootDir.endsWith('/components')) rootDir = rootDir.replace('/components', '');
                 if (rootDir.endsWith('/src')) rootDir = rootDir.replace('/src', '');
@@ -1790,12 +1819,9 @@
             }
 
             let fileSlug = 'index';
-
-            // Priority 1: Use the slug stored by restrictOfficeSelect() during page init
             if (window.currentDeptSlug && DEPT_FEEDBACK_SLUG_MAP[window.currentDeptSlug]) {
                 fileSlug = DEPT_FEEDBACK_SLUG_MAP[window.currentDeptSlug];
             } else {
-                // Priority 2: Derive from the department title on the page
                 const deptTitle = document.getElementById("dept-title")?.textContent?.replace(' Panel', '').trim() || '';
                 if (deptTitle && !['University Wide Panel', 'General Admin Panel', 'Department Admin'].includes(deptTitle)) {
                     const dLow = deptTitle.toLowerCase();
@@ -1814,12 +1840,112 @@
 
         function openQRModal() {
             document.getElementById("qr-modal").classList.remove("hidden");
-            // Auto-generate the QR code for this department immediately
             generateDeptQRCode();
         }
 
         function closeQRModal() {
             document.getElementById("qr-modal").classList.add("hidden");
+        }
+
+        // === Profile Management Functions ===
+        function openProfileModal() {
+            document.getElementById("profile-modal").classList.remove("hidden");
+            document.getElementById("profile-fullname").value = localStorage.getItem("userFullname") || "";
+            document.getElementById("profile-username").value = localStorage.getItem("username") || "";
+            document.getElementById("profile-email").value = localStorage.getItem("userEmail") || "";
+            document.getElementById("profile-current-password").value = "";
+            document.getElementById("profile-new-password").value = "";
+            document.getElementById("profile-confirm-password").value = "";
+        }
+
+        function closeProfileModal() {
+            document.getElementById("profile-modal").classList.add("hidden");
+        }
+
+        function togglePassVisibility(id) {
+            const input = document.getElementById(id);
+            const eye = document.getElementById(id + "-eye");
+            if (input.type === "password") {
+                input.type = "text";
+                eye.classList.remove("fa-eye");
+                eye.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                eye.classList.remove("fa-eye-slash");
+                eye.classList.add("fa-eye");
+            }
+        }
+
+        async function updateProfile(e) {
+            e.preventDefault();
+            const btn = document.getElementById("profile-save-btn");
+            const fullname = document.getElementById("profile-fullname").value.trim();
+            const username = document.getElementById("profile-username").value.trim();
+
+            const currentPassword = document.getElementById("profile-current-password").value;
+            const newPassword = document.getElementById("profile-new-password").value;
+            const confirmPassword = document.getElementById("profile-confirm-password").value;
+            if (newPassword || username !== localStorage.getItem("username") || fullname !== localStorage.getItem("userFullname")) {
+                if (!currentPassword) {
+                    alert("⚠️ Please enter your current password to authorize these changes.");
+                    return;
+                }
+            }
+
+            if (newPassword) {
+                if (newPassword.length < 8) {
+                    alert("⚠️ New password must be at least 8 characters long.");
+                    return;
+                }
+                if (newPassword !== confirmPassword) {
+                    alert("⚠️ New passwords do not match!");
+                    return;
+                }
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Saving...';
+
+            const payload = {
+                fullname,
+                username,
+                current_password: currentPassword || null
+            };
+
+            if (newPassword) {
+                payload.new_password = newPassword;
+            }
+
+            try {
+                const res = await fetch("/api/user/profile", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem("userFullname", data.fullname);
+                    localStorage.setItem("username", data.username);
+                    if (document.getElementById("admin-name")) {
+                        document.getElementById("admin-name").textContent = data.fullname;
+                    }
+                    alert("✅ Profile updated successfully!");
+                    closeProfileModal();
+                } else {
+                    const error = await res.json();
+                    alert("❌ Error: " + (error.detail || "Failed to update profile"));
+                }
+            } catch (err) {
+                console.error(err);
+                alert("❌ Network error. Please try again.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Save Changes';
+            }
         }
 
         function generateDeptQRCode() {
@@ -1829,27 +1955,20 @@
 
             const deptName = document.getElementById("dept-title")?.textContent?.replace(' Panel', '').trim() || 'Feedback';
             const feedbackUrl = getDeptFeedbackUrl();
-
-            // Update labels
             if (deptLabel) deptLabel.innerHTML = `<i class="fas fa-building mr-1"></i> ${deptName}`;
             if (urlHint) urlHint.textContent = feedbackUrl;
-
-            // Clear container
             container.innerHTML = '';
 
             try {
-                // Generate QR code automatically using the local qrcode.js library
 
                 const qrcode = new QRCode(container, {
                     text: feedbackUrl,
                     width: 200,
                     height: 200,
-                    colorDark: "#be185d",
+                    colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.M
                 });
-
-                // qrcode.js generates a canvas and an img tag. Wait brief moment for it to render
                 setTimeout(() => {
                     const canvas = container.querySelector('canvas');
                     const img = container.querySelector('img');
@@ -1897,16 +2016,27 @@
                             padding: 20px;
                         }
                         .poster {
-                            border: 8px solid #be185d;
-                            border-radius: 28px;
-                            padding: 36px 40px;
+                            border: 10px solid #15803d;
+                            border-radius: 40px;
+                            padding: 40px;
                             text-align: center;
-                            max-width: 480px;
+                            max-width: 550px;
                             width: 100%;
+                            position: relative;
+                            background: white;
+                            box-shadow: 0 0 0 5px #FACC15 inset;
+                        }
+                        .logo-img {
+                            height: 100px;
+                            width: auto;
+                            margin-bottom: 20px;
+                            display: block;
+                            margin-left: auto;
+                            margin-right: auto;
                         }
                         .university-logo {
-                            color: #1e3a5f;
-                            font-size: 13px;
+                            color: #15803d;
+                            font-size: 16px;
                             font-weight: 800;
                             text-transform: uppercase;
                             letter-spacing: 2px;
@@ -1914,78 +2044,80 @@
                         }
                         .university-sub {
                             color: #6b7280;
-                            font-size: 10px;
+                            font-size: 11px;
                             text-transform: uppercase;
-                            letter-spacing: 1px;
-                            margin-bottom: 18px;
+                            letter-spacing: 1.5px;
+                            margin-bottom: 24px;
+                            font-weight: 600;
                         }
                         .divider {
                             border: none;
-                            border-top: 2px solid #fce7f3;
-                            margin: 14px 0;
+                            border-top: 3px solid #FACC15;
+                            margin: 20px auto;
+                            width: 60%;
                         }
                         .heading {
-                            color: #be185d;
-                            font-size: 22px;
+                            color: #15803d;
+                            font-size: 28px;
                             font-weight: 900;
                             text-transform: uppercase;
                             letter-spacing: 1px;
-                            margin-bottom: 4px;
+                            margin-bottom: 8px;
                         }
                         .subheading {
-                            color: #6b7280;
-                            font-size: 13px;
-                            margin-bottom: 20px;
+                            color: #4b5563;
+                            font-size: 15px;
+                            margin-bottom: 25px;
+                            font-weight: 500;
                         }
                         .qr-wrap {
-                            background: #fdf2f8;
-                            border-radius: 16px;
-                            padding: 16px;
+                            background: #f0fdf4;
+                            border: 2px solid #15803d;
+                            border-radius: 20px;
+                            padding: 20px;
                             display: inline-block;
-                            margin-bottom: 20px;
+                            margin-bottom: 25px;
                         }
                         .qr-wrap img {
-                            width: 260px;
-                            height: 260px;
+                            width: 280px;
+                            height: 280px;
                             display: block;
                         }
                         .dept-name {
-                            font-size: 20px;
+                            font-size: 24px;
                             font-weight: 900;
-                            color: #1e3a5f;
-                            margin-bottom: 6px;
-                        }
-                        .url-label {
-                            font-size: 10px;
-                            color: #9ca3af;
-                            word-break: break-all;
-                            margin-bottom: 18px;
+                            color: #15803d;
+                            margin-bottom: 10px;
+                            background: #fefce8;
+                            padding: 10px;
+                            border-radius: 12px;
                         }
                         .footer-note {
-                            font-size: 11px;
-                            color: #9ca3af;
-                            border-top: 1px solid #f3f4f6;
-                            padding-top: 14px;
-                            margin-top: 4px;
+                            font-size: 12px;
+                            color: #6b7280;
+                            border-top: 1px solid #e5e7eb;
+                            padding-top: 20px;
+                            margin-top: 10px;
+                            font-style: italic;
                         }
                         @media print {
                             body { padding: 0; }
+                            .poster { box-shadow: none; border-width: 15px; }
                         }
                     </style>
                 </head>
-                <body onload="window.print();">
+                <body onload="setTimeout(() => window.print(), 500);">
                     <div class="poster">
+                        <img src="/uploads/logo.png" class="logo-img" alt="SEKU Logo">
                         <div class="university-logo">South Eastern Kenya University</div>
-                        <div class="university-sub">SEKU &bull; Customer Feedback System</div>
+                        <div class="university-sub">${deptName} &bull; Customer Feedback</div>
                         <hr class="divider">
-                        <p class="heading">Scan to Give Feedback</p>
-                        <p class="subheading">Point your phone camera at the QR code below</p>
+                        <p class="heading">Scan to Rate Us</p>
                         <div class="qr-wrap">
                             <img src="${img.src}" alt="Feedback QR Code">
                         </div>
                         <div class="dept-name">${deptName}</div>
-                        <div class="url-label">${feedbackUrl}</div>
-                        <div class="footer-note">Your feedback is confidential and helps us improve. &bull; University Quality Assurance</div>
+                        <div class="footer-note">Your feedback is confidential and helps us improve our services. &bull; ARPE Compliant</div>
                     </div>
                 </body>
                 </html>

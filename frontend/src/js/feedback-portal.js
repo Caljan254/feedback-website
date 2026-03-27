@@ -2,7 +2,6 @@
 
 class FeedbackPortal {
     constructor() {
-        // Expose instance EARLY so methods called during init can find it
         window.feedbackPortal = this;
         this.init();
     }
@@ -26,98 +25,13 @@ class FeedbackPortal {
 
     // Initialize content protection to prevent copying
     initializeContentProtection() {
-        const isFormElement = (el) => {
-            if (!el) return false;
-            const tag = el.tagName;
-            return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || el.isContentEditable;
-        };
-
-        // Inject CSS to disable text selection globally
-        const style = document.createElement('style');
-        style.innerHTML = `
-            body {
-                -webkit-touch-callout: none;
-                -webkit-user-select: none;
-                -khtml-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-            }
-            input, textarea, select, [contenteditable] {
-                -webkit-touch-callout: default;
-                -webkit-user-select: auto;
-                -khtml-user-select: auto;
-                -moz-user-select: auto;
-                -ms-user-select: auto;
-                user-select: auto;
-            }
-        `;
-        document.head.appendChild(style);
-
-        // Disable right-click
-        document.addEventListener('contextmenu', e => {
-            if (!isFormElement(e.target)) e.preventDefault();
-        });
-        
-        // Disable text selection via JS as a fallback
-        document.addEventListener('selectstart', e => {
-            if (!isFormElement(e.target)) {
-                e.preventDefault();
-            }
-        });
-        
-        // Disable dragging of images and text
-        document.addEventListener('dragstart', e => {
-            if (e.target.tagName === 'IMG' || !isFormElement(e.target)) {
-                e.preventDefault();
-            }
-        });
-        
-        // Disable copy and cut
-        document.addEventListener('copy', e => {
-            if (!isFormElement(e.target)) e.preventDefault();
-        });
-        document.addEventListener('cut', e => {
-            if (!isFormElement(e.target)) e.preventDefault();
-        });
-        
-        // Disable common inspect shortcuts and copy shortcuts
-        document.addEventListener('keydown', e => {
-            // F12
-            if (e.key === 'F12') {
-                e.preventDefault();
-            }
-            
-            if (e.ctrlKey || e.metaKey) {
-                const key = e.key.toLowerCase();
-                // Prevent View Source (Ctrl+U), Print (Ctrl+P), Save (Ctrl+S) globally
-                if (['u', 'p', 's'].includes(key)) {
-                    e.preventDefault();
-                }
-                
-                // Prevent Copy (Ctrl+C), Cut (Ctrl+X), Select All (Ctrl+A) if not in form element
-                if (['c', 'x', 'a'].includes(key)) {
-                    if (!isFormElement(e.target)) {
-                        e.preventDefault();
-                    }
-                }
-                
-                // Prevent Developer Tools (Ctrl+Shift+I/J/C)
-                if (e.shiftKey && ['i', 'j', 'c'].includes(key)) {
-                    e.preventDefault();
-                }
-            }
-        });
     }
 
     // Update logo based on office
     updateLogoForOffice() {
-        // Wait for header to load
         setTimeout(() => {
             const headerLogo = document.getElementById('main-header-logo');
             if (!headerLogo) return;
-            
-            // Reverted conditional logic: ALWAYS use ICT logo for consistent branding across all feedback offices
             headerLogo.src = '/uploads/ict-logo.png';
             headerLogo.className = 'h-10 sm:h-16 md:h-24 w-auto max-w-[180px] sm:max-w-[400px] md:max-w-2xl object-contain py-1';
         }, 300);
@@ -137,8 +51,6 @@ class FeedbackPortal {
     // Initialize functions specific to current page
     initializePageSpecificFunctions() {
         const currentPath = window.location.pathname;
-        
-        // Check if we're on a department feedback page (served from /departments/ in Vite)
         if (currentPath.includes('/departments/')) {
             this.initializeDepartmentPage();
         }
@@ -152,12 +64,8 @@ class FeedbackPortal {
     // Initialize home page functions
     initializeHomePage() {
         console.log('Home page initialized');
-        
-        // Reset any stored feedback data when coming back to home
         sessionStorage.removeItem('feedbackUserInfo');
         sessionStorage.removeItem('selectedOffice');
-        
-        // Initialize office selection dropdown
         this.initializeOfficeSelection();
     }
 
@@ -172,8 +80,6 @@ class FeedbackPortal {
     // Initialize department page
     initializeDepartmentPage() {
         console.log('Department page initialized');
-        
-        // Check if user info exists, if not redirect back to home
         const userInfo = this.getUserInfo();
         if (!userInfo) {
             this.showNotification('Please select an office first', 'error');
@@ -186,14 +92,8 @@ class FeedbackPortal {
         // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const office = urlParams.get('office');
-        
-        // Display user info
         this.displayUserInfo(userInfo);
-        
-        // Set up form submission handler
         this.setupDepartmentFormSubmission();
-        
-        // Update page title and heading
         if (office) {
             const officeName = this.getOfficeName(office);
             document.title = `${officeName} Feedback - University Feedback Portal`;
@@ -212,7 +112,6 @@ class FeedbackPortal {
         if (!questionsContainer) return;
 
         try {
-            // Fetch dynamic questions from backend
             const res = await fetch(`/api/questions?office=${officeId}`);
             const questions = await res.json();
             
@@ -250,7 +149,6 @@ class FeedbackPortal {
 
     // Get questions based on office category
     getDepartmentQuestions(officeId) {
-        // Category mapping
         const categories = {
             'management': ['vc-office', 'dvc-academic', 'dvc-admin', 'registrar-academic', 'registrar-admin', 'council-office', 'legal-services', 'corp-comm'],
             'academic': ['admissions', 'academic-registry', 'exams-office', 'timetabling', 'research-postgrad', 'quality-assurance', 'industrial-attachment', 'elearning'],
@@ -291,8 +189,6 @@ class FeedbackPortal {
                 { q: "Was the engagement productive?", options: ["Yes", "No"] }
             ]
         };
-
-        // Specific overrides
         if (officeId === 'admissions') {
             return [
                 { q: "What type of application is this feedback about?", options: ["Undergraduate", "Postgraduate", "Transfer", "International", "Scholarship"] },
@@ -337,7 +233,7 @@ class FeedbackPortal {
         return [
             { q: "Was the staff helpful?", options: ["Yes", "No"] },
             { q: "Was your issue resolved efficiently?", options: ["Yes", "No"] }
-        ]; // Default
+        ];
     }
 
     // Get human-readable office name
@@ -484,26 +380,20 @@ class FeedbackPortal {
         const isCurrentlyVisible = this.mobileMenu.style.display !== 'none';
         
         if (!isCurrentlyVisible) {
-            // SHOW THE MENU
             this.mobileMenu.style.display = 'block';
             this.mobileMenuOverlay.style.display = 'block';
             document.body.style.overflow = 'hidden';
-            
-            // Allow display change to settle before animating
             setTimeout(() => {
                 this.mobileMenu.classList.remove('translate-x-full');
             }, 10);
             
             if (this.hamburgerBtn) this.hamburgerBtn.setAttribute('aria-expanded', 'true');
         } else {
-            // HIDE THE MENU
             this.mobileMenu.classList.add('translate-x-full');
             this.mobileMenuOverlay.style.display = 'none';
             document.body.style.overflow = '';
             
             if (this.hamburgerBtn) this.hamburgerBtn.setAttribute('aria-expanded', 'false');
-            
-            // Wait for transition to finish before hiding display
             setTimeout(() => {
                 this.mobileMenu.style.display = 'none';
             }, 300);
@@ -603,7 +493,7 @@ class FeedbackPortal {
         
         const notification = document.createElement('div');
         notification.className = `notification ${type} pointer-events-auto`;
-        notification.style.pointerEvents = 'auto'; // Explicitly set to override container
+        notification.style.pointerEvents = 'auto';
 
         let icon = '';
         if (type === 'success') icon = '<i class="fas fa-check-circle notification-icon"></i>';
@@ -649,8 +539,6 @@ class FeedbackPortal {
         
         let infoHtml = '<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">';
         infoHtml += '<div><span class="font-semibold">Feedback for:</span> ' + (userInfo.name || 'Anonymous User') + '</div>';
-        
-        // Remove Category: Anonymous as per user request
         if (userInfo.category && userInfo.category !== 'Anonymous') {
             infoHtml += '<div><span class="font-semibold">Category:</span> ' + userInfo.category + '</div>';
         }
@@ -675,8 +563,6 @@ class FeedbackPortal {
     async handleDepartmentFormSubmit(e) {
         e.preventDefault();
         const form = e.target;
-
-        // ─── CLIENT-SIDE VALIDATION ───────────────────────────────────────────
         // 1. Check every dynamic-question-block radio group (Validate all in form)
         const allQuestionBlocks = Array.from(document.querySelectorAll('.dynamic-question-block'));
         const visibleQuestionBlocks = allQuestionBlocks.filter(block => block.offsetParent !== null);
@@ -698,7 +584,6 @@ class FeedbackPortal {
                 if (!isChecked) {
                     answered = false;
                 } else {
-                    // Check visible text inputs within this block (e.g. for "Other" options)
                     visibleTextInputs.forEach(ti => {
                         if (ti.offsetParent !== null && !ti.value.trim()) {
                             answered = false;
@@ -710,7 +595,6 @@ class FeedbackPortal {
             }
 
             if (!answered) {
-                // Highlight only if visible
                 if (block.offsetParent !== null) {
                     block.classList.add('ring-2', 'ring-red-500', 'p-2', 'rounded-lg');
                     if (!firstUnanswered) firstUnanswered = block;
@@ -719,11 +603,9 @@ class FeedbackPortal {
                 block.classList.remove('ring-2', 'ring-red-500', 'p-2');
             }
         });
-
-        // 2. Check required textareas and text inputs
         let firstEmptyRequired = null;
         const requiredInputs = Array.from(form.querySelectorAll('textarea[required], input[required]:not([type="radio"]):not([type="hidden"])'))
-            .filter(el => el.offsetParent !== null); // Standard check for visible fields
+            .filter(el => el.offsetParent !== null);
         
         requiredInputs.forEach(el => {
             if (!el.value.trim()) {
@@ -733,10 +615,7 @@ class FeedbackPortal {
                 el.classList.remove('ring-2', 'ring-red-500');
             }
         });
-
-        // 3. Report errors (Only for VISIBLE fields on the final step, assuming Alpine handled previous ones)
         if (firstUnanswered || firstEmptyRequired) {
-             // If Alpine is used for steps, standard validation usually catches this, 
              // but we keep it as a safety net for visible fields.
              if (firstUnanswered || firstEmptyRequired) {
                 this.showNotification('⚠️ Please answer all questions on this page.', 'error');
@@ -760,8 +639,6 @@ class FeedbackPortal {
         allQuestionBlocks.forEach(block => {
             const questionId = block.getAttribute('data-question-id');
             if (!questionId) return;
-
-            // 1. Get visible question text (ground truth label)
             let visibleQuestionText = '';
             const pEl = block.querySelector('p');
             const labelEl = block.querySelector('label.font-semibold, label.block');
@@ -777,8 +654,6 @@ class FeedbackPortal {
             if (!visibleQuestionText) visibleQuestionText = `Question #${questionId}`;
 
             let answer = null;
-
-            // 2. Determine Answer based on input types
             const radios = block.querySelectorAll('input[type="radio"]');
             const checks = block.querySelectorAll('input[type="checkbox"]');
             const textarea = block.querySelector('textarea');
@@ -789,7 +664,6 @@ class FeedbackPortal {
             } else if (checks.length > 0) {
                 const checkedOnes = Array.from(checks).filter(c => c.checked).map(c => c.value);
                 if (checkedOnes.length > 0) {
-                    // Include 'Other' text if present
                     const otherInput = block.querySelector('input[type="text"]');
                     const formattedAnswers = checkedOnes.map(v => {
                         if (v === 'other' && otherInput && otherInput.value.trim()) {
@@ -816,24 +690,18 @@ class FeedbackPortal {
         const userInfo = this.getUserInfo();
         const urlParams = new URLSearchParams(window.location.search);
         const office = urlParams.get('office') || 'unknown';
-
-        // Improved data aggregation
         const finalData = {
-            // Spread formValues first, so explicit properties below can override them
             ...formValues,
             name: userInfo?.anonymous ? null : (userInfo?.name || null),
             email: userInfo?.anonymous ? null : (userInfo?.email || null),
             category: userInfo?.category || '',
             office: office,
             anonymous: userInfo?.anonymous ? "true" : "false",
-            // Priority for rating: explicit rating field -> q_4 field -> fallbacks
             rating: formValues.rating || formValues.q_4 || formValues.dq_23 || '',
             message: formValues.comment || formValues.message || '',
             dynamic_responses: dynamicResponses,
             timestamp: new Date().toISOString()
         };
-
-        // Advanced Fallback for rating: check dynamic responses if still empty
         if (!finalData.rating || finalData.rating === '') {
             const ratingResponse = dynamicResponses.find(r => 
                 r.question_id === 23 || 
@@ -848,11 +716,7 @@ class FeedbackPortal {
 
         try {
             const loadingNotification = this.showNotification('Submitting your feedback...', 'info', 0);
-            
-            // Artificial delay to ensure user sees the loading state
             await new Promise(resolve => setTimeout(resolve, 2000));
-
-            // Include Authorization header if user is logged in
             const headers = { 
                 "Content-Type": "application/json", 
                 "Accept": "application/json" 
@@ -873,8 +737,6 @@ class FeedbackPortal {
             if (res.ok) {
                 const result = await res.json();
                 const trackingId = result.tracking_id || 'N/A';
-                
-                // Show persistent success notification with copy button
                 this.showNotification(`
                     <div class="flex flex-col gap-3 pointer-events-auto">
                         <div class="flex items-center">
@@ -901,7 +763,7 @@ class FeedbackPortal {
                             </button>
                         </div>
                     </div>
-                `, 'success', 0); // 0 duration means it stays until clicked/dismissed
+                `, 'success', 0);
                 
                 // Set up automatic redirect timer
                 let timeLeft = 15;
@@ -915,13 +777,10 @@ class FeedbackPortal {
                         clearInterval(timerInterval);
                         window.location.href = '/src/components/pages/home.html';
                     }
-                }, 1000);                
-                // Save to history with server timestamp
+                }, 1000);
                 this.saveTrackingIdToHistory(trackingId, office, result.created_at);
                 
                 form.reset();
-                
-                // Clear session storage after successful submission
                 sessionStorage.removeItem('feedbackUserInfo');
                 sessionStorage.removeItem('selectedOffice');
             } else {
@@ -972,9 +831,7 @@ class FeedbackPortal {
             if (categoryEl && !categoryEl.value) {
                 const role = localStorage.getItem('userRole');
                 if (role) {
-                    // Try to match the dropdown value (e.g., 'Staff', 'Student', 'Visitor')
                     const formattedRole = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
-                    // Basic mapping
                     const options = Array.from(categoryEl.options).map(opt => opt.value);
                     if (options.includes(formattedRole)) {
                         categoryEl.value = formattedRole;
@@ -1039,12 +896,8 @@ class FeedbackPortal {
             office: office,
             anonymous: anonymous ? true : false
         };
-
-        // Store user info in sessionStorage
         sessionStorage.setItem('feedbackUserInfo', JSON.stringify(userInfo));
         sessionStorage.setItem('selectedOffice', office);
-
-        // Get the office file mapping (pointing to public/departments/)
         const officeFiles = {
             'academic-registry': 'academic-registry-feedback.html',
             'accounts-office': 'accounts-office-feedback.html',
@@ -1110,15 +963,12 @@ class FeedbackPortal {
             'transport': 'transport-feedback.html',
             'vc-office': 'vc-office-feedback.html'
 };
-
-        // Redirect to department page (served from public folder in Vite)
         const fileName = officeFiles[office] || 'generic-feedback.html';
         window.location.href = `/departments/${fileName}?office=${office}`;
     }
 
     // ===== EVENT LISTENERS =====
     initializeEventListeners() {
-        // User info form submission
         const userInfoForm = document.getElementById('user-info-form');
         if (userInfoForm) {
             userInfoForm.removeEventListener('submit', this.userInfoSubmitHandler);
@@ -1148,14 +998,11 @@ class FeedbackPortal {
     // ===== UI ENHANCEMENTS =====
     highlightActiveNavLink() {
         const currentPath = window.location.pathname;
-        // In Vite, currentPath might be '/', '/src/components/pages/home.html', or '/departments/...'
         
         const navLinks = document.querySelectorAll('.nav-link');
         navLinks.forEach(link => {
             const href = link.getAttribute('href');
             if (!href) return;
-            
-            // Normalize current path
             let normalizedPath = currentPath;
             if (currentPath === '/' || currentPath === '/index.html') {
                 normalizedPath = '/src/components/pages/home.html';
@@ -1168,8 +1015,6 @@ class FeedbackPortal {
             }
             
             link.classList.remove('active');
-            
-            // Match if paths are same or if the filename matches (for relative links)
             const currentFile = normalizedPath.split('/').pop();
             const hrefFile = normalizedHref.split('/').pop();
             
@@ -1224,16 +1069,13 @@ class FeedbackPortal {
     saveTrackingIdToHistory(id, office, timestamp = null) {
         try {
             let history = JSON.parse(localStorage.getItem('feedback_history') || '[]');
-            // Remove if already exists (to move to top)
             history = history.filter(item => item.id !== id);
-            // Add to top
             history.unshift({
                 id: id,
                 office: office,
                 officeName: this.getOfficeName(office),
                 date: timestamp || new Date().toISOString()
             });
-            // Keep only last 10
             history = history.slice(0, 10);
             localStorage.setItem('feedback_history', JSON.stringify(history));
         } catch (e) {
@@ -1279,8 +1121,6 @@ class FeedbackPortal {
             publicLinks.forEach(link => {
                 link.style.setProperty('display', 'none', 'important');
             });
-
-            // Update welcome text for admin panel
             const welcomeText = document.getElementById('header-welcome-text');
             if (welcomeText) {
                 welcomeText.innerText = 'Welcome to admin panel, Customer Feedback System';
@@ -1313,7 +1153,6 @@ class FeedbackPortal {
             const timestamp = el.getAttribute('data-timestamp');
             if (timestamp) {
                 el.innerText = this.formatRelativeTime(timestamp);
-                // Optional: add title with full date
                 if (!el.getAttribute('title')) {
                     el.setAttribute('title', new Date(timestamp).toLocaleString());
                 }
@@ -1322,10 +1161,7 @@ class FeedbackPortal {
     }
 
     startTimestampUpdater() {
-        // Update immediately
         this.updateAllTimestamps();
-        
-        // Clear existing interval if any
         if (this.timeUpdateInterval) {
             clearInterval(this.timeUpdateInterval);
         }
@@ -1341,8 +1177,6 @@ class FeedbackPortal {
 document.addEventListener('DOMContentLoaded', () => {
     new FeedbackPortal();
 });
-
-// Legacy global functions for onclick attributes
 function toggleMobileMenu() { window.feedbackPortal?.toggleMobileMenu(); }
 function toggleDarkMode() { window.feedbackPortal?.toggleDarkMode(); }
 function startFeedbackProcess() { window.feedbackPortal?.startFeedbackProcess(); }

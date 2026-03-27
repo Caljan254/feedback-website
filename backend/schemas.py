@@ -24,6 +24,13 @@ class UserOut(BaseModel):
         from_attributes = True
 
 
+class UserUpdate(BaseModel):
+    fullname: Optional[str] = None
+    username: Optional[str] = None
+    current_password: Optional[str] = None
+    new_password: Optional[str] = None
+
+
 # Enhanced JWT Token schema with user info
 class Token(BaseModel):
     access_token: str

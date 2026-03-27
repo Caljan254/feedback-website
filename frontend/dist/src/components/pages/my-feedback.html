@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <link rel="icon" type="image/x-icon" href="../../../favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.warning {
+            background-color: #F59E0B;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .notification-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .notification-close {
+            margin-left: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .feedback-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .feedback-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-card.unread {
+            border-left-color: #3B82F6;
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .feedback-card.read {
+            border-left-color: #10B981;
+        }
+
+        .feedback-card.answered {
+            border-left-color: #8B5CF6;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-answered {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .dark .status-answered {
+            background-color: #064e3b;
+            color: #a7f3d0;
+        }
+
+        .status-unanswered {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .dark .status-unanswered {
+            background-color: #78350f;
+            color: #fcd34d;
+        }
+
+        .status-read {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .dark .status-read {
+            background-color: #1e3a8a;
+            color: #93c5fd;
+        }
+
+        .status-unread {
+            background-color: #f3f4f6;
+            color: #374151;
+        }
+
+        .dark .status-unread {
+            background-color: #374151;
+            color: #d1d5db;
+        }
+
+        .reply-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .reply-badge.has-reply {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .dark .reply-badge.has-reply {
+            background-color: #0c4a6e;
+            color: #bae6fd;
+        }
+
+        .message-preview {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: rgba(243, 244, 246, 0.5);
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .dark .message-preview {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+
+        .reply-section {
+            background-color: #f0fdf4;
+            border-left: 3px solid #10B981;
+        }
+
+        .dark .reply-section {
+            background-color: #064e3b;
+            border-left-color: #34d399;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #10B981;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        .refresh-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        /* Custom scrollbar for better visibility */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #10B981;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #059669;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #374151;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #10B981;
+        }
+
+        /* Ensure modal content is properly contained */
+        #feedback-modal .flex.flex-col {
+            max-height: 90vh;
+        }
+
+        /* Smooth scrolling */
+        .custom-scrollbar {
+            scroll-behavior: smooth;
+        }
+
+        /* Ensure long words break and don't overflow */
+        .break-words {
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .whitespace-pre-wrap {
+            white-space: pre-wrap;
+        }
+
+        /* Message preview in modal */
+        .message-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            #feedback-modal .flex.flex-col {
+                max-height: 95vh;
+            }
+
+            .custom-scrollbar {
+                max-height: calc(95vh - 150px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper max-w-6xl mx-auto px-4 pt-4 pb-4">
+        <!-- Notification Container -->
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+
+        <!-- Page Title with Refresh Button -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-bold text-green-700 dark:text-green-400 mb-2">My Feedback History
+                </h1>
+                <p id="user-greeting" class="text-gray-600 dark:text-gray-400">Track your feedback and see admin
+                    responses</p>
+            </div>
+            <button onclick="loadUserFeedback()"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow transition flex items-center">
+                <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>
+                Refresh
+            </button>
+        </div>
+
+        <!-- Login Prompt (shown when not logged in) -->
+        <div id="login-prompt"
+            class="hidden bg-yellow-50 dark:bg-yellow-900 border-l-4 border-yellow-400 p-4 mb-6 rounded-lg">
+            <div class="flex items-center">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <!-- <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                        Please <a href="/src/components/pages/login.html"
+                        class="font-medium underline text-yellow-700 dark:text-yellow-200
+                        hover:text-yellow-600">login</a>
+                        to view your feedback history automatically, or use the guest tracking below.
+                    </p> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Guest Tracking Form (shown when not logged in) -->
+        <div id="guest-tracking-section"
+            class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6 border-t-4 border-green-500">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-2">Track Guest Feedback</h2>
+                    <p class="text-gray-600 dark:text-gray-400 text-sm">Enter the email address or Reference Number
+                        (e.g., REF-ABC12345) used when submitting your feedback.</p>
+                </div>
+                <div class="flex-1 max-w-md w-full">
+                    <div class="flex gap-2">
+                        <div class="relative flex-grow">
+                            <input type="text" id="guest-tracking-input" placeholder="Email or Reference Number"
+                                class="w-full px-4 py-2 pl-10 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 transition-all text-sm">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <button onclick="trackGuestFeedback()"
+                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all shadow-md hover:shadow-lg flex items-center whitespace-nowrap">
+                            <i class="fas fa-search mr-2"></i> Track
+                        </button>
+                    </div>
+                    <p id="guest-tracking-error" class="text-red-500 text-xs mt-2 hidden"></p>
+                </div>
+            </div>
+
+            <!-- Recent Tracking IDs (Help for users who forgot to save them) -->
+            <div id="recent-tracking-ids" class="mt-6 pt-6 border-t dark:border-gray-700 hidden">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                        <i class="fas fa-history mr-2"></i>Recent Reference Numbers (Autosaved)
+                    </h3>
+                    <button onclick="clearAllRecentIds()" class="text-[10px] text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-bold uppercase tracking-tighter transition-colors">
+                        <i class="fas fa-trash-alt mr-1"></i>Clear History
+                    </button>
+                </div>
+                <div id="recent-ids-container" class="flex flex-wrap gap-2">
+                    <!-- Loaded via JS -->
+                </div>
+                <p class="text-[10px] text-gray-400 mt-2 italic">These are saved locally on this browser to help you
+                    find IDs you might have forgotten to copy.</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards (shown when logged in) -->
+        <div id="stats-cards" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-blue-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Total Feedback</h3>
+                <p id="user-total-feedback" class="text-3xl font-bold text-blue-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-yellow-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Unread</h3>
+                <p id="user-unread-feedback" class="text-3xl font-bold text-yellow-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-green-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Answered</h3>
+                <p id="user-answered-feedback" class="text-3xl font-bold text-green-600">0</p>
+            </div>
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow text-center border-l-4 border-purple-500">
+                <h3 class="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Read</h3>
+                <p id="user-read-feedback" class="text-3xl font-bold text-purple-600">0</p>
+            </div>
+        </div>
+
+        <!-- Filter Controls -->
+        <div id="filter-section" class="hidden mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex flex-wrap gap-4 items-center">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by
+                        Status</label>
+                    <select id="status-filter"
+                        class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-40">
+                        <option value="all">All</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                        <option value="unanswered">Pending Reply</option>
+                        <option value="answered">Replied</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Filter by
+                        Office</label>
+                    <select id="office-filter"
+                        class="bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-48">
+                        <option value="all">All Offices</option>
+
+                        <!-- Management -->
+                        <optgroup label="Management">
+                            <option value="vc-office">VC's Office</option>
+                            <option value="dvc-academic">DVC Academic</option>
+                            <option value="dvc-admin">DVC Admin</option>
+                            <option value="registrar-academic">Registrar Academic</option>
+                            <option value="registrar-admin">Registrar Admin</option>
+                            <option value="council-office">Council Office</option>
+                            <option value="legal-services">Legal Services</option>
+                            <option value="corp-comm">Corp Comm / PR</option>
+                        </optgroup>
+
+                        <!-- Academic -->
+                        <optgroup label="Academic Affairs">
+                            <option value="admissions">Admissions</option>
+                            <option value="academic-registry">Registry</option>
+                            <option value="exams-office">Exams Office</option>
+                            <option value="timetabling">Timetabling</option>
+                            <option value="research-postgrad">Research/Postgrad</option>
+                            <option value="quality-assurance">Quality Assurance</option>
+                            <option value="industrial-attachment">Attachment Office</option>
+                            <option value="elearning">e-Learning</option>
+                        </optgroup>
+
+                        <!-- Schools -->
+                        <optgroup label="Schools & Departments">
+                            <option value="ssc-dean">Dean, SSC</option>
+                            <option value="dept-math">Math Dept</option>
+                            <option value="dept-ict">ICT Dept</option>
+                            <option value="dept-physical">Physical Sciences</option>
+                            <option value="dept-biological">Biological Sciences</option>
+                            <option value="set-dean">Dean, Engineering</option>
+                            <option value="dept-civil">Civil Eng</option>
+                            <option value="dept-elec">Electrical Eng</option>
+                            <option value="dept-mech">Mechanical Eng</option>
+                            <option value="sbe-dean">Dean, Business</option>
+                            <option value="dept-admin">Business Admin</option>
+                            <option value="dept-accounting">Accounting & Finance</option>
+                            <option value="dept-economics">Economics Dept</option>
+                            <option value="seh-dean">Dean, Education</option>
+                            <option value="dept-edu">Education Studies</option>
+                            <option value="dept-social">Social Sciences</option>
+                            <option value="dept-humanities">Humanities Dept</option>
+                            <option value="sanr-dean">Dean, Agriculture</option>
+                            <option value="dept-env">Environmental Science</option>
+                            <option value="dept-agri">Agricultural Sciences</option>
+                        </optgroup>
+
+                        <!-- Student Affairs -->
+                        <optgroup label="Student Affairs">
+                            <option value="dean-students">Dean of Students</option>
+                            <option value="student-affairs">Student Affairs</option>
+                            <option value="counselling">Counselling</option>
+                            <option value="chaplaincy">Chaplaincy</option>
+                            <option value="career-guidance">Career Guidance</option>
+                            <option value="games">Games & Sports</option>
+                            <option value="student-clubs">Student Clubs</option>
+                        </optgroup>
+
+                        <!-- Finance & Support -->
+                        <optgroup label="Finance & Support">
+                            <option value="finance">Finance</option>
+                            <option value="fees-office">Fees Office</option>
+                            <option value="accounts-office">Accounts Office</option>
+                            <option value="procurement">Procurement</option>
+                            <option value="hr-office">HR Office</option>
+                            <option value="library">Library</option>
+                            <option value="ict-services">Directorate Of ICT</option>
+                            <option value="health-unit">Health Unit</option>
+                            <option value="hostel">Hostel</option>
+                            <option value="catering">Catering</option>
+                            <option value="security">Security</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="flex items-end space-x-2">
+                    <button onclick="applyFilters()"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow transition h-10">
+                        <i class="fas fa-filter mr-2"></i>Apply
+                    </button>
+                    <button onclick="clearFilters()"
+                        class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded shadow transition h-10">
+                        <i class="fas fa-times mr-2"></i>Clear
+                    </button>
+                </div>
+
+                <div class="flex items-end ml-auto">
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <span id="filter-count">Showing all feedback</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Box -->
+        <div id="search-section" class="hidden mb-6">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search by office, message, or rating..."
+                    class="w-full px-4 py-3 pl-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow focus:ring-2 focus:ring-green-500 focus:border-green-500 transition">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                <button onclick="clearSearch()"
+                    class="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden flex justify-center items-center py-12">
+            <div class="loading-spinner"></div>
+            <span class="ml-3 text-gray-600 dark:text-gray-400">Loading your feedback...</span>
+        </div>
+
+        <!-- No Feedback State -->
+        <div id="no-feedback-state" class="hidden text-center py-12">
+            <div class="text-gray-400 text-6xl mb-4">
+                <i class="fas fa-comment-slash"></i>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Feedback Found</h3>
+            <p class="text-gray-500 dark:text-gray-400 mb-6">You haven't submitted any feedback yet.</p>
+            <a href="/src/components/pages/submit-feedback.html"
+                class="inline-block bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700 transition-colors">
+                <i class="fas fa-plus mr-2"></i>Submit Your First Feedback
+            </a>
+        </div>
+
+        <!-- Feedback List -->
+        <div id="feedback-list" class="hidden space-y-4">
+            <!-- Feedback items will be dynamically inserted here -->
+        </div>
+
+        <!-- Pagination -->
+        <div id="pagination" class="hidden flex justify-center items-center space-x-4 mt-8">
+            <button id="prev-page"
+                class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                <i class="fas fa-chevron-left mr-2"></i>Previous
+            </button>
+            <span id="page-info" class="text-gray-600 dark:text-gray-400">Page 1 of 1</span>
+            <button id="next-page"
+                class="px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled>
+                Next<i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Feedback Details Modal - IMPROVED SCROLLABLE VERSION -->
+    <div id="feedback-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-3xl transform transition-all fade-in flex flex-col max-h-[90vh]">
+            <!-- Fixed Header -->
+            <div class="flex justify-between items-center border-b dark:border-gray-700 p-6 flex-shrink-0">
+                <h3 class="text-xl font-bold text-gray-800 dark:text-white">Feedback Details</h3>
+                <button onclick="closeFeedbackModal()"
+                    class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 text-2xl">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <div id="feedback-details-content" class="p-6 overflow-y-auto custom-scrollbar"
+                style="max-height: calc(90vh - 180px);">
+                <!-- Content will be loaded dynamically -->
+            </div>
+
+            <!-- Fixed Footer -->
+            <div class="border-t dark:border-gray-700 p-4 flex justify-end flex-shrink-0">
+                <button onclick="closeFeedbackModal()"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Item Template (hidden) -->
+    <template id="feedback-item-template">
+        <div class="feedback-card bg-white dark:bg-gray-800 rounded-lg shadow p-6 transition-all">
+            <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2 mb-3">
+                        <span
+                            class="department-badge px-3 py-1 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded-full text-sm font-medium"></span>
+                        <span class="status-badge read-status-badge"></span>
+                        <span class="status-badge reply-status-badge"></span>
+                        <span class="reply-badge has-reply-badge hidden">
+                            <i class="fas fa-check-circle mr-1"></i>Has Reply
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="flex items-center mb-2">
+                            <span class="rating-display text-yellow-500 font-semibold mr-2"></span>
+                            <span class="rating-text text-gray-700 dark:text-gray-300"></span>
+                        </div>
+                        <p class="message-preview text-gray-800 dark:text-gray-200 mb-3"></p>
+                    </div>
+
+                    <div class="feedback-details text-sm text-gray-500 dark:text-gray-400 space-y-1">
+                        <div class="feedback-date">
+                            <i class="far fa-calendar mr-1"></i>
+                            <span class="date-text"></span>
+                        </div>
+                        <div class="feedback-category">
+                            <i class="far fa-user mr-1"></i>
+                            <span class="category-text"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex lg:flex-col space-x-2 lg:space-x-0 lg:space-y-2">
+                    <button
+                        class="view-details-btn px-4 py-2 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors text-sm flex items-center justify-center">
+                        <i class="fas fa-eye mr-1"></i>View Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reply Preview (if exists) -->
+            <div class="reply-preview hidden mt-4 pt-4 border-t dark:border-gray-700">
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0">
+                        <div
+                            class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                            <i class="fas fa-reply text-green-600 dark:text-green-400 text-sm"></i>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Admin Response:</p>
+                        <p class="reply-preview-text text-sm text-gray-600 dark:text-gray-400 line-clamp-2"></p>
+                        <p class="reply-date-text text-xs text-gray-400 dark:text-gray-500 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Global variables
+        let userEmail = null;
+        let userFeedback = [];
+        let filteredFeedback = [];
+        let currentPage = 1;
+        const itemsPerPage = 5;
+
+        // Helper functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatDate(dateString) {
+            try {
+                const date = new Date(dateString);
+                return date.toLocaleString('en-KE', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            } catch {
+                return dateString || 'Unknown date';
+            }
+        }
+
+        // Format a reply/read date - also shows real time
+        function formatRealTime(dateString) {
+            return formatDate(dateString);
+        }
+
+        function formatOfficeName(officeId) {
+            if (!officeId) return 'Unknown';
+            const cleanOffice = officeId.replace('-q', '');
+
+            const offices = {
+                'admin-message': "📨 Official Admin Communication",
+                'vc-office': "Vice Chancellor's Office",
+                'dvc-academic': "DVC (Academic, Research & AR)",
+                'dvc-admin': "DVC (Admin, Finance & Planning)",
+                'registrar-academic': "Registrar (Academic Affairs)",
+                'registrar-admin': "Registrar (AA & HR)",
+                'council-office': "University Council Office",
+                'legal-services': "Legal Services Office",
+                'corp-comm': "Corporate Communications / PR",
+                'admissions': "Admissions Office",
+                'academic-registry': "Academic Registry",
+                'exams-office': "Examinations Office",
+                'timetabling': "Timetabling Office",
+                'research-postgrad': "Research & Postgraduate",
+                'quality-assurance': "Quality Assurance Office",
+                'industrial-attachment': "Industrial Attachment Office",
+                'elearning': "e-Learning / ODL Office",
+                'ssc-dean': "Dean, School of Sci & Comp",
+                'dept-math': "Department of Mathematics",
+                'dept-ict': "Dept of Computing & IT",
+                'dept-physical': "Dept of Physical Sciences",
+                'dept-biological': "Dept of Biological Sciences",
+                'set-dean': "Dean, School of Engineering",
+                'dept-civil': "Dept of Civil Engineering",
+                'dept-elec': "Dept of Electrical Eng",
+                'dept-mech': "Dept of Mechanical Eng",
+                'sbe-dean': "Dean, School of Business",
+                'dept-admin': "Dept of Business Admin",
+                'dept-accounting': "Dept of Accounting & Finance",
+                'dept-economics': "Dept of Economics",
+                'seh-dean': "Dean, School of Education",
+                'dept-edu': "Dept of Educational Studies",
+                'dept-social': "Dept of Social Sciences",
+                'dept-humanities': "Dept of Humanities",
+                'sanr-dean': "Dean, School of Agriculture",
+                'dept-env': "Dept of Environmental Science",
+                'dept-agri': "Dept of Agricultural Sciences",
+                'dean-students': "Dean of Students Office",
+                'student-affairs': "Student Affairs Office",
+                'counselling': "Counselling Services",
+                'chaplaincy': "Chaplaincy / Spiritual Services",
+                'career-guidance': "Career Guidance Office",
+                'games': "Games and Sports Office",
+                'student-clubs': "Student Clubs & Associations",
+                'finance': "Finance Department",
+                'fees-office': "Fees Office",
+                'accounts-office': "Accounts Office",
+                'procurement': "Procurement Office",
+                'internal-audit': "Internal Audit Office",
+                'hr-office': "Human Resource Office",
+                'staff-welfare': "Staff Welfare Office",
+                'training-dev': "Training & Development",
+                'library': "Library Services",
+                'ict-services': "Directorate Of ICT",
+                'health-unit': "Health Unit / Clinic",
+                'hostel': "Accommodation / Hostel",
+                'catering': "Catering Services",
+                'estate': "Estate / Maintenance",
+                'transport': "Transport Office",
+                'security': "Security Department",
+                'grounds': "Grounds & Cleaning Services",
+                'research-dir': "Research Directorate",
+                'innovation-office': "Innovation & Tech Transfer",
+                'community-outreach': "Community Outreach"
+            };
+
+            return offices[cleanOffice] || cleanOffice.split('-').map(word =>
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function getRatingStars(rating) {
+            if (!rating) return '';
+            const r = rating.toLowerCase();
+            if (r.includes('excellent') || r.includes('very satisfied')) return '★★★★★';
+            if (r.includes('very good') || r.includes('satisfied')) return '★★★★☆';
+            if (r.includes('good')) return '★★★☆☆';
+            if (r.includes('fair') || r.includes('average')) return '★★☆☆☆';
+            if (r.includes('poor')) return '★☆☆☆☆';
+
+            // Legacy mapping
+            const stars = {
+                'Poor': '★☆☆☆☆',
+                'Fair': '★★☆☆☆',
+                'Good': '★★★☆☆',
+                'Very Good': '★★★★☆',
+                'Excellent': '★★★★★'
+            };
+            return stars[rating] || '';
+        }
+
+        function getDerivedRating(item) {
+            let displayRating = item.rating || item.q_4 || '';
+
+            if ((!displayRating || displayRating === 'N/A') && item.responses && item.responses.length > 0) {
+                const overallResp = item.responses.find(r => {
+                    // Check explicitly for standard ID 23
+                    if (r.question_id === 23) return true;
+                    const qt = (r.question_text || "").toLowerCase();
+                    return (qt.includes("overall") && (qt.includes("rate") || qt.includes("experience") || qt.includes("satisfaction")));
+                });
+                if (overallResp) displayRating = overallResp.answer;
+            }
+
+            return displayRating || '';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success', duration = 5000) {
+            if (window.feedbackPortal && typeof window.feedbackPortal.showNotification === 'function') {
+                window.feedbackPortal.showNotification(message, type, duration);
+            } else {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+
+                let icon = '';
+                if (type === 'success') icon = '<i class="fas fa-check-circle notification-icon"></i>';
+                else if (type === 'error') icon = '<i class="fas fa-exclamation-circle notification-icon"></i>';
+                else if (type === 'warning') icon = '<i class="fas fa-exclamation-triangle notification-icon"></i>';
+                else icon = '<i class="fas fa-info-circle notification-icon"></i>';
+
+                notification.innerHTML = `${icon}<div class="notification-content">${message}</div><div class="notification-close" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></div>`;
+
+                container.appendChild(notification);
+                setTimeout(() => notification.classList.add('show'), 10);
+
+                if (duration > 0) {
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => notification.remove(), 300);
+                    }, duration);
+                }
+            }
+        }
+
+        // Check if user is logged in
+        function isUserLoggedIn() {
+            return localStorage.getItem('token') !== null;
+        }
+
+        // Get user email
+        function getUserEmail() {
+            return localStorage.getItem('userEmail');
+        }
+
+        // Get auth token
+        function getToken() {
+            return localStorage.getItem('token');
+        }
+
+        // Load user's feedback from API
+        async function loadUserFeedback() {
+            const refreshIcon = document.getElementById('refresh-icon');
+            if (refreshIcon) refreshIcon.classList.add('refresh-spinner');
+
+            const loadingState = document.getElementById('loading-state');
+            const feedbackList = document.getElementById('feedback-list');
+            const noFeedbackState = document.getElementById('no-feedback-state');
+            const filterSection = document.getElementById('filter-section');
+            const searchSection = document.getElementById('search-section');
+            const statsCards = document.getElementById('stats-cards');
+            const loginPrompt = document.getElementById('login-prompt');
+            const guestTrackingSection = document.getElementById('guest-tracking-section');
+            const userGreeting = document.getElementById('user-greeting');
+
+            // Check login status
+            if (!isUserLoggedIn()) {
+                loginPrompt.classList.remove('hidden');
+                guestTrackingSection.classList.remove('hidden');
+                filterSection.classList.add('hidden');
+                searchSection.classList.add('hidden');
+                statsCards.classList.add('hidden');
+                feedbackList.classList.add('hidden');
+                noFeedbackState.classList.add('hidden');
+                loadingState.classList.add('hidden');
+                if (refreshIcon) refreshIcon.classList.remove('refresh-spinner');
+                return;
+            }
+
+            // Get user email
+            userEmail = getUserEmail();
+            if (userEmail) {
+                userGreeting.textContent = `Welcome back, ${userEmail.split('@')[0]}! Here's your feedback history.`;
+            }
+
+            // Hide login prompt and guest tracking, show loading
+            loginPrompt.classList.add('hidden');
+            guestTrackingSection.classList.add('hidden');
+            loadingState.classList.remove('hidden');
+            feedbackList.classList.add('hidden');
+            noFeedbackState.classList.add('hidden');
+            filterSection.classList.add('hidden');
+            searchSection.classList.add('hidden');
+            statsCards.classList.add('hidden');
+
+            const token = getToken();
+
+            try {
+                console.log('Fetching user feedback from API...');
+
+                // Use the new user-specific endpoint
+                const response = await fetch('/api/user/feedback', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log('Response status:', response.status);
+
+                if (response.status === 401) {
+                    showNotification('Session expired. Please login again.', 'error');
+                    setTimeout(() => {
+                        window.location.href = '/src/components/pages/login.html';
+                    }, 2000);
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Data received:', data);
+
+                if (!Array.isArray(data)) {
+                    console.log('Data is not an array:', data);
+                    throw new Error('Invalid response format');
+                }
+
+                userFeedback = data;
+
+                // Sort by date (newest first) - just in case API doesn't sort
+                userFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+                filteredFeedback = [...userFeedback];
+
+                // Update UI based on results
+                loadingState.classList.add('hidden');
+
+                if (userFeedback.length === 0) {
+                    noFeedbackState.classList.remove('hidden');
+                    filterSection.classList.add('hidden');
+                    searchSection.classList.add('hidden');
+                    statsCards.classList.add('hidden');
+                    showNotification('No feedback found', 'info');
+                } else {
+                    filterSection.classList.remove('hidden');
+                    searchSection.classList.remove('hidden');
+                    statsCards.classList.remove('hidden');
+
+                    updateStats();
+                    renderFeedback();
+                    showNotification(`Loaded ${userFeedback.length} feedback entries`, 'success');
+                }
+
+            } catch (error) {
+                console.error('Error loading feedback:', error);
+                loadingState.classList.add('hidden');
+
+                showNotification('Failed to load feedback. Please try again.', 'error');
+
+                // Show error state
+                noFeedbackState.classList.remove('hidden');
+                noFeedbackState.querySelector('h3').textContent = 'Error Loading Feedback';
+                noFeedbackState.querySelector('p').textContent = 'Please refresh the page to try again.';
+
+                // Add retry button
+                const retryBtn = document.createElement('button');
+                retryBtn.onclick = loadUserFeedback;
+                retryBtn.className = 'mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition';
+                retryBtn.innerHTML = '<i class="fas fa-redo mr-2"></i>Retry';
+                noFeedbackState.appendChild(retryBtn);
+
+            } finally {
+                if (refreshIcon) refreshIcon.classList.remove('refresh-spinner');
+            }
+        }
+
+        // Track Guest Feedback (without login)
+        async function trackGuestFeedback() {
+            const trackingInput = document.getElementById('guest-tracking-input');
+            const inputValue = trackingInput.value.trim();
+            const errorElement = document.getElementById('guest-tracking-error');
+
+            if (!inputValue) {
+                errorElement.textContent = 'Please enter your email or Reference Number.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            errorElement.classList.add('hidden');
+
+            const loadingState = document.getElementById('loading-state');
+            const feedbackList = document.getElementById('feedback-list');
+            const noFeedbackState = document.getElementById('no-feedback-state');
+            const filterSection = document.getElementById('filter-section');
+            const searchSection = document.getElementById('search-section');
+            const statsCards = document.getElementById('stats-cards');
+            const userGreeting = document.getElementById('user-greeting');
+
+            loadingState.classList.remove('hidden');
+            feedbackList.classList.add('hidden');
+            noFeedbackState.classList.add('hidden');
+            filterSection.classList.add('hidden');
+            searchSection.classList.add('hidden');
+            statsCards.classList.add('hidden');
+
+            userGreeting.textContent = `Searching for: ${inputValue}`;
+
+            try {
+                const isTrackingId = inputValue.toUpperCase().startsWith('REF-');
+                const payload = isTrackingId ? { tracking_id: inputValue } : { email: inputValue };
+
+                console.log('Tracking guest feedback for:', inputValue);
+                const response = await fetch('/api/feedback/track', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                userFeedback = data;
+                userFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                filteredFeedback = [...userFeedback];
+
+                loadingState.classList.add('hidden');
+
+                if (userFeedback.length === 0) {
+                    noFeedbackState.classList.remove('hidden');
+                    noFeedbackState.querySelector('h3').textContent = 'No Feedback Found';
+                    noFeedbackState.querySelector('p').textContent = `We couldn't find any feedback for "${inputValue}".`;
+                    showNotification('No feedback found', 'info');
+                } else {
+                    filterSection.classList.remove('hidden');
+                    searchSection.classList.remove('hidden');
+                    statsCards.classList.remove('hidden');
+
+                    updateStats();
+                    renderFeedback();
+                    if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+                    showNotification(`Found ${userFeedback.length} feedback entries`, 'success');
+                }
+            } catch (error) {
+                console.error('Error tracking guest feedback:', error);
+                loadingState.classList.add('hidden');
+                showNotification('Failed to track feedback. Please try again.', 'error');
+                errorElement.textContent = 'Failed to connect to the server.';
+                errorElement.classList.remove('hidden');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = userFeedback.length;
+            const unread = userFeedback.filter(f => !f.is_read).length;
+            const answered = userFeedback.filter(f => f.replied_at).length;
+            const read = userFeedback.filter(f => f.is_read).length;
+
+            document.getElementById('user-total-feedback').textContent = total;
+            document.getElementById('user-unread-feedback').textContent = unread;
+            document.getElementById('user-answered-feedback').textContent = answered;
+            document.getElementById('user-read-feedback').textContent = read;
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const statusFilter = document.getElementById('status-filter').value;
+            const officeFilter = document.getElementById('office-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase();
+
+            filteredFeedback = userFeedback.filter(item => {
+                // Status filter
+                if (statusFilter === 'unread' && item.is_read) return false;
+                if (statusFilter === 'read' && !item.is_read) return false;
+                if (statusFilter === 'unanswered' && item.replied_at) return false;
+                if (statusFilter === 'answered' && !item.replied_at) return false;
+
+                // Office filter
+                if (officeFilter !== 'all' && item.office !== officeFilter && item.office !== officeFilter + '-q') {
+                    return false;
+                }
+
+                // Search filter
+                if (searchQuery) {
+                    const searchableText = [
+                        formatOfficeName(item.office),
+                        item.message || '',
+                        item.rating || '',
+                        item.category || ''
+                    ].join(' ').toLowerCase();
+                    if (!searchableText.includes(searchQuery)) return false;
+                }
+
+                return true;
+            });
+
+            document.getElementById('filter-count').textContent =
+                `Showing ${filteredFeedback.length} of ${userFeedback.length} feedback`;
+
+            currentPage = 1;
+            renderFeedback();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('status-filter').value = 'all';
+            document.getElementById('office-filter').value = 'all';
+            document.getElementById('search-input').value = '';
+            filteredFeedback = [...userFeedback];
+            document.getElementById('filter-count').textContent = `Showing all ${userFeedback.length} feedback`;
+            currentPage = 1;
+            renderFeedback();
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            applyFilters();
+        }
+
+        // Render feedback items
+        function renderFeedback() {
+            const feedbackList = document.getElementById('feedback-list');
+            const pagination = document.getElementById('pagination');
+            const noFeedbackState = document.getElementById('no-feedback-state');
+
+            if (filteredFeedback.length === 0) {
+                feedbackList.classList.add('hidden');
+                pagination.classList.add('hidden');
+                noFeedbackState.classList.remove('hidden');
+                noFeedbackState.querySelector('h3').textContent = 'No Matching Feedback';
+                noFeedbackState.querySelector('p').textContent = 'Try adjusting your filters.';
+                return;
+            }
+
+            noFeedbackState.classList.add('hidden');
+            feedbackList.classList.remove('hidden');
+
+            // Calculate pagination
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedFeedback = filteredFeedback.slice(start, end);
+
+            // Update page info
+            const totalPages = Math.ceil(filteredFeedback.length / itemsPerPage);
+            document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+            document.getElementById('prev-page').disabled = currentPage === 1;
+            document.getElementById('next-page').disabled = currentPage === totalPages;
+            pagination.classList.remove('hidden');
+
+            // Clear and render
+            feedbackList.innerHTML = '';
+
+            paginatedFeedback.forEach(item => {
+                const template = document.getElementById('feedback-item-template');
+                const clone = template.content.cloneNode(true);
+                const card = clone.querySelector('.feedback-card');
+
+                // Set classes based on status
+                if (!item.is_read) card.classList.add('unread');
+                if (item.is_read) card.classList.add('read');
+                if (item.replied_at) card.classList.add('answered');
+
+                // Department badge — special style for admin-initiated messages
+                const deptBadge = clone.querySelector('.department-badge');
+                if (item.office === 'admin-message') {
+                    deptBadge.textContent = '📨 Admin Message';
+                    deptBadge.className = 'department-badge px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-medium';
+                } else {
+                    deptBadge.textContent = formatOfficeName(item.office);
+                }
+
+                // Read status badge
+                const readBadge = clone.querySelector('.read-status-badge');
+                if (item.is_read) {
+                    readBadge.className = 'status-badge status-read';
+                    readBadge.innerHTML = '<i class="fas fa-eye mr-1"></i>Read';
+                } else {
+                    readBadge.className = 'status-badge status-unread';
+                    readBadge.innerHTML = '<i class="fas fa-eye-slash mr-1"></i>Unread';
+                }
+
+                // Reply status badge
+                const replyBadge = clone.querySelector('.reply-status-badge');
+                if (item.replied_at) {
+                    replyBadge.className = 'status-badge status-answered';
+                    replyBadge.innerHTML = '<i class="fas fa-check-circle mr-1"></i>Answered';
+
+                    // Show has-reply badge
+                    const hasReplyBadge = clone.querySelector('.has-reply-badge');
+                    hasReplyBadge.classList.remove('hidden');
+                    hasReplyBadge.className = 'reply-badge has-reply';
+                } else {
+                    replyBadge.className = 'status-badge status-unanswered';
+                    replyBadge.innerHTML = '<i class="fas fa-clock mr-1"></i>Pending';
+                }
+
+                // Rating
+                const ratingDisplay = clone.querySelector('.rating-display');
+                const ratingText = clone.querySelector('.rating-text');
+                const derivedRating = getDerivedRating(item);
+
+                if (derivedRating && derivedRating !== 'N/A') {
+                    ratingDisplay.textContent = getRatingStars(derivedRating);
+                    ratingText.textContent = derivedRating;
+                } else {
+                    ratingDisplay.innerHTML = '';
+                    ratingText.textContent = 'No rating';
+                }
+
+                // Message preview
+                const messagePreview = clone.querySelector('.message-preview');
+                messagePreview.textContent = item.message || 'No message provided';
+                if (item.message && item.message.length > 200) {
+                    messagePreview.textContent = item.message.substring(0, 200) + '...';
+                }
+
+                // Date — show real date and time of submission
+                const dateSpan = clone.querySelector('.date-text');
+                dateSpan.setAttribute('data-timestamp', item.created_at);
+                dateSpan.textContent = formatDate(item.created_at);
+
+                // Category
+                const categorySpan = clone.querySelector('.category-text');
+                categorySpan.textContent = item.category || 'Anonymous';
+
+                // Reply preview (if exists)
+                if (item.replied_at) {
+                    const replyPreview = clone.querySelector('.reply-preview');
+                    replyPreview.classList.remove('hidden');
+
+                    const replyText = clone.querySelector('.reply-preview-text');
+                    replyText.textContent = item.reply_message || 'No reply message';
+
+                    const replyDate = clone.querySelector('.reply-date-text');
+                    replyDate.setAttribute('data-timestamp', item.replied_at);
+                    replyDate.textContent = `Replied on: ${formatDate(item.replied_at)}`;
+                }
+
+                // View details button
+                const viewBtn = clone.querySelector('.view-details-btn');
+                viewBtn.addEventListener('click', () => showFeedbackDetails(item));
+
+                feedbackList.appendChild(clone);
+            });
+
+            if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+        }
+
+        // Show feedback details modal - IMPROVED WITH BETTER FORMATTING
+        function showFeedbackDetails(item) {
+            const modal = document.getElementById('feedback-modal');
+            const content = document.getElementById('feedback-details-content');
+
+            const derivedRating = getDerivedRating(item);
+
+            // Generate responses HTML
+            let responsesHtml = '';
+            if (item.responses && item.responses.length > 0) {
+                responsesHtml = item.responses.map(resp => `
+                    <div class="bg-white dark:bg-gray-800 p-3 rounded-lg border-l-4 border-gray-400">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${resp.question_text || `Question #${resp.question_id}`}</p>
+                        <p class="font-bold text-sm text-gray-700 dark:text-gray-300">${resp.answer}</p>
+                    </div>
+                `).join('');
+            }
+
+            let detailsHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>Status
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Read Status</p>
+                                    ${item.is_read ?
+                    '<span class="status-badge status-read"><i class="fas fa-eye mr-1"></i>Read</span>' :
+                    '<span class="status-badge status-unread"><i class="fas fa-eye-slash mr-1"></i>Unread</span>'}
+                                    ${item.read_at ?
+                    `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                            Read <span data-timestamp="${item.read_at}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.read_at) : new Date(item.read_at).toLocaleString()}</span>
+                                        </p>` : ''}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Reply Status</p>
+                                    ${item.replied_at ?
+                    '<span class="status-badge status-answered"><i class="fas fa-check-circle mr-1"></i>Answered</span>' :
+                    '<span class="status-badge status-unanswered"><i class="fas fa-clock mr-1"></i>Pending</span>'}
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Office</p>
+                                    <p class="text-gray-900 dark:text-white font-medium">${formatOfficeName(item.office)}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Submitted</p>
+                                    <p class="text-gray-900 dark:text-white font-semibold">${formatDate(item.created_at)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-user-circle mr-2 text-green-500"></i>Your Information
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Name</p>
+                                    <p class="text-gray-900 dark:text-white">
+                                        ${item.anonymous === "true" || !item.name ? 'Anonymous' : escapeHtml(item.name)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</p>
+                                    <p class="text-gray-900 dark:text-white">
+                                        ${item.anonymous === "true" || !item.email ? 'N/A' : escapeHtml(item.email)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Category</p>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium 
+                                        ${item.category === 'Staff' ? 'bg-blue-100 text-blue-800' :
+                    item.category === 'Student' ? 'bg-green-100 text-green-800' :
+                        item.category === 'Visitor' ? 'bg-purple-100 text-purple-800' :
+                            'bg-gray-100 text-gray-800'}">
+                                        ${item.category || 'Anonymous'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        ${derivedRating ? `
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-star mr-2 text-yellow-500"></i>Rating
+                            </h4>
+                            <div class="flex items-center">
+                                <span class="text-2xl text-yellow-500 mr-2">${getRatingStars(derivedRating)}</span>
+                                <span class="text-gray-900 dark:text-white font-medium">${derivedRating}</span>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${responsesHtml ? `
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-question-circle mr-2 text-purple-500"></i>Your Responses
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                ${responsesHtml}
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                            <h4 class="text-lg font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                                <i class="fas fa-comment mr-2 text-green-500"></i>Your Message
+                            </h4>
+                            <div class="message-preview break-words whitespace-pre-wrap">
+                                ${escapeHtml(item.message || 'No message provided.').replace(/\n/g, '<br>')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Add admin reply section if exists - with improved formatting
+            if (item.replied_at && item.reply_message) {
+                detailsHTML += `
+                    <div class="mt-6 bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                        <h4 class="text-lg font-semibold text-green-800 dark:text-green-300 mb-4 flex items-center">
+                            <i class="fas fa-reply mr-2"></i>Admin Response
+                        </h4>
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Replied on</p>
+                            <p class="text-gray-900 dark:text-white font-medium" data-timestamp="${item.replied_at}">
+                                ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(item.replied_at) : new Date(item.replied_at).toLocaleString()}
+                            </p>
+                        </div>
+                        <div class="message-preview bg-white dark:bg-green-900/30 break-words whitespace-pre-wrap">
+                            ${escapeHtml(item.reply_message).replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            content.innerHTML = detailsHTML;
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFeedbackModal() {
+            document.getElementById('feedback-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Pagination functions
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                renderFeedback();
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        function nextPage() {
+            const totalPages = Math.ceil(filteredFeedback.length / itemsPerPage);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderFeedback();
+                window.scrollTo({ top: 300, behavior: 'smooth' });
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Check dark mode preference
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'true' ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches && darkModePreference === null)) {
+                document.documentElement.classList.add('dark');
+            }
+
+            // Load recent tracking history for guest users
+            loadRecentTrackingIds();
+
+            // Load user feedback
+            loadUserFeedback();
+
+            // Event listeners
+            document.getElementById('status-filter').addEventListener('change', applyFilters);
+            document.getElementById('office-filter').addEventListener('change', applyFilters);
+            document.getElementById('search-input').addEventListener('keyup', function (e) {
+                if (e.key === 'Enter') applyFilters();
+            });
+
+            // Pagination buttons
+            document.getElementById('prev-page').addEventListener('click', prevPage);
+            document.getElementById('next-page').addEventListener('click', nextPage);
+
+            // Close modal on escape key
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape') {
+                    closeFeedbackModal();
+                }
+            });
+
+            // Close modal when clicking backdrop
+            document.getElementById('feedback-modal').addEventListener('click', function (e) {
+                if (e.target === this) closeFeedbackModal();
+            });
+        });
+
+        function loadRecentTrackingIds() {
+            if (window.feedbackPortal) {
+                const history = window.feedbackPortal.getTrackingHistory();
+                const container = document.getElementById('recent-ids-container');
+                const section = document.getElementById('recent-tracking-ids');
+
+                if (history && history.length > 0 && container && section) {
+                    section.classList.remove('hidden');
+                    container.innerHTML = history.map(item => `
+                        <div class="group relative">
+                            <button onclick="trackRecentId('${item.id}')" 
+                                    class="flex items-center gap-2 bg-gray-100 hover:bg-green-50 dark:bg-gray-700 dark:hover:bg-green-900/30 border border-gray-200 dark:border-gray-600 px-3 py-2 rounded-lg transition-all pr-8">
+                                <i class="fas fa-ticket-alt text-green-600 dark:text-green-400 opacity-60 group-hover:opacity-100"></i>
+                                <div class="text-left">
+                                    <div class="text-xs font-bold font-mono text-gray-800 dark:text-gray-200">${item.id}</div>
+                                    <div class="flex justify-between items-center gap-2">
+                                        <div class="text-[10px] text-gray-400 truncate max-w-[80px]">${item.officeName || 'Office'}</div>
+                                        <div class="text-[9px] text-gray-500 whitespace-nowrap" data-timestamp="${item.date || ''}">${formatDate(item.date)}</div>
+                                    </div>
+                                </div>
+                            </button>
+                            <button onclick="deleteRecentId('${item.id}', event)" 
+                                    class="absolute right-1 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="Remove from history">
+                                <i class="fas fa-times text-xs"></i>
+                            </button>
+                        </div>
+                    `).join('');
+                    if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+                } else if (section) {
+                    section.classList.add('hidden');
+                }
+            }
+        }
+
+        function deleteRecentId(id, event) {
+            if (event) event.stopPropagation();
+            if (window.feedbackPortal) {
+                window.feedbackPortal.removeFromTrackingHistory(id);
+                loadRecentTrackingIds();
+                showNotification('Removed from history', 'info');
+            }
+        }
+
+        function clearAllRecentIds() {
+            if (confirm('Are you sure you want to clear all recently saved reference numbers?')) {
+                if (window.feedbackPortal) {
+                    window.feedbackPortal.clearTrackingHistory();
+                    loadRecentTrackingIds();
+                    showNotification('History cleared', 'info');
+                }
+            }
+        }
+
+        function trackRecentId(id) {
+            const input = document.getElementById('guest-tracking-input');
+            if (input) {
+                input.value = id;
+                trackGuestFeedback();
+            }
+        }
+    </script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        // Use ResizeObserver for more accuracy if available
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
+</body>
+
+</html>

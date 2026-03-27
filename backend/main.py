@@ -67,29 +67,11 @@ async def serve_login():
     except FileNotFoundError:
         return HTMLResponse(content="<h1>Login page not found</h1>", status_code=404)
 
-@app.get("/signup")
-async def serve_signup():
-    try:
-        with open("static/signup.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>Signup page not found</h1>", status_code=404)
 
-@app.get("/forgot-password")
-async def serve_forgot_password():
-    try:
-        with open("static/forgot-password.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>Forgot password page not found</h1>", status_code=404)
 
-@app.get("/reset-password")
-async def serve_reset_password():
-    try:
-        with open("static/reset-password.html", "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(content="<h1>Reset password page not found</h1>", status_code=404)
+
+
+
 
 @app.get("/admin")
 async def serve_admin(current_user: User = Depends(get_current_user)):

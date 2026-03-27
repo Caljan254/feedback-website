@@ -5,8 +5,19 @@ from datetime import timedelta
 load_dotenv()
 
 class Config:
-    # MySQL Database
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'mysql+pymysql://username:password@localhost/feedback_portal')
+    # MySQL Database components
+    DB_USER = os.getenv('DB_USER', 'root')
+    DB_PASSWORD = os.getenv('DB_PASSWORD', '')
+    DB_HOST = os.getenv('DB_HOST', 'localhost')
+    DB_PORT = os.getenv('DB_PORT', '3306')
+    DB_NAME = os.getenv('DB_NAME', 'feedback_db')
+
+    # Construct the full URI
+    # Preference is given to a full DATABASE_URL if provided
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        'DATABASE_URL', 
+        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT

@@ -38,20 +38,12 @@ def add_security_headers(response):
 
 # Standardized DB Connection helper
 def get_db_connection():
-    import urllib.parse
-    uri = Config.SQLALCHEMY_DATABASE_URI
-    result = urllib.parse.urlparse(uri)
-    username = result.username
-    password = result.password
-    # Safely get database name
-    db_name = result.path.lstrip('/') if result.path else "feedback_portal"
-    hostname = result.hostname
-    
     return mysql.connector.connect(
-        host=hostname or "localhost",
-        user=username or "root",
-        password=password or "",
-        database=db_name
+        host=Config.DB_HOST,
+        user=Config.DB_USER,
+        password=Config.DB_PASSWORD,
+        database=Config.DB_NAME,
+        port=int(Config.DB_PORT)
     )
 
 db = get_db_connection()

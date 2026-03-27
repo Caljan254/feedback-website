@@ -71,7 +71,7 @@
                     <li><a href="https://www.seku.ac.ke" target="_blank"
                             class="flex items-center hover:text-yellow-200 transition-all group"><i
                                 class="fas fa-external-link-alt text-xs mr-2 opacity-50"></i> Official Website</a></li>
-                    <li><a href="https://portal.seku.ac.ke" target="_blank"
+                    <li><a href="https://seku.abnselfserve.com/" target="_blank"
                             class="flex items-center hover:text-yellow-200 transition-all group"><i
                                 class="fas fa-graduation-cap text-xs mr-2 opacity-50"></i> Student Portal</a></li>
                     <li><a href="src/components/pages/internship-application.html"
@@ -80,9 +80,6 @@
                     <li><a href="src/components/pages/login.html" data-auth="guest"
                             class="flex items-center hover:text-yellow-200 transition-all group"><i
                                 class="fas fa-sign-in-alt text-xs mr-2 opacity-50"></i> Login</a></li>
-                    <li><a href="src/components/pages/signup.html" data-auth="guest"
-                            class="flex items-center hover:text-yellow-200 transition-all group"><i
-                                class="fas fa-user-plus text-xs mr-2 opacity-50"></i> Sign Up</a></li>
 
                 </ul>
             </div>
@@ -125,8 +122,9 @@
                 <!-- Left: Copyright and Certification -->
                 <div class="text-center md:text-left order-2 md:order-1">
                     <p class="text-xs sm:text-sm text-green-50/70 font-medium">
-                        &copy; 2026 South Eastern Kenya University. <span class="hidden sm:inline">|</span> <span
-                            class="text-yellow-400/80">ISO 9001:2015 Certified</span>
+                        &copy; <span class="auto-year">2026</span> South Eastern Kenya University. <span
+                            class="hidden sm:inline">|</span> <span class="text-yellow-400/80">ISO 9001:2015
+                            Certified</span>
                     </p>
                 </div>
 
@@ -142,8 +140,8 @@
 
                 <!-- Right: University Info (No Logo) -->
                 <div class="text-center md:text-right order-1 md:order-3">
-                    <p class="text-sm sm:text-base font-black tracking-tight text-white">South Eastern Kenya
-                        University</p>
+                    <p class="text-sm sm:text-base font-black tracking-tight text-white">South Eastern Kenya University
+                    </p>
                     <p class="text-[10px] sm:text-xs text-green-300 font-medium uppercase tracking-widest opacity-80">
                         Empowering Humanity</p>
                 </div>
@@ -151,3 +149,12 @@
         </div>
     </div>
 </footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const autoYearElements = document.querySelectorAll('.auto-year');
+        const currentYear = new Date().getFullYear();
+        autoYearElements.forEach(element => {
+            element.textContent = currentYear;
+        });
+    });
+</script>

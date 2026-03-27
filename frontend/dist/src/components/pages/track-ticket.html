@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEKU Feedback System - Track Your Ticket</title>
+    <!-- Tailwind + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+    <style>
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .content-wrapper {
+            min-height: calc(100vh - 400px);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <div class="content-wrapper bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center py-20">
+        <div class="text-center px-4 reveal">
+            <div class="mb-8">
+                <div class="w-24 h-24 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-5xl mx-auto shadow-lg">
+                    <i class="fas fa-ticket-alt"></i>
+                </div>
+            </div>
+            
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-green-700 dark:text-green-400 mb-6 tracking-tight">
+                Track Service Tickets
+            </h1>
+            
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl max-w-2xl mx-auto border-t-4 border-yellow-400">
+                <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4">
+                    ICT Service Support Tracking is coming soon!
+                </h2>
+                <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed">
+                    This portal will allow you to track the progress of your technical assistance requests and ICT infrastructure support tickets.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/src/components/pages/home.html" class="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition">
+                        Back to Home
+                    </a>
+                    <a href="/src/components/pages/services.html" class="px-8 py-3 border-2 border-green-600 text-green-600 font-bold rounded-xl hover:bg-green-50 transition">
+                        Explore Our Services
+                    </a>
+                </div>
+            </div>
+            
+            <p class="text-gray-500 mt-12 text-sm font-medium uppercase tracking-widest">
+                Our team is working hard to launch this soon
+            </p>
+        </div>
+    </div>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Header Spacer Logic
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                spacer.style.height = header.offsetHeight + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', () => adjustHeaderSpacer());
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+            // Scroll Reveal Logic
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('active');
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+
+</html>

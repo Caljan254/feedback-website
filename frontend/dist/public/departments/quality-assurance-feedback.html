@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quality Assurance Office Feedback - SEKU Feedback System</title>
+    <link rel="icon" type="image/x-icon" href="../../favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* SEKU Official Theme Colors - consistent with all feedback pages */
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
+        /* Notification styling - matching ICT page */
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1
+        }
+
+        .notification.success {
+            background-color: var(--seku-green);
+            color: #fff
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: #fff
+        }
+
+        .notification.warning {
+            background-color: var(--seku-gold);
+            color: var(--seku-green)
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: #fff
+        }
+
+        .notification-icon {
+            margin-right: .75rem;
+            font-size: 1.1rem
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: .95rem
+        }
+
+        .notification-close {
+            margin-left: .75rem;
+            cursor: pointer;
+            opacity: .8
+        }
+
+        .notification-close:hover {
+            opacity: 1
+        }
+
+        .form-input:focus {
+            border-color: var(--seku-green);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.2)
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0fdf4 0%, #fefce8 100%);
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto
+        }
+
+        footer {
+            flex-shrink: 0
+        }
+
+        /* Survey card styling - matching ICT */
+        .survey-card {
+            background: white;
+            border-radius: 1.5rem;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 20px 35px -10px rgba(21, 128, 61, 0.1);
+        }
+
+        /* Step counter */
+        .step-counter {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: var(--seku-gold);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            font-size: 0.75rem;
+        }
+
+        /* Director message / welcome card style */
+        .director-message-card {
+            background: linear-gradient(135deg, #fefce8, #f0fdf4);
+            border-left: 4px solid var(--seku-gold);
+            border-radius: 1rem;
+        }
+
+        /* Radio and checkbox styling */
+        input[type="radio"]:checked,
+        input[type="checkbox"]:checked {
+            accent-color: var(--seku-green);
+        }
+
+        /* Table header styling - SEKU Green gradient with gold text */
+        .table-header {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+        }
+
+        .table-header th {
+            color: var(--seku-gold);
+        }
+
+        /* Button styling */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            border: 2px solid var(--seku-gold);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.3);
+        }
+
+        .btn-secondary {
+            color: var(--seku-green);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            color: var(--seku-gold);
+            transform: translateX(-3px);
+        }
+
+        /* Question block styling */
+        .question-block {
+            background: #fefce8;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+
+        /* Option label hover */
+        .option-label:hover {
+            color: var(--seku-gold);
+        }
+
+        /* Table row hover */
+        .rating-table tbody tr:hover {
+            background: rgba(21, 128, 61, 0.05);
+        }
+
+        /* Mobile optimizations - identical to ICT page */
+        @media (max-width: 640px) {
+            .content-wrapper {
+                padding-left: 1rem;
+                padding-right: 1rem;
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .survey-card {
+                padding: 1.25rem !important;
+            }
+
+            .text-lg {
+                font-size: 1rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .text-xl {
+                font-size: 1.125rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .director-message-card {
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            button {
+                padding: 0.75rem 1.5rem !important;
+                font-size: 1rem !important;
+            }
+
+            .flex-wrap {
+                gap: 0.5rem !important;
+            }
+
+            .rating-table thead {
+                display: none;
+            }
+
+            .rating-table tr {
+                display: block;
+                background: white;
+                border-radius: 1rem;
+                margin-bottom: 1rem;
+                border: 1px solid rgba(21, 128, 61, 0.2);
+                padding: 1rem;
+            }
+
+            .rating-table td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: none !important;
+                padding: 0.5rem 0 !important;
+                border-bottom: 1px solid #f1f5f9 !important;
+            }
+
+            .rating-table td:first-child {
+                display: block;
+                font-weight: 800;
+                color: var(--seku-green);
+                border-bottom: 2px solid var(--seku-gold) !important;
+                margin-bottom: 0.5rem;
+                padding-bottom: 0.75rem !important;
+            }
+
+            .rating-table td:last-child {
+                border-bottom: none !important;
+            }
+
+            .rating-table td::before {
+                content: attr(data-label);
+                font-size: 0.85rem;
+                font-weight: 600;
+                color: #64748b;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+    <div class="content-wrapper max-w-4xl mx-auto px-4 py-2 sm:py-4">
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+
+        <!-- User info display (hidden if no user) -->
+        <div id="user-info-display"
+            class="hidden empty:hidden bg-green-50 border-l-4 border-yellow-500 p-3 sm:p-4 rounded-lg mb-2 sm:mb-3 text-gray-800 text-sm">
+        </div>
+
+        <!-- Survey Card - SEKU Theme (Quality Assurance Office) -->
+        <section x-data="window.qualityAssuranceSurvey" class="survey-card p-4 sm:p-8">
+
+            <script>
+                window.qualityAssuranceSurvey = {
+                    step: 0,
+                    compliments: '',
+                    complaints: '',
+                    suggestions: '',
+                    totalSteps: 4,  // Welcome + 3 logical steps
+                    validateStep() {
+                        if (this.step === 0) return true;
+                        const stepContainer = document.querySelector(`[x-show*="step === ${this.step}"]`);
+                        if (!stepContainer) return true;
+                        const currentStepBlocks = stepContainer.querySelectorAll('.dynamic-question-block');
+                        let allAnswered = true;
+
+                        currentStepBlocks.forEach(block => {
+                            const inputs = block.querySelectorAll('input[type="radio"], input[type="checkbox"]');
+                            const textarea = block.querySelector('textarea');
+                            const visibleTextInputs = block.querySelectorAll('input[type="text"]:not([style*="display: none"])');
+
+                            let blockAnswered = true;
+
+                            if (inputs.length > 0) {
+                                const isChecked = Array.from(inputs).some(i => i.checked);
+                                if (!isChecked) {
+                                    blockAnswered = false;
+                                } else {
+                                    visibleTextInputs.forEach(ti => {
+                                        if (ti.offsetParent !== null && !ti.value.trim()) {
+                                            blockAnswered = false;
+                                        }
+                                    });
+                                }
+                            } else if (textarea && block.hasAttribute('data-required-text')) {
+                                if (!textarea.value.trim()) {
+                                    blockAnswered = false;
+                                }
+                            }
+
+                            if (!blockAnswered) {
+                                allAnswered = false;
+                                block.classList.add('ring-2', 'ring-yellow-500', 'p-2', 'rounded-lg');
+                            } else {
+                                block.classList.remove('ring-2', 'ring-yellow-500', 'p-2');
+                            }
+                        });
+
+                        if (!allAnswered) {
+                            window.feedbackPortal.showNotification('⚠️ Please answer all questions on this page before proceeding.', 'error');
+                            return false;
+                        }
+                        return true;
+                    },
+                    next() {
+                        if (this.validateStep()) {
+                            this.step++;
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    },
+                    prev() {
+                        this.step--;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                };
+            </script>
+
+            <!-- Step counter -->
+            <div class="flex flex-col items-center mb-4">
+                <span x-show="step > 0"
+                    class="step-counter text-xs sm:text-sm font-bold px-3 sm:px-4 py-1 sm:py-1.5 rounded-full"
+                    x-text="`Step ${step} of 4`"></span>
+            </div>
+
+            <!-- Step 0: Welcome Message - SEKU Theme -->
+            <div x-show="step === 0" x-transition class="step-content">
+                <div class="flex justify-center items-center py-4 mb-6">
+                    <h2 class="text-2xl font-bold text-green-700">Quality Assurance Office</h2>
+                </div>
+                <div class="director-message-card p-4 sm:p-6 shadow-sm">
+                    <p class="text-green-800 leading-relaxed font-medium text-base sm:text-xl">
+                        Driving excellence through continuous improvement. The Quality Assurance Office supports
+                        accreditation, program review, and quality standards across the university. Your feedback helps
+                        us strengthen our quality culture and enhance institutional effectiveness.
+                    </p>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button @click="next()"
+                        class="btn-primary px-8 sm:px-10 py-3 sm:py-4 rounded-xl shadow-lg font-bold text-base sm:text-lg flex items-center gap-2">
+                        Start <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <form class="department-feedback-form space-y-6 sm:space-y-8"
+                @submit.prevent="window.feedbackPortal.handleDepartmentFormSubmit($event)">
+
+                <!-- Step 1: Primary Purpose + Service Quality -->
+                <div x-show="step === 1" x-transition class="step-content space-y-6 sm:space-y-8">
+                    <!-- Question 1: Primary Purpose -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4 p-3 sm:p-0" data-question-id="3"
+                        x-data="{ otherPurpose: false, otherText: '' }">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">1. What was the primary purpose of
+                            your visit to the Quality Assurance Office? (Select one)</p>
+                        <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Program/Institutional accreditation', 'Curriculum review support', 'Quality audit participation', 'Policy/Standard clarification', 'Self-assessment report submission', 'Peer review coordination', 'Quality improvement initiative']">
+                                <label class="flex items-center cursor-pointer group">
+                                    <input type="radio" name="dq_3" :value="opt" required @change="otherPurpose = false"
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 focus:ring-green-500 border-gray-300">
+                                    <span
+                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors"
+                                        x-text="opt"></span>
+                                </label>
+                            </template>
+                            <label class="flex items-center cursor-pointer group">
+                                <input type="radio" name="dq_3" :value="otherText" required
+                                    @change="otherPurpose = true"
+                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 focus:ring-green-500 border-gray-300">
+                                <span
+                                    class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors">Other:</span>
+                                <input type="text" x-model="otherText" x-show="otherPurpose"
+                                    x-bind:required="otherPurpose"
+                                    class="ml-2 border-b-2 border-gray-300 bg-transparent outline-none focus:border-green-500 px-2 py-0.5 text-sm transition-all w-32 sm:w-auto"
+                                    placeholder="Specify here..."
+                                    x-effect="if(otherPurpose) $nextTick(() => $el.focus())">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Question 2: Service Quality -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4 p-3 sm:p-0" data-question-id="5">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">2. How would you rate the quality
+                            and effectiveness of quality assurance services? <span
+                                class="text-xs sm:text-sm font-normal text-gray-500 block mt-1">(Guidance provided,
+                                clarity of standards, staff expertise)</span></p>
+                        <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Excellent - Very thorough and professional', 'Good - Competent and helpful', 'Average - Adequate but could improve', 'Poor - Lacking expertise or slow', 'Very Poor - Unprofessional']">
+                                <label class="flex items-center cursor-pointer group">
+                                    <input type="radio" name="dq_5" :value="opt" required
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600 border-gray-300">
+                                    <span
+                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500 transition-colors"
+                                        x-text="opt"></span>
+                                </label>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Quality Assurance Services Ratings Grid + Staff Professionalism -->
+                <div x-show="step === 2" x-transition class="step-content space-y-6 sm:space-y-8">
+                    <div class="space-y-3 sm:space-y-4">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">3. How would you rate the following
+                            quality assurance processes?</p>
+                        <div class="responsive-table-container">
+                            <table class="w-full text-left border-collapse rating-table">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold">Service /
+                                            Aspect</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
+                                            Excellent</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
+                                            Good</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
+                                            Fair</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
+                                            Poor</th>
+                                        <th class="px-1 sm:px-2 py-2 sm:py-3 text-xs sm:text-sm font-bold text-center">
+                                            N/A</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="dynamic-question-block" data-question-id="7">
+                                        <td
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Accreditation guidance/support</td>
+                                        <template
+                                            x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
+                                            <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val"><input
+                                                    type="radio" name="dq_7" :value="val" required
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"></td>
+                                        </template>
+                                    </tr>
+                                    <tr class="dynamic-question-block" data-question-id="9">
+                                        <td
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Clarity of quality standards</td>
+                                        <template
+                                            x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
+                                            <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val"><input
+                                                    type="radio" name="dq_9" :value="val" required
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"></td>
+                                        </template>
+                                    </tr>
+                                    <tr class="dynamic-question-block" data-question-id="11">
+                                        <td
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Quality audit process</td>
+                                        <template
+                                            x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
+                                            <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val"><input
+                                                    type="radio" name="dq_11" :value="val" required
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"></td>
+                                        </template>
+                                    </tr>
+                                    <tr class="dynamic-question-block" data-question-id="13">
+                                        <td
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Feedback collection mechanisms</td>
+                                        <template
+                                            x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
+                                            <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val"><input
+                                                    type="radio" name="dq_13" :value="val" required
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"></td>
+                                        </template>
+                                    </tr>
+                                    <tr class="dynamic-question-block" data-question-id="14">
+                                        <td
+                                            class="px-2 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm text-gray-700 font-medium">
+                                            Quality improvement planning</td>
+                                        <template
+                                            x-for="val in ['Excellent', 'Good', 'Fair', 'Poor', 'Not Applicable']">
+                                            <td class="px-1 sm:px-2 py-3 sm:py-4 text-center" :data-label="val"><input
+                                                    type="radio" name="dq_14" :value="val" required
+                                                    class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"></td>
+                                        </template>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Question 4: Staff Professionalism -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="15">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">4. How satisfied were you with the
+                            professionalism and expertise of QA staff?</p>
+                        <div class="flex flex-wrap gap-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied']">
+                                <label class="flex items-center cursor-pointer group"><input type="radio" name="dq_15"
+                                        :value="opt" required class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"><span
+                                        class="ml-2 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500"
+                                        x-text="opt"></span></label>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Accessibility, Timeliness, Support Materials, Impact -->
+                <div x-show="step === 3" x-transition class="step-content space-y-6 sm:space-y-8">
+                    <!-- Accessibility -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="17">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">5. How accessible are the QA
+                            resources and personnel?</p>
+                        <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Very Accessible', 'Accessible', 'Neutral', 'Difficult to Access', 'Very Inaccessible']">
+                                <label class="flex items-center cursor-pointer group"><input type="radio" name="dq_17"
+                                        :value="opt" required class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"><span
+                                        class="ml-2 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500"
+                                        x-text="opt"></span></label>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Timeliness -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="19">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">6. How timely are the responses and
+                            feedback from QA processes?</p>
+                        <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Excellent (Very timely)', 'Good (Reasonable timing)', 'Fair (Some delays)', 'Poor (Excessive delays)', 'Not applicable']">
+                                <label class="flex items-center cursor-pointer group"><input type="radio" name="dq_19"
+                                        :value="opt" required class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"><span
+                                        class="ml-2 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500"
+                                        x-text="opt"></span></label>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Support Materials -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="21">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">7. How adequate are the QA
+                            guidelines, templates, and support materials?</p>
+                        <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Excellent (Comprehensive and clear)', 'Good (Adequate)', 'Fair (Some gaps)', 'Poor (Inadequate or unclear)', 'Not applicable']">
+                                <label class="flex items-center cursor-pointer group"><input type="radio" name="dq_21"
+                                        :value="opt" required class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"><span
+                                        class="ml-2 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500"
+                                        x-text="opt"></span></label>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Impact -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="22">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg">8. How would you rate the impact of
+                            QA initiatives on service/program improvement?</p>
+                        <div class="space-y-2 sm:space-y-3 pl-0 sm:pl-2">
+                            <template
+                                x-for="opt in ['Excellent (Significant improvement)', 'Good (Noticeable impact)', 'Fair (Some impact)', 'Poor (Little or no impact)', 'Cannot assess']">
+                                <label class="flex items-center cursor-pointer group"><input type="radio" name="dq_22"
+                                        :value="opt" required class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"><span
+                                        class="ml-2 text-sm sm:text-base text-gray-700 group-hover:text-yellow-500"
+                                        x-text="opt"></span></label>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Overall Rating, Compliments, Complaints & Suggestions -->
+                <div x-show="step === 4" x-transition class="step-content space-y-6 sm:space-y-8">
+                    <!-- Overall Rating -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="23">
+                        <p class="text-gray-800 font-semibold text-base sm:text-lg border-t pt-4 sm:pt-6">9. Overall,
+                            how would you rate your experience with the Quality Assurance Office today? *</p>
+                        <div
+                            class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-2 sm:gap-6 pl-0 sm:pl-2">
+                            <template x-for="opt in ['Excellent', 'Good', 'Average', 'Poor']">
+                                <label
+                                    class="flex items-center cursor-pointer group py-2 px-3 sm:px-4 bg-white rounded-xl border-2 border-green-200 hover:border-yellow-500 transition-all shadow-sm w-full sm:w-auto">
+                                    <input type="radio" name="dq_23" :value="opt" required
+                                        class="w-4 h-4 sm:w-5 sm:h-5 text-green-600"><span
+                                        class="ml-2 sm:ml-3 text-sm sm:text-base text-gray-700 font-bold"
+                                        x-text="opt"></span>
+                                </label>
+                            </template>
+                        </div>
+                        <input type="hidden" name="q_4"
+                            x-effect="$el.value = document.querySelector('input[name=dq_23]:checked')?.value || ''">
+                        <input type="hidden" name="rating"
+                            x-effect="$el.value = document.querySelector('input[name=dq_23]:checked')?.value || ''">
+                    </div>
+
+                    <!-- Compliments & Complaints Section -->
+                    <div class="space-y-6 bg-yellow-50/30 rounded-2xl p-5 border border-yellow-200">
+                        <p class="text-gray-800 font-bold text-lg">10. Please share your specific Complaints and/or
+                            Compliments to help us improve. <span
+                                class="text-sm font-normal text-gray-500 block italic">(Your feedback matters)</span>
+                        </p>
+                        <div class="space-y-3">
+                            <label class="text-green-700 font-semibold block underline">Compliments (What went well? Was
+                                there a QA officer or process that stood out?)</label>
+                            <textarea x-model="compliments" rows="3"
+                                class="w-full rounded-xl border-2 border-green-100 bg-white p-3 sm:p-4 shadow-sm outline-none focus:border-yellow-500 transition-all"
+                                placeholder="Share your positive feedback..."></textarea>
+                        </div>
+                        <div class="space-y-3">
+                            <label class="text-red-700 font-semibold block underline">Complaints (What went wrong or
+                                needs immediate attention?)</label>
+                            <textarea x-model="complaints" rows="3"
+                                class="w-full rounded-xl border-2 border-red-100 bg-white p-3 sm:p-4 shadow-sm outline-none focus:border-yellow-500 transition-all"
+                                placeholder="Tell us what needs improvement..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- General Comments / Suggestions -->
+                    <div class="dynamic-question-block space-y-3 sm:space-y-4" data-question-id="27">
+                        <label class="text-gray-800 font-semibold text-base sm:text-lg block">11. Do you have any
+                            general comments, suggestions, or specific areas where we need to improve? <span
+                                class="text-xs sm:text-sm font-normal text-gray-500 block mt-1 italic">*(e.g., "Clearer
+                                accreditation guidelines" or "QA staff are very supportive")*</span></label>
+                        <textarea x-model="suggestions" rows="3"
+                            class="w-full rounded-xl border-2 border-green-200 focus:border-yellow-500 p-3 sm:p-4 shadow-sm outline-none transition-all text-sm"
+                            placeholder="Additional comments or suggestions..."></textarea>
+                    </div>
+
+                    <!-- Hidden comment field that aggregates all -->
+                    <input type="hidden" name="comment"
+                        x-effect="$el.value = `COMPLIMENTS: ${compliments || 'N/A'}\n\nCOMPLAINTS: ${complaints || 'N/A'}\n\nSUGGESTIONS: ${suggestions || 'N/A'}`">
+
+                    <div class="pt-4 sm:pt-6">
+                        <button type="submit"
+                            class="btn-primary w-full px-6 sm:px-8 py-3 sm:py-4 rounded-xl shadow-lg font-bold text-base sm:text-xl tracking-wide transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2 sm:gap-3">
+                            <i class="fas fa-paper-plane text-xs sm:text-sm"></i> Submit Quality Assurance Feedback
+                        </button>
+                        <p class="text-center text-xs text-gray-400 mt-3 sm:mt-4 italic">Your feedback is confidential
+                            and used to improve university services.</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons (consistent with ICT) -->
+                <div class="flex justify-between items-center pt-4 sm:pt-6 border-t border-gray-200" x-show="step > 0">
+                    <button type="button" @click="prev()" x-show="step > 0"
+                        class="btn-secondary flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+                        <i class="fas fa-chevron-left text-xs sm:text-sm"></i> Previous
+                    </button>
+                    <button type="button" @click="next()" x-show="step > 0 && step < 4"
+                        class="btn-secondary flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+                        Next <i class="fas fa-chevron-right text-xs sm:text-sm"></i>
+                    </button>
+                </div>
+
+            </form>
+        </section>
+    </div>
+    <div id="footer-placeholder"></div>
+    <script src="../../src/js/load-components.js"></script>
+    <script src="../../src/js/feedback-portal.js"></script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => { adjustHeaderSpacer(); });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+        document.addEventListener('DOMContentLoaded', () => { adjustHeaderSpacer(); });
+    </script>
+</body>
+
+</html>

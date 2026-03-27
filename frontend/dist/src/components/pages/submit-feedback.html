@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <link rel="icon" type="image/x-icon" href="../../../favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        /* SEKU Official Theme Colors */
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            width: auto;
+            min-width: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: var(--seku-green);
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.warning {
+            background-color: var(--seku-gold);
+            color: var(--seku-green);
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+
+        .notification-icon {
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .notification-content {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .notification-close {
+            margin-left: 0.75rem;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .form-input {
+            transition: all 0.2s ease;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.75rem;
+        }
+
+        .form-input:focus {
+            border-color: var(--seku-green);
+            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1);
+            outline: none;
+        }
+
+        .office-dropdown {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .dropdown-enter-active {
+            transition: all 0.2s ease-out;
+        }
+
+        .dropdown-leave-active {
+            transition: all 0.15s ease-in;
+        }
+
+        .dropdown-enter-from,
+        .dropdown-leave-to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Step cards styling */
+        .step-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.1);
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--seku-gold);
+            box-shadow: 0 20px 30px -10px rgba(21, 128, 61, 0.2);
+        }
+
+        .step-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: var(--seku-gold);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover .step-icon {
+            transform: scale(1.05) rotate(5deg);
+            background: var(--seku-gold);
+            color: var(--seku-green);
+        }
+
+        /* FAQ cards */
+        .faq-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 5px 15px -5px rgba(21, 128, 61, 0.05);
+        }
+
+        .faq-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--seku-gold);
+            box-shadow: 0 15px 25px -10px rgba(21, 128, 61, 0.15);
+        }
+
+        .faq-card h3 {
+            color: var(--seku-green);
+            font-weight: 700;
+        }
+
+        /* Stats section */
+        .stats-section {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            border-radius: 2rem;
+            border: 2px solid var(--seku-gold);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--seku-gold);
+        }
+
+        .stat-label {
+            color: white;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Office selection card */
+        .office-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.1);
+        }
+
+        /* User info form card */
+        .info-form-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.1);
+        }
+
+        /* Pro tip box */
+        .pro-tip {
+            background: linear-gradient(135deg, #fefce8, #ffffff);
+            border-left: 4px solid var(--seku-gold);
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+
+        /* Button styles */
+        .btn-seku {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            border: 2px solid var(--seku-gold);
+            cursor: pointer;
+        }
+
+        .btn-seku:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(21, 128, 61, 0.3);
+            background: linear-gradient(135deg, var(--seku-green-light), var(--seku-green));
+        }
+
+        /* Dropdown button */
+        .dropdown-btn {
+            background: #f9fafb;
+            border: 2px solid rgba(21, 128, 61, 0.2);
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-btn:hover {
+            border-color: var(--seku-gold);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <!-- Content Wrapper -->
+    <div class="content-wrapper max-w-4xl mx-auto px-4 pt-4 pb-4">
+        <!-- Notification Container -->
+        <div id="notification-container"
+            class="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"></div>
+
+        <!-- Page Title -->
+        <div class="text-center mb-8">
+            <h1 id="page-welcome-title" class="text-3xl sm:text-4xl font-bold text-green-700 mb-4 uppercase">Welcome To Directorate Of ICT Customer Feedback</h1>
+            <div class="w-24 h-1 bg-gradient-to-r from-green-700 to-yellow-500 mx-auto mb-4 rounded-full"></div>
+            <p class="text-gray-600 max-w-2xl mx-auto">Rate us and share your experience with us please on our services.
+                Your feedback is very important to us and will help us improve our services.
+            </p>
+        </div>
+
+        <!-- Office Selection Section - SEKU Theme -->
+        <section id="office-section" class="office-card mb-6 max-w-2xl mx-auto" x-data="{
+                open: false,
+                search: '',
+                selectedOffice: { value: 'ict-services', name: 'Directorate Of ICT' },
+                init() {
+                    window.selectedOfficeValue = 'ict-services';
+                    if(window.feedbackPortal) window.feedbackPortal.updateLogoForOffice();
+                    setTimeout(() => {
+                        const btn = document.getElementById('continue-to-user-info');
+                        if (btn) btn.classList.remove('hidden');
+                    }, 100);
+                },
+                categories: [
+                    {
+                        name: 'Academic Affairs & Research',
+                        offices: [
+                            { value: 'academic-registry', name: 'Academic Registry' },
+                            { value: 'admissions', name: 'Admissions Office' },
+                            { value: 'exams-office', name: 'Examinations Office' },
+                            { value: 'timetabling', name: 'Timetabling Office' },
+                            { value: 'industrial-attachment', name: 'Industrial Attachment' },
+                            { value: 'research-dir', name: 'Research Directorate' },
+                            { value: 'research-postgrad', name: 'Postgraduate Research' },
+                            { value: 'elearning', name: 'e-Learning / ODL' },
+                            { value: 'quality-assurance', name: 'Quality Assurance' }
+                        ]
+                    },
+                    {
+                        name: 'Schools & Departments',
+                        offices: [
+                            { value: 'ssc-dean', name: 'Dean, Science & Computing' },
+                            { value: 'dept-ict', name: 'Dept. of Computing & IT' },
+                            { value: 'dept-math', name: 'Dept. of Mathematics' },
+                            { value: 'dept-physical', name: 'Dept. of Physical Sciences' },
+                            { value: 'dept-biological', name: 'Dept. of Biological Sciences' },
+                            { value: 'set-dean', name: 'Dean, Engineering' },
+                            { value: 'dept-civil', name: 'Dept. of Civil Engineering' },
+                            { value: 'dept-elec', name: 'Dept. of Electrical Eng' },
+                            { value: 'dept-mech', name: 'Dept. of Mechanical Eng' },
+                            { value: 'sbe-dean', name: 'Dean, Business' },
+                            { value: 'dept-admin', name: 'Dept. of Business Admin' },
+                            { value: 'dept-accounting', name: 'Dept. of Finance & Accounting' },
+                            { value: 'dept-economics', name: 'Dept. of Economics' },
+                            { value: 'seh-dean', name: 'Dean, Education' },
+                            { value: 'dept-edu', name: 'Dept. of Educational Studies' },
+                            { value: 'dept-social', name: 'Dept. of Social Sciences' },
+                            { value: 'dept-humanities', name: 'Dept. of Humanities' },
+                            { value: 'sanr-dean', name: 'Dean, Agriculture' },
+                            { value: 'dept-env', name: 'Dept. of Environmental Science' },
+                            { value: 'dept-agri', name: 'Dept. of Agricultural Sciences' }
+                        ]
+                    },
+                    {
+                        name: 'Administrative Offices',
+                        offices: [
+                            { value: 'vc-office', name: 'VC Office' },
+                            { value: 'dvc-academic', name: 'DVC (Academic & Research)' },
+                            { value: 'dvc-admin', name: 'DVC (Admin & Finance)' },
+                            { value: 'registrar-academic', name: 'Registrar (Academic)' },
+                            { value: 'registrar-admin', name: 'Registrar (Admin & HR)' },
+                            { value: 'finance', name: 'Finance Department' },
+                            { value: 'fees-office', name: 'Fees Office' },
+                            { value: 'accounts-office', name: 'Accounts Office' },
+                            { value: 'hr-office', name: 'Human Resource Office' },
+                            { value: 'corp-comm', name: 'Corporate Communication' },
+                            { value: 'ict-services', name: 'Directorate Of ICT' },
+                            { value: 'ict-feedback', name: 'ICT Office' },
+                            { value: 'procurement', name: 'Procurement Office' },
+                            { value: 'internal-audit', name: 'Internal Audit' },
+                            { value: 'registry', name: 'Student Registry' },
+                            { value: 'legal-services', name: 'Legal Services' },
+                            { value: 'council-office', name: 'University Council Office' }
+                        ]
+                    },
+                    {
+                        name: 'Student Support Services',
+                        offices: [
+                            { value: 'library', name: 'Library Services' },
+                            { value: 'dean-students', name: 'Dean of Students' },
+                            { value: 'student-affairs', name: 'Student Affairs' },
+                            { value: 'health-feedback', name: 'Health Services' },
+                            { value: 'health-unit', name: 'Health Unit / Clinic' },
+                            { value: 'hostel', name: 'Hostels & Accommodation' },
+                            { value: 'catering', name: 'Catering Services' },
+                            { value: 'transport', name: 'Transport Office' },
+                            { value: 'security', name: 'Security Department' },
+                            { value: 'games', name: 'Games & Sports Office' },
+                            { value: 'estate', name: 'Estate/Maintenance Dept' },
+                            { value: 'counselling', name: 'Counselling Services' },
+                            { value: 'chaplaincy', name: 'Chaplaincy' },
+                            { value: 'career-guidance', name: 'Career Guidance' },
+                            { value: 'student-clubs', name: 'Student Clubs & Associations' }
+                        ]
+                    }
+                ],
+                get filteredCategories() {
+                    if (!this.search) return this.categories;
+                    const searchLower = this.search.toLowerCase();
+                    return this.categories.map(cat => ({
+                        ...cat,
+                        offices: cat.offices.filter(office => 
+                            office.name.toLowerCase().includes(searchLower)
+                        )
+                    })).filter(cat => cat.offices.length > 0);
+                }
+            }">
+            <h2 class="text-lg sm:text-xl font-bold text-green-700 mb-4 text-center">
+                Select office...
+            </h2>
+
+            <div class="relative">
+                <button @click="open = !open" 
+                    class="dropdown-btn w-full flex justify-between items-center px-4 py-3 rounded-lg transition-all duration-200 ring-2 ring-green-500 shadow-md">
+                    <span x-text="selectedOffice ? selectedOffice.name : 'Select Office...'"
+                        class="text-gray-800 text-sm sm:text-base font-bold"></span>
+                    <i class="fas fa-chevron-down text-green-600 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+
+                <div x-show="open" @click.away="open = false" x-cloak
+                    class="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-2xl overflow-hidden border-2 border-yellow-400 z-50 flex flex-col"
+                    x-transition:enter="dropdown-enter-active" x-transition:leave="dropdown-leave-active">
+
+                    <!-- Search Input Area -->
+                    <div class="p-3 border-b bg-gray-50">
+                        <div class="relative">
+                            <input type="text" x-model="search"
+                                placeholder="Search here... (e.g. library, finance)"
+                                class="w-full pl-10 pr-4 py-3 text-sm bg-white border-2 border-green-500/30 focus:border-green-500 rounded-xl outline-none transition-all shadow-sm"
+                                @click.stop>
+                            <i class="fas fa-search absolute left-3.5 top-3.5 text-green-500 opacity-60"></i>
+                        </div>
+                    </div>
+
+                    <div class="overflow-y-auto office-dropdown max-h-[40vh]">
+                        <template x-for="category in filteredCategories" :key="category.name">
+                            <div>
+                                <div class="px-3 py-2 bg-green-700 text-white font-black text-[10px] uppercase tracking-widest"
+                                    x-text="category.name"></div>
+                                <template x-for="office in category.offices" :key="office.value">
+                                    <button type="button"
+                                        @click="selectedOffice = office; window.selectedOfficeValue = office.value; if(window.feedbackPortal) window.feedbackPortal.updateLogoForOffice(); open = false; search = ''"
+                                        class="w-full text-left px-5 py-3 hover:bg-green-50 transition-colors duration-200 flex items-center group border-b last:border-0">
+                                        <span
+                                            class="flex-grow text-gray-800 text-sm group-hover:text-green-600 group-hover:font-medium"
+                                            x-text="office.name"></span>
+                                        <i x-show="selectedOffice && selectedOffice.value === office.value"
+                                            class="fas fa-check-circle text-green-500 ml-2"></i>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- No Results State -->
+                        <div x-show="filteredCategories.length === 0" class="py-10 text-center text-gray-400 italic px-6">
+                            <i class="fas fa-search-minus text-4xl mb-3 opacity-20 block"></i>
+                            No matching offices found
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <button id="continue-to-user-info" class="btn-seku w-full text-center justify-center flex items-center gap-2"
+                    onclick="showUserInfoForm()">Continue</button>
+            </div>
+        </section>
+
+        <!-- USER INFO FORM - SEKU Theme -->
+        <section id="user-info-section" class="hidden info-form-card mb-6 max-w-2xl mx-auto mt-8">
+            <div class="back-arrow mb-4 cursor-pointer inline-flex items-center gap-2 text-green-600 hover:text-yellow-500 transition"
+                onclick="goBackToOfficeSelection()">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-green-700 mb-6 text-center">
+                Please Enter Your Information Before Giving Feedback
+            </h2>
+            <form id="user-info-form" class="space-y-5">
+                <div>
+                    <label for="name" class="block text-gray-700 font-semibold mb-2 text-sm">Name:</label>
+                    <input id="name" name="name" type="text" required
+                        class="form-input w-full rounded-lg border-2 border-gray-200 px-4 py-3 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm" />
+                </div>
+                <div>
+                    <label for="email" class="block text-gray-700 font-semibold mb-2 text-sm">Email:</label>
+                    <input id="email" name="email" type="email" required
+                        class="form-input w-full rounded-lg border-2 border-gray-200 px-4 py-3 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm" />
+                </div>
+                <div>
+                    <label for="category" class="block text-gray-700 font-semibold mb-2 text-sm">Category:</label>
+                    <select id="category" name="category" required
+                        class="form-input w-full rounded-lg border-2 border-gray-200 px-4 py-3 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-100 text-sm">
+                        <option value="" disabled selected>Select your category</option>
+                        <option value="Staff">Staff</option>
+                        <option value="Student">Student</option>
+                        <option value="Visitor">Visitor</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" id="anonymous" name="anonymous" class="h-4 w-4 accent-green-600" />
+                    <label for="anonymous" class="text-gray-700 text-sm">Submit Anonymously (skip name, email,
+                        category)</label>
+                </div>
+                <div class="pro-tip flex items-start space-x-3">
+                    <i class="fas fa-info-circle text-yellow-500 mt-1"></i>
+                    <p class="text-xs text-gray-600">
+                        <strong class="text-green-700">Pro Tip:</strong> If you provide an email, you can track your
+                        feedback and see our responses on the "My Feedback" page later even without a login.
+                    </p>
+                </div>
+                <button type="submit" class="btn-seku w-full">Start Feedback</button>
+            </form>
+        </section>
+        
+        <div id="extra-info-container">
+        <!-- How It Works Section - SEKU Theme -->
+        <section class="py-6 reveal">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-green-700 mb-4">How It Works</h2>
+                <div class="w-20 h-1 bg-yellow-500 mx-auto mb-4 rounded-full"></div>
+                <p class="text-gray-600 max-w-2xl mx-auto">Providing feedback is simple, secure, and has a real impact
+                    on our university community.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="step-card text-center">
+                    <div class="step-icon mx-auto">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-green-700 mb-2">1. Share Thoughts</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Select your department and fill out the simple feedback form anonymously or with your details.
+                    </p>
+                </div>
+
+                <div class="step-card text-center">
+                    <div class="step-icon mx-auto">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-green-700 mb-2">2. Immediate Routing</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Your feedback is instantly routed to the relevant administrator and department heads for review.
+                    </p>
+                </div>
+
+                <div class="step-card text-center">
+                    <div class="step-icon mx-auto">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-green-700 mb-2">3. Get Results</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Track your response in real-time or receive an email once the issue has been addressed.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section - SEKU Theme -->
+        <section class="stats-section py-8 my-6 rounded-3xl reveal">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 px-4 text-center">
+                <div class="stat-card">
+                    <div class="stat-number text-3xl font-black">5K+</div>
+                    <div class="stat-label">Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number text-3xl font-black">1.2K+</div>
+                    <div class="stat-label">Staffs</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number text-3xl font-black">800+</div>
+                    <div class="stat-label">Visitors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number text-3xl font-black">98%</div>
+                    <div class="stat-label">Resolved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number text-3xl font-black">24/7</div>
+                    <div class="stat-label">Access</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number text-3xl font-black">50+</div>
+                    <div class="stat-label">Offices</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section - SEKU Theme -->
+        <section class="max-w-6xl mx-auto px-4 py-6 reveal">
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-green-700 mb-6 text-center">
+                Frequently Asked Questions
+            </h2>
+            <div class="w-20 h-1 bg-yellow-500 mx-auto mb-8 rounded-full"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="faq-card border-l-4 border-l-yellow-500">
+                    <h3 class="text-lg font-bold mb-2">Can I submit feedback anonymously?</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Yes, you can choose to submit your feedback anonymously. However, we won't be able to follow up
+                        with you directly.
+                    </p>
+                </div>
+
+                <div class="faq-card border-l-4 border-l-green-500">
+                    <h3 class="text-lg font-bold mb-2">Who reviews my feedback?</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        The relevant department heads and appointed administrators review all submissions.
+                    </p>
+                </div>
+
+                <div class="faq-card border-l-4 border-l-yellow-500">
+                    <h3 class="text-lg font-bold mb-2">Is my feedback confidential?</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Yes, all feedback is treated confidentially and is only shared with relevant personnel for
+                        resolution.
+                    </p>
+                </div>
+
+                <div class="faq-card border-l-4 border-l-green-500">
+                    <h3 class="text-lg font-bold mb-2">Response Time?</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        We aim to respond to all matters and give feedback within 48 hours.
+                    </p>
+                </div>
+
+                <div class="faq-card border-l-4 border-l-yellow-500">
+                    <h3 class="text-lg font-bold mb-2">How do I track my feedback?</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        Use the unique Tracking ID provided after submission on the "My Feedback" page.
+                    </p>
+                </div>
+
+                <div class="faq-card border-l-4 border-l-green-500">
+                    <h3 class="text-lg font-bold mb-2">Who can use this portal?</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        All SEKU students, staff members, and external visitors are welcome to share their experiences.
+                    </p>
+                </div>
+            </div>
+        </section>
+        </div>
+    </div>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Make selectedOfficeValue available globally for feedback-portal.js
+        window.selectedOfficeValue = null;
+
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+
+        // Scroll Reveal Logic
+        function reveal() {
+            const reveals = document.querySelectorAll(".reveal");
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        window.addEventListener("scroll", reveal);
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            reveal();
+            adjustHeaderSpacer();
+        });
+
+        // Navigation functions
+        function goBackToOfficeSelection() {
+            document.getElementById('office-section').classList.remove('hidden');
+            document.getElementById('user-info-section').classList.add('hidden');
+            document.getElementById('office-section').classList.add('block');
+            
+            // Show extra info
+            document.getElementById('extra-info-container').classList.remove('hidden');
+            
+            // Reset Title
+            document.getElementById('page-welcome-title').textContent = 'Welcome To Directorate Of ICT Customer Feedback';
+        }
+
+        function showUserInfoForm() {
+            document.getElementById('office-section').classList.add('hidden');
+            document.getElementById('user-info-section').classList.remove('hidden');
+            
+            // Hide extra info
+            document.getElementById('extra-info-container').classList.add('hidden');
+            
+            // Update Title
+            document.getElementById('page-welcome-title').textContent = 'ICT CUSTOMER FEEDBACK';
+        }
+    </script>
+</body>
+
+</html>

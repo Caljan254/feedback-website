@@ -10,7 +10,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
-SECRET_KEY = "aaamumo254"
+from config import Config
+
+SECRET_KEY = Config.JWT_SECRET_KEY
 ALGORITHM = "HS256"
 
 def verify_password(plain_password, hashed_password):

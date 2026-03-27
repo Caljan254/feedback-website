@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>South Eastern Kenya University (SEKU) Customer Feedback System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        .message-preview {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: inherit;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background-color: rgba(243, 244, 246, 0.5);
+            border-radius: 0.375rem;
+        }
+
+        .dark .message-preview {
+            background-color: rgba(31, 41, 55, 0.5);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-unread {
+            background-color: rgba(250, 204, 21, 0.15);
+            /* Gold light tint */
+            color: #b45309;
+            /* Gold dark text */
+            border: 1px solid rgba(250, 204, 21, 0.3);
+        }
+
+        .dark .status-unread {
+            background-color: rgba(250, 204, 21, 0.25);
+            color: #fcd34d;
+        }
+
+        .status-read {
+            background-color: rgba(34, 197, 94, 0.1);
+            /* Green light tint */
+            color: #15803d;
+            /* Green dark text */
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .dark .status-read {
+            background-color: rgba(34, 197, 94, 0.15);
+            color: #4ade80;
+        }
+
+        .status-replied {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .dark .status-replied {
+            background-color: #064e3b;
+            color: #a7f3d0;
+        }
+
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .refresh-spinner {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Custom Scrollbar Styles */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hide contact info and redundant Admin link in admin panel */
+        .header-contact-bar,
+        header [href*="admin.html"],
+        #services-menu,
+        #ict-feedback-menu {
+            display: none !important;
+        }
+
+        /* Ensure welcome top bar is visible on admin panel */
+        header .hidden.sm\:block {
+            display: block !important;
+        }
+
+        /* SEKU THEME SYSTEM */
+        :root {
+            --seku-green-dark: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
+        .status-replied {
+            background-color: var(--seku-green-dark);
+            color: white;
+            border: 1px solid var(--seku-green-dark);
+        }
+
+        .dark .status-replied {
+            background-color: var(--seku-green-dark);
+            color: var(--seku-gold);
+        }
+
+        .btn-seku-primary {
+            background-color: var(--seku-green-dark);
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-seku-primary:hover {
+            background-color: var(--seku-green-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-seku-gold {
+            background-color: var(--seku-gold);
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .btn-seku-gold:hover {
+            background-color: var(--seku-gold-dark);
+        }
+
+        /* Enhance header welcome text for admin */
+        #header-welcome-text {
+            font-size: 1.1rem !important;
+            letter-spacing: 0.15em !important;
+            padding: 0.25rem 0;
+            width: 100% !important;
+            text-align: center !important;
+            display: block !important;
+            color: var(--seku-gold) !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            #header-welcome-text {
+                font-size: 1.4rem !important;
+            }
+        }
+
+        /* Professional table styling */
+        thead th {
+            background-color: var(--seku-green-dark) !important;
+            color: white !important;
+            font-weight: 800 !important;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 0.7rem;
+        }
+
+        .dark thead th {
+            background-color: #111827 !important;
+            color: var(--seku-gold) !important;
+            border-bottom: 2px solid var(--seku-green-dark);
+        }
+
+        /* Stats Card Polish */
+        .stats-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark .stats-card {
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white min-h-screen transition-colors duration-200">
+
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <!-- MAIN CONTENT -->
+    <main class="w-full max-w-7xl mx-auto pt-4 px-4 pb-6">
+        <div class="mb-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-white dark:bg-gray-800 p-4 rounded-xl shadow-lg border-l-8 transition-all hover:shadow-xl"
+            style="border-left-color: var(--seku-green-dark);">
+            <div>
+                <div class="flex items-center space-x-3 mb-1" style="color: var(--seku-green-dark);">
+                    <i class="fas fa-user-shield text-2xl"></i>
+                    <h2 class="text-3xl font-extrabold" id="dept-title">Department Admin</h2>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Welcome back, <span id="admin-name" class="font-bold text-gray-800 dark:text-white">Admin</span>.
+                    Manage your department's feedback and activity.
+                </p>
+            </div>
+            <div class="mt-4 md:mt-0 flex space-x-3 flex-wrap gap-2">
+                <button onclick="openComposeModal()"
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-paper-plane mr-2"></i>Message Member
+                </button>
+                <button onclick="viewActivityLogs()"
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-history mr-2"></i>Logs
+                </button>
+                <button onclick="openAnalytics()"
+                    class="btn-seku-gold px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-chart-pie mr-2"></i>Data Mining
+                </button>
+                <button onclick="openQuestionModal()"
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-question-circle mr-2"></i>Manage Questions
+                </button>
+                <button onclick="openQRModal()"
+                    class="btn-seku-gold px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i class="fas fa-qrcode mr-2"></i>Print QR
+                </button>
+                <button onclick="loadFeedback()"
+                    class="btn-seku-primary px-4 py-2 rounded-lg shadow transition flex items-center">
+                    <i id="refresh-icon" class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-green-light);">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-inbox mr-2"></i>Total Messages
+                </h3>
+                <p id="total-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-dark);">0</p>
+            </div>
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-gold);">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-clock mr-2"></i>Pending Read
+                </h3>
+                <p id="unread-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-gold-dark);">0</p>
+            </div>
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-green-dark);">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-check-double mr-2"></i>Replied
+                </h3>
+                <p id="replied-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-light);">0</p>
+            </div>
+            <div class="stats-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md border-b-4"
+                style="border-bottom-color: var(--seku-green-dark);">
+                <h3 class="text-sm font-semibold text-gray-500 dark:text-gray-400 flex items-center">
+                    <i class="fas fa-calendar-day mr-2"></i>New Today
+                </h3>
+                <p id="today-feedback" class="text-4xl font-bold mt-2" style="color: var(--seku-green-dark);">0</p>
+            </div>
+        </div>
+
+        <!-- Search & Actions -->
+        <div class="mb-4 flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative flex-grow w-full">
+                <input type="text" id="search-input" placeholder="Search by name, email, or message contents..."
+                    class="w-full px-4 py-3 pl-12 bg-white dark:bg-gray-800 border-2 border-transparent focus:border-green-600 rounded-xl shadow-sm focus:ring-0 transition-all outline-none"
+                    style="border-color: rgba(21, 128, 61, 0.1);">
+                <i class="fas fa-search absolute left-4 top-4 text-green-700 opacity-50"></i>
+            </div>
+            <div class="flex space-x-2 w-full md:w-auto">
+                <select id="filter-status" onchange="applyFilters()"
+                    class="bg-white dark:bg-gray-800 border-2 border-transparent rounded-xl px-4 py-3 shadow-sm outline-none focus:border-green-600 w-1/2 md:w-40"
+                    style="border-color: rgba(21, 128, 61, 0.1);">
+                    <option value="">All Status</option>
+                    <option value="unread">🟡 Unread</option>
+                    <option value="read">🔵 Read</option>
+                    <option value="replied">🟢 Replied</option>
+                </select>
+                <button onclick="exportToCSV()"
+                    class="btn-seku-primary px-6 py-3 rounded-xl shadow-lg transition-all flex items-center justify-center w-1/2 md:w-auto font-bold uppercase tracking-wide text-xs">
+                    <i class="fas fa-file-csv mr-2 text-yellow-300"></i>Export CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback Table -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 dark:bg-gray-700/50 uppercase text-xs font-bold text-white">
+                            <th class="px-6 py-4">Sender & Office</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">User Role</th>
+                            <th class="px-6 py-4">Rating</th>
+                            <th class="px-6 py-4">Date Submitted</th>
+                            <th class="px-6 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="feedback-body" class="divide-y divide-gray-100 dark:divide-gray-700/50">
+                        <!-- Content loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/30 flex justify-between items-center">
+                <p id="page-info" class="text-sm text-gray-500 dark:text-gray-400 italic">Showing 0 of 0 entries</p>
+                <div class="flex space-x-2">
+                    <button onclick="prevPage()" id="prev-btn"
+                        class="p-2 px-4 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600 disabled:opacity-50 hover:bg-gray-50 transition"><i
+                            class="fas fa-chevron-left"></i></button>
+                    <button onclick="nextPage()" id="next-btn"
+                        class="p-2 px-4 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600 disabled:opacity-50 hover:bg-gray-50 transition"><i
+                            class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALS (Reply, Details, Logs) -->
+    <!-- [Modals remain similar to previous but with streamlined UI] -->
+    <div id="reply-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl"><i class="fas fa-reply mr-2"></i>Send Official Reply</h3>
+                <button onclick="closeReplyModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <form id="reply-form" class="p-6 space-y-4 overflow-y-auto flex-grow custom-scrollbar">
+                <input type="hidden" id="reply-id">
+                <input type="hidden" id="reply-email">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Recipient Name</label>
+                    <input id="reply-name-display" disabled
+                        class="w-full bg-gray-100 dark:bg-gray-700 p-2 rounded border-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Subject</label>
+                    <input id="reply-subject" required
+                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Message Body</label>
+                    <textarea id="reply-message" rows="8" required
+                        class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600"></textarea>
+                </div>
+            </form>
+            <div
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
+                <button type="button" onclick="closeReplyModal()"
+                    class="px-6 py-2 text-gray-500 hover:bg-gray-100 rounded-lg transition font-medium">Cancel</button>
+                <button type="submit" form="reply-form" id="send-btn"
+                    class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">Send Response</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPOSE MESSAGE TO MEMBER MODAL -->
+    <div id="compose-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl"><i class="fas fa-paper-plane mr-2"></i>Send Message to Registered Member
+                </h3>
+                <button onclick="closeComposeModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <i class="fas fa-info-circle mr-1" style="color: var(--seku-green-dark);"></i>
+                    Enter the email address of a registered member to send them an official message. They will see it in
+                    their <strong>My Feedback</strong> page.
+                </p>
+                <form id="compose-form" class="space-y-4" onsubmit="sendMessageToMember(event)">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Recipient Email</label>
+                        <div class="relative">
+                            <input type="email" id="compose-email" required placeholder="member@seku.ac.ke"
+                                class="w-full px-4 py-3 pl-10 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                            <i class="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+                        </div>
+                        <p id="compose-email-error" class="text-red-500 text-xs mt-1 hidden">Could not send. Please
+                            verify the email address.</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Subject</label>
+                        <input type="text" id="compose-subject" required
+                            placeholder="Official Notice from Administration"
+                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Message</label>
+                        <textarea id="compose-message" rows="6" required
+                            placeholder="Type your official message here..."
+                            class="w-full p-3 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-green-600 text-sm"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end space-x-3 flex-shrink-0">
+                <button type="button" onclick="closeComposeModal()"
+                    class="px-6 py-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition font-medium">Cancel</button>
+                <button type="submit" form="compose-form" id="compose-send-btn"
+                    class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">
+                    <i class="fas fa-paper-plane mr-2"></i>Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="analytics-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-4xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl"><i class="fas fa-microchip mr-2"></i>Feedback Analytics & Data Mining</h3>
+                <button onclick="closeAnalytics()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow space-y-8" id="analytics-content">
+                <!-- Dashboard content -->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(21, 128, 61, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);">
+                            <i class="fas fa-heart mr-2"></i>Sentiment</h4>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
+                                id="sentiment-value">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
+                            <div id="sentiment-bar" class="h-2 rounded-full"
+                                style="width: 0%; background-color: var(--seku-green-dark);"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 leading-tight">Positivity across all feedback</p>
+                    </div>
+
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(34, 197, 94, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);">
+                            <i class="fas fa-check-circle mr-2"></i>Resolution</h4>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
+                                id="efficiency-value">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
+                            <div id="efficiency-bar" class="h-2 rounded-full"
+                                style="width: 0%; background-color: var(--seku-green-light);"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 leading-tight">Effectiveness of problem solving</p>
+                    </div>
+
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(250, 204, 21, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-gold-dark);">
+                            <i class="fas fa-star mr-2"></i>Avg Rating</h4>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
+                                id="avg-rating-value">0.0</span>
+                        </div>
+                        <div class="flex text-sm mt-1" id="avg-rating-stars" style="color: var(--seku-gold-dark);">
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 leading-tight">Overall experience scores</p>
+                    </div>
+
+                    <div class="col-span-1 border rounded-xl p-4 dark:border-gray-700"
+                        style="background-color: rgba(21, 128, 61, 0.05);">
+                        <h4 class="font-semibold mb-2 text-sm flex items-center" style="color: var(--seku-green-dark);">
+                            <i class="fas fa-comment-dots mr-2"></i>Actionability</h4>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
+                                id="actionability-value">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
+                            <div id="actionability-bar" class="h-2 rounded-full"
+                                style="width: 0%; background-color: var(--seku-green-dark);"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 leading-tight">Feedback with detailed comments</p>
+                    </div>
+
+                    <div class="col-span-1 border rounded-xl p-4 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
+                        <h4 class="text-gray-700 dark:text-gray-400 font-semibold mb-2 text-sm flex items-center"><i
+                                class="fas fa-user-secret mr-2"></i>Anonymity</h4>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-2xl font-black text-gray-800 dark:text-gray-100"
+                                id="anonymity-value">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-1">
+                            <div id="anonymity-bar" class="bg-gray-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-2 leading-tight">Submissions sent anonymously</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-sm">
+                        <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-users mr-2"
+                                style="color: var(--seku-green-dark);"></i>Category Distribution</h4>
+                        <div class="space-y-4" id="category-stats">
+                            <!-- Category stats -->
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-sm">
+                        <h4 class="font-bold mb-4 flex items-center"><i class="fas fa-question-circle mr-2"
+                                style="color: var(--seku-green-dark);"></i>Top Concerns</h4>
+                        <div class="space-y-4" id="concern-stats">
+                            <!-- Concern stats -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end">
+                <button onclick="closeAnalytics()"
+                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium">Close Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="logs-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in h-[85vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl"><i class="fas fa-history mr-2"></i>Activity Log</h3>
+                <button onclick="closeLogsModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="logs-content">
+                <p class="text-center text-gray-400 py-10 italic">Loading logs...</p>
+            </div>
+            <div
+                class="px-6 py-5 bg-gray-50 dark:bg-gray-800/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
+                <button onclick="closeLogsModal()"
+                    class="btn-seku-primary px-8 py-2.5 rounded-lg shadow-xl font-black uppercase tracking-wider text-sm transition transform hover:scale-105 active:scale-95">
+                    Close Activity Log
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MESSAGE DETAILS MODAL -->
+    <div id="details-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden fade-in h-[85vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white flex-shrink-0"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl" id="details-title">Message Details</h3>
+                <button onclick="closeDetailsModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow custom-scrollbar" id="details-content">
+                <!-- Loaded via JS -->
+            </div>
+            <div
+                class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end flex-shrink-0">
+                <button onclick="closeDetailsModal()"
+                    class="btn-seku-primary px-6 py-2 rounded-lg shadow-md font-bold transition">Close Details</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR CODE MODAL -->
+    <div id="qr-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden fade-in flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
+                <div>
+                    <h3 class="font-bold text-xl"><i class="fas fa-qrcode mr-2"></i>Department Feedback QR</h3>
+                    <p class="text-green-100 text-xs mt-0.5">Scan to give feedback directly</p>
+                </div>
+                <button onclick="closeQRModal()" class="hover:bg-green-700 p-2 rounded-full transition"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="p-6 text-center">
+                <!-- Department label -->
+                <div class="mb-4">
+                    <span id="qr-dept-label"
+                        class="inline-block bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 font-bold px-4 py-1.5 rounded-full text-sm border border-green-200 dark:border-green-800">
+                        <i class="fas fa-building mr-1"></i> Loading department...
+                    </span>
+                </div>
+
+                <!-- QR Display -->
+                <div
+                    class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-6 rounded-2xl inline-block mb-4 ring-4 ring-green-500/20 shadow-inner">
+                    <div id="qr-image-container" class="w-52 h-52 flex items-center justify-center text-gray-300">
+                        <div class="flex flex-col items-center gap-3">
+                            <i class="fas fa-circle-notch fa-spin text-4xl" style="color: var(--seku-green-dark);"></i>
+                            <span class="text-xs text-gray-400">Generating QR code...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- URL hint -->
+                <div class="mb-5">
+                    <p class="text-[11px] text-gray-400 dark:text-gray-500 truncate" id="qr-url-hint">Preparing feedback
+                        link...</p>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="grid grid-cols-1 gap-3">
+                    <button onclick="printQRCode()"
+                        class="btn-seku-primary font-bold py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-sm">
+                        <i class="fas fa-print text-base"></i> Print QR code
+                    </button>
+                    <button onclick="closeQRModal()"
+                        class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium py-2.5 rounded-xl transition-all text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUESTION MANAGEMENT MODAL -->
+    <div id="questions-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop">
+        <div
+            class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden fade-in max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 flex justify-between items-center text-white"
+                style="background-color: var(--seku-green-dark);">
+                <h3 class="font-bold text-xl"><i class="fas fa-question-circle mr-2"></i>Manage Feedback Questions</h3>
+                <button onclick="closeQuestionModal()" class="text-2xl hover:text-green-200 transition">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow space-y-6">
+                <!-- Add Question Form -->
+                <div class="p-4 rounded-xl border border-green-100 dark:border-green-800 mb-6"
+                    style="background-color: rgba(34, 197, 94, 0.05);">
+                    <h4 class="font-bold mb-3" style="color: var(--seku-green-dark);">Add New Question</h4>
+                    <form id="add-question-form" onsubmit="saveNewQuestion(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Question Text</label>
+                            <input type="text" id="new-q-text" required
+                                placeholder="e.g. Was the staff helpful and polite?"
+                                class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Options
+                                    (comma-separated)</label>
+                                <input type="text" id="new-q-options" required placeholder="Yes,No" value="Yes,No"
+                                    class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-gray-400 mb-1">Target Office
+                                    (optional)</label>
+                                <select id="new-q-office"
+                                    class="w-full px-4 py-2 border rounded-lg dark:bg-gray-700 outline-none focus:ring-2 focus:ring-orange-500 text-sm">
+                                    <option value="">Global (All Offices)</option>
+                                    <option value="vc-office">Vice Chancellor's Office</option>
+                                    <option value="admissions">Admissions</option>
+                                    <option value="finance">Finance Department</option>
+                                    <option value="library">Library Services</option>
+                                    <option value="ict-services">Directorate Of ICT</option>
+                                    <option value="hostel">Hostel / Accommodation</option>
+                                    <option value="catering">Catering Services</option>
+                                    <option value="security">Security Department</option>
+                                    <option value="transport">Transport Office</option>
+                                    <option value="health-unit">Health Unit / Clinic</option>
+                                    <option value="dean-students">Dean of Students Office</option>
+                                    <option value="dept-math">Dept of Mathematics</option>
+                                    <option value="dept-physical">Dept of Physical Sciences</option>
+                                    <option value="dept-biological">Dept of Biological Sciences</option>
+                                    <option value="ssc-dean">Dean, School of Sci & Comp</option>
+                                    <option value="games">Games and Sports Office</option>
+                                    <option value="academic-registry">Academic Registry</option>
+                                    <option value="exams-office">Examinations Office</option>
+                                    <option value="procurement">Procurement Office</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full btn-seku-primary font-bold py-2 rounded-lg transition shadow-md">
+                            Add Question to Users
+                        </button>
+                </div>
+
+                <!-- Current Questions List -->
+                <div>
+                    <h4 class="font-bold mb-4 flex items-center text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-list-ul mr-2" style="color: var(--seku-green-dark);"></i>Active Questions
+                    </h4>
+                    <div id="questions-list" class="space-y-3">
+                        <!-- Questions loaded via JS -->
+                        <p class="text-center text-gray-400 py-6 italic">No questions found</p>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-gray-50 dark:bg-gray-700/50 border-t dark:border-gray-700 flex justify-end">
+                <button onclick="closeQuestionModal()"
+                    class="bg-gray-200 dark:bg-gray-600 px-6 py-2 rounded-lg font-medium hover:bg-gray-300 transition">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        let allFeedback = [];
+        let filteredFeedback = [];
+        let currentPage = 1;
+        let allQuestions = []; // Added for question management
+        const itemsPerPage = 8;
+        const token = localStorage.getItem("token");
+        const deptId = localStorage.getItem("deptId");
+
+        // Auth Check & Session Handle
+        if (!token) {
+            window.location.href = "login.html";
+        }
+
+        async function init() {
+            document.getElementById("admin-name").textContent = localStorage.getItem("userFullname") || "Admin";
+
+            // Update header text for admin panel
+            setTimeout(() => {
+                const headerText = document.getElementById("header-welcome-text");
+                if (headerText) {
+                    headerText.textContent = "WELCOME TO ADMIN PANEL DASHBOARD";
+                }
+            }, 100);
+
+            // Fetch department name
+            try {
+                if (deptId && deptId !== "null") {
+                    const res = await fetch("/api/departments");
+                    const depts = await res.json();
+                    const myDept = depts.find(d => d.id == deptId);
+                    if (myDept) {
+                        document.getElementById("dept-title").textContent = myDept.name + " Panel";
+                        restrictOfficeSelect(myDept.name);
+                    }
+                } else {
+                    document.getElementById("dept-title").textContent = "University Wide Panel";
+                    document.getElementById("dept-title").classList.add("text-blue-600");
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById("dept-title").textContent = "General Admin Panel";
+            }
+
+            await loadQuestions(); // Load all questions first for data mapping
+            await loadFeedback(); // Then load feedback once questions are available
+
+            // Session Timer (30 mins activity check)
+            let lastInteraction = Date.now();
+            document.addEventListener('mousemove', () => lastInteraction = Date.now());
+            setInterval(() => {
+                if (Date.now() - lastInteraction > 30 * 60 * 1000) {
+                    alert("Session expired due to inactivity.");
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                }
+            }, 60000);
+        }
+
+        async function loadFeedback() {
+            const spin = document.getElementById("refresh-icon");
+            spin.classList.add("refresh-spinner");
+
+            try {
+                const res = await fetch("/api/admin/feedback", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    allFeedback = await res.json();
+                    applyFilters();
+                    updateStats();
+                } else if (res.status === 401) {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                }
+            } catch (e) { console.error(e); }
+            finally { spin.classList.remove("refresh-spinner"); }
+        }
+
+        function updateStats() {
+            const now = new Date();
+            now.setHours(0, 0, 0, 0);
+
+            document.getElementById("total-feedback").textContent = allFeedback.length;
+            document.getElementById("unread-feedback").textContent = allFeedback.filter(f => !f.is_read).length;
+            document.getElementById("replied-feedback").textContent = allFeedback.filter(f => f.replied_at).length;
+            document.getElementById("today-feedback").textContent = allFeedback.filter(f => new Date(f.created_at) >= now).length;
+        }
+
+        /**
+         * Derived Rating & Prioritization Logic
+         * Scans actual rating answers for clear dissatisfaction to flag Top Concerns.
+         * Excludes open-ended improvement/suggestion questions.
+         */
+        function getDerivedStatus(f) {
+            // Free-text keywords that indicate a critical issue (msg body only)
+            const criticalKeywords = [
+                'crash', 'freeze', 'unresponsive', 'broken', 'not working',
+                'urgent', 'asap', 'emergency', 'critical', 'furious', 'angry',
+                'unacceptable', 'horrible', 'terrible', 'useless', 'worthless'
+            ];
+
+            // Rating triggers specifically requested by the user
+            // These will match if the answer starts with any of these (e.g. "Poor (Unprofessional)")
+            const negativeTriggers = [
+                'poor',
+                'no coverage',
+                'n/a',
+                'not applicable',
+                'fair',
+                'dissatisfied',
+                'very dissatisfied',
+                'very difficult',
+                'unprofessional'
+            ];
+
+            // Questions to exclude from Top Concern logic
+            const excludedKeywords = ['improvement', 'recommend', 'suggestion', 'comments', 'additional', 'which areas', 'area', 'purpose'];
+
+            // 1. Identify "Main Service Rating"
+            let mainRating = 'Unrated';
+            if (f.rating && f.rating !== 'N/A' && f.rating.trim() !== '') {
+                mainRating = f.rating;
+            } else {
+                mainRating = f.q_4 || f.q_3 || f.q_2 || 'Unrated';
+            }
+
+            // 2. Determine "Top Concern"
+            let isTopConcern = false;
+
+            // 2a. Message scan
+            const msg = (f.message || '').toLowerCase();
+            if (criticalKeywords.some(kw => msg.includes(kw))) isTopConcern = true;
+
+            // 2b. Responses scan
+            if (!isTopConcern && f.responses && f.responses.length > 0) {
+                for (const resp of f.responses) {
+                    const qText = (resp.question_text || '').toLowerCase();
+                    if (excludedKeywords.some(kw => qText.includes(kw))) continue;
+
+                    const ans = (resp.answer || '').toLowerCase().trim();
+                    // Check if answer starts with a trigger (handles "Poor (Unprofessional)")
+                    if (negativeTriggers.some(trig => ans === trig || ans.startsWith(trig + ' ') || ans.startsWith(trig + '('))) {
+                        isTopConcern = true;
+                        break;
+                    }
+                }
+            }
+
+            // 2c. Main rating scan
+            if (!isTopConcern && mainRating !== 'Unrated') {
+                const rLow = mainRating.toLowerCase().trim();
+                if (negativeTriggers.some(trig => rLow === trig || rLow.startsWith(trig + ' ') || rLow.startsWith(trig + '('))) {
+                    isTopConcern = true;
+                }
+            }
+
+            return { mainRating, isTopConcern };
+        }
+
+        function applyFilters() {
+            const query = document.getElementById("search-input").value.toLowerCase();
+            const status = document.getElementById("filter-status").value;
+
+            filteredFeedback = allFeedback.filter(f => {
+                const matchesSearch = !query ||
+                    (f.name && f.name.toLowerCase().includes(query)) ||
+                    (f.message && f.message.toLowerCase().includes(query)) ||
+                    (f.email && f.email.toLowerCase().includes(query)) ||
+                    (f.tracking_id && f.tracking_id.toLowerCase().includes(query));
+
+                let matchesStatus = true;
+                if (status === 'unread') matchesStatus = !f.is_read;
+                if (status === 'read') matchesStatus = f.is_read && !f.replied_at;
+                if (status === 'replied') matchesStatus = !!f.replied_at;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            // Sort by newest first (time-based only)
+            filteredFeedback.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            currentPage = 1;
+            renderTable();
+            if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+        }
+
+        function renderTable() {
+            const body = document.getElementById("feedback-body");
+            const start = (currentPage - 1) * itemsPerPage;
+            const pageData = filteredFeedback.slice(start, start + itemsPerPage);
+
+            body.innerHTML = pageData.map(f => {
+                const { mainRating, isTopConcern } = getDerivedStatus(f);
+
+                const isPoor = isTopConcern || mainRating.toLowerCase().includes('poor');
+                const isGood = mainRating.toLowerCase().includes('good') || mainRating.toLowerCase().includes('satisfied');
+                const isExcellent = mainRating.toLowerCase().includes('excellent') || mainRating.toLowerCase().includes('very');
+
+                // 🎯 Determine rating value (Improved fallback)
+                let displayRating = f.rating || f.q_4 || '';
+
+                // Fallback 1: Search in detailed responses for the "Overall" question
+                if ((!displayRating || displayRating === 'N/A') && f.responses && f.responses.length > 0) {
+                    const overallResp = f.responses.find(r => {
+                        // Check explicitly for our standard ID 23 first
+                        if (r.question_id === 23) return true;
+
+                        const qObj = allQuestions.find(q => q.id === r.question_id);
+                        const qt = (r.question_text || (qObj ? qObj.text : "")).toLowerCase();
+                        return (qt.includes("overall") && (qt.includes("rate") || qt.includes("experience") || qt.includes("satisfaction")));
+                    });
+                    if (overallResp) displayRating = overallResp.answer;
+                }
+
+                if (!displayRating || displayRating === 'N/A') {
+                    displayRating = '';
+                }
+
+                const ratingLower = displayRating.toLowerCase();
+                let ratingClass = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'; // Default
+                let ratingDot = '⚪';
+
+                if (ratingLower.includes('poor')) {
+                    ratingClass = 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400';
+                    ratingDot = '🔴';
+                } else if (ratingLower.includes('excellent')) {
+                    ratingClass = 'bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400';
+                    ratingDot = '🟢';
+                } else if (ratingLower.includes('good')) {
+                    ratingClass = 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400';
+                    ratingDot = '🔵';
+                } else if (ratingLower.includes('average')) {
+                    ratingClass = 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900/40 dark:text-yellow-400';
+                    ratingDot = '🟡';
+                } else if (ratingLower !== '' && ratingLower !== 'n/a') {
+                    ratingClass = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+                    ratingDot = '⚪';
+                }
+
+                return `
+                <tr class="group hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors ${isPoor ? 'bg-red-50/30 dark:bg-red-900/10' : ''}">
+                    <td class="px-6 py-4">
+                        <div class="font-bold text-gray-900 dark:text-white flex items-center">
+                            ${f.anonymous === "true" ? `<span class="text-blue-600 dark:text-blue-400 font-mono text-xs">${f.tracking_id || 'Anon'}</span>` : (f.name || 'Anonymous')}
+                            ${isTopConcern ? '<span class="ml-2 px-1.5 py-0.5 bg-red-600 text-white text-[9px] rounded font-bold uppercase tracking-tighter shadow-sm animate-pulse">Top Concern</span>' : ''}
+                        </div>
+                        <div class="flex flex-col gap-0.5 mt-1">
+                            <div class="text-[10px] text-gray-400 font-medium italic">${f.anonymous === "true" ? 'Anonymous' : (f.email || 'No email')}</div>
+                            <div class="text-[11px] font-bold text-green-700 dark:text-green-400 uppercase tracking-tight">
+                                <i class="fas fa-building mr-1 opacity-70"></i>${f.office ? (window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office) : 'General'}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">${getStatusBadge(f)}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-gray-700 dark:text-gray-300">
+                        <span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[10px] uppercase tracking-wider">
+                            ${f.anonymous === "true" ? "Anonymous" : (f.category || "Staff/Student")}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${ratingClass}">
+                                ${displayRating}
+                            </span>
+                            <span class="text-base">${ratingDot}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-xs text-gray-500">
+                        <span data-timestamp="${f.created_at}">
+                            ${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(f.created_at) : new Date(f.created_at).toLocaleDateString()}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex items-center justify-center space-x-2">
+                            <button onclick="viewDetails(${f.id})" class="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition" title="View"><i class="fas fa-eye"></i></button>
+                            ${!f.replied_at ? `<button onclick="openReply(${f.id})" class="p-2 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30 rounded-lg transition" title="Reply"><i class="fas fa-reply"></i></button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+            }).join('') || `<tr><td colspan="6" class="py-20 text-center text-gray-500"><i class="fas fa-scroll text-5xl mb-4 block opacity-20"></i>No records found matching filters.</td></tr>`;
+
+            document.getElementById("page-info").textContent = `Showing ${filteredFeedback.length > 0 ? start + 1 : 0} to ${Math.min(start + itemsPerPage, filteredFeedback.length)} of ${filteredFeedback.length} entries`;
+            document.getElementById("prev-btn").disabled = currentPage === 1;
+            document.getElementById("next-btn").disabled = currentPage >= Math.ceil(filteredFeedback.length / itemsPerPage);
+
+            if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+        }
+
+        function getStatusBadge(f) {
+            if (f.replied_at) return '<span class="status-badge status-replied"><i class="fas fa-check-circle mr-1"></i>Replied</span>';
+            if (f.is_read) return '<span class="status-badge status-read"><i class="fas fa-eye mr-1"></i>Read</span>';
+            return '<span class="status-badge status-unread"><i class="fas fa-bell mr-1 animate-pulse"></i>New</span>';
+        }
+
+        async function viewDetails(id) {
+            const f = allFeedback.find(item => item.id == id);
+            if (!f) return;
+
+            // Recalculate derived status for display
+            const { mainRating, isTopConcern } = getDerivedStatus(f);
+
+            // Mark as read in backend
+            if (!f.is_read) {
+                fetch(`/api/admin/feedback/${id}/read`, {
+                    method: 'POST',
+                    headers: { "Authorization": `Bearer ${token}` }
+                }).then(() => { f.is_read = true; updateStats(); renderTable(); });
+            }
+
+            // Get dynamic responses for this feedback
+            let questionsHtml = '';
+
+            if (f.responses && f.responses.length > 0) {
+                f.responses.forEach(resp => {
+                    // Use question_text from backend (populated via Question relationship)
+                    // This ensures we always show the CORRECT department's question text,
+                    // not a generic question that happens to share the same DB ID.
+                    let qText = resp.question_text;
+                    if (!qText) {
+                        // Fallback: look up in locally cached allQuestions
+                        const qObj = allQuestions.find(q => q.id === resp.question_id);
+                        qText = qObj ? qObj.text : `Question #${resp.question_id}`;
+                    }
+                    const answer = resp.answer;
+
+                    const isPositive = ['Yes', 'Good', 'Excellent', 'Satisfied', 'Very Satisfied'].includes(answer);
+                    questionsHtml += `
+                        <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border-l-4 ${isPositive ? 'border-green-500' : 'border-red-400'}">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">${qText}</label>
+                            <p class="font-bold text-sm ${isPositive ? 'text-green-700 dark:text-green-400' : 'text-gray-700 dark:text-gray-300'}">${answer}</p>
+                        </div>
+                    `;
+                });
+            } else {
+                // Fallback to old hardcoded fields if they exist (for legacy data)
+                for (let i = 0; i < 5; i++) {
+                    const answer = f[`q_${i}`];
+                    if (answer && answer !== 'N/A') {
+                        questionsHtml += `
+                            <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border-l-4 border-gray-400">
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Historical Question ${i}</label>
+                                <p class="font-bold text-sm text-gray-700 dark:text-gray-300">${answer}</p>
+                            </div>
+                        `;
+                    }
+                }
+            }
+
+            // Determine rating value (Match logic with the table fallback)
+            let displayRating = f.rating || f.q_4 || '';
+
+            if ((!displayRating || displayRating === 'N/A') && f.responses && f.responses.length > 0) {
+                const overallResp = f.responses.find(r => {
+                    if (r.question_id === 23) return true;
+                    const qObj = allQuestions.find(q => q.id === r.question_id);
+                    const qt = (qObj ? qObj.text : "").toLowerCase();
+                    return (qt.includes("overall") && (qt.includes("rate") || qt.includes("experience") || qt.includes("satisfaction")));
+                });
+                if (overallResp) displayRating = overallResp.answer;
+            }
+
+            if (!displayRating || displayRating === 'N/A') displayRating = 'Not Rated';
+
+            const ratingLower = displayRating.toLowerCase();
+            let ratingClassModal = 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400';
+
+            if (ratingLower.includes('poor')) {
+                ratingClassModal = 'bg-red-500 text-white';
+            } else if (ratingLower.includes('excellent')) {
+                ratingClassModal = 'bg-green-600 text-white';
+            } else if (ratingLower.includes('good')) {
+                ratingClassModal = 'bg-blue-600 text-white';
+            } else if (ratingLower.includes('average')) {
+                ratingClassModal = 'bg-yellow-500 text-white';
+            }
+
+            const content = document.getElementById("details-content");
+            content.innerHTML = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Sender Name</label>
+                            <p class="font-bold text-sm truncate text-blue-600 dark:text-blue-400">
+                                ${f.anonymous === "true" ? `Anon (${f.tracking_id})` : (f.name || 'Anonymous')}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">User Role</label>
+                            <p class="font-bold text-sm truncate">${f.anonymous === "true" ? "Anonymous" : (f.category || "General")}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Overall Experience</label>
+                            <div class="mt-1">
+                                <span class="font-bold text-[10px] px-2 py-0.5 rounded shadow-sm ${ratingClassModal}">${displayRating}</span>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Office Context</label>
+                            <p class="font-bold text-sm text-indigo-500 truncate">${window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : f.office}</p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Status</label>
+                            <p class="font-bold text-sm ${f.is_read ? 'text-green-500' : 'text-orange-500'}">
+                                ${f.is_read ? 'Reviewed' : 'Awaiting Review'}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-lg">
+                            <label class="text-xs font-bold text-gray-400 uppercase">Timestamp</label>
+                            <p class="font-bold text-sm text-gray-500 truncate line-clamp-1" title="${new Date(f.created_at).toLocaleString()}">${new Date(f.created_at).toLocaleString()}</p>
+                        </div>
+                    </div>
+
+                    ${questionsHtml ? `
+                    <div class="space-y-3">
+                        <label class="text-xs font-bold text-gray-400 uppercase">Specific Questions & Answers</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            ${questionsHtml}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div>
+                        <label class="text-xs font-bold text-gray-400 uppercase">Detailed Feedback Message</label>
+                        <div class="mt-2 message-preview bg-gray-50 dark:bg-gray-900/50 p-4 border dark:border-gray-700 rounded-xl shadow-inner max-h-48 overflow-y-auto custom-scrollbar">
+                            ${f.message || '<span class="italic text-gray-400">No message provided</span>'}
+                        </div>
+                    </div>
+
+                    ${f.replied_at ? `
+                    <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-green-600 uppercase">Official Response</span>
+                            <span class="text-[10px] text-gray-400" data-timestamp="${f.replied_at}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(f.replied_at) : new Date(f.replied_at).toLocaleString()}</span>
+                        </div>
+                        <p class="text-sm italic">"${f.reply_message || 'N/A'}"</p>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            document.getElementById("details-modal").classList.remove("hidden");
+        }
+
+        function openReply(id) {
+            const f = allFeedback.find(item => item.id == id);
+            document.getElementById("reply-id").value = id;
+            document.getElementById("reply-email").value = f.email || "";
+            document.getElementById("reply-name-display").value = f.anonymous === "true" ? "Anonymous User" : (f.name || "User");
+            const deptTitle = document.getElementById("dept-title").textContent.replace(' Panel', '').trim();
+            document.getElementById("reply-subject").value = `RE: Feedback regarding ${f.office || 'University Services'}`;
+
+            let signOff = `Best Regards,\n${localStorage.getItem("userFullname")}`;
+            if (deptTitle.toLowerCase().includes("directorate of ict") || deptTitle.toLowerCase().includes("ict services") || deptTitle.toLowerCase() === "ict") {
+                signOff = `Regards\nDirectorate Of ICT Help Desk`;
+            }
+
+            document.getElementById("reply-message").value = `Dear ${f.name || 'User'},\n\nThank you for reaching out to the ${deptTitle}. We have received your feedback and wanted to inform you that...\n\n${signOff}`;
+            document.getElementById("reply-modal").classList.remove("hidden");
+        }
+
+        document.getElementById("reply-form").onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById("send-btn");
+            btn.disabled = true;
+            btn.textContent = "Sending...";
+
+            try {
+                const res = await fetch("/api/send-reply", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                    body: JSON.stringify({
+                        feedback_id: document.getElementById("reply-id").value,
+                        email: document.getElementById("reply-email").value,
+                        subject: document.getElementById("reply-subject").value,
+                        message: document.getElementById("reply-message").value
+                    })
+                });
+                if (res.ok) {
+                    alert("Reply sent successfully!");
+                    closeReplyModal();
+                    loadFeedback();
+                }
+            } catch (e) { alert("Failed to send reply"); }
+            finally { btn.disabled = false; btn.textContent = "Send Response"; }
+        };
+
+        async function viewActivityLogs() {
+            document.getElementById("logs-modal").classList.remove("hidden");
+            try {
+                const res = await fetch("/api/admin/activity-logs", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                let logs = await res.json();
+                // Limit to last 20 records for clarity and performance
+                logs = logs.slice(0, 20);
+                document.getElementById("logs-content").innerHTML = `
+                <div class="space-y-4">
+                    ${logs.map(log => `
+                            <div class="flex items-start space-x-3 border-b dark:border-gray-700 pb-3">
+                                <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-full mt-1">
+                                    <i class="fas ${log.action === 'reply_message' ? 'fa-reply' : 'fa-eye'}" style="color: var(--seku-green-dark);"></i>
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between">
+                                        <p class="font-bold text-sm text-gray-800 dark:text-gray-200">${log.action.replace('_', ' ').toUpperCase()}</p>
+                                        <p class="text-[10px] text-gray-400 font-medium" data-timestamp="${log.timestamp}">${window.feedbackPortal ? window.feedbackPortal.formatRelativeTime(log.timestamp) : new Date(log.timestamp).toLocaleString()}</p>
+                                    </div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">${log.details}</p>
+                                </div>
+                            </div>
+                        `).join('') || '<p class="text-center py-10 text-gray-400 italic">No activities recorded yet.</p>'
+                    }
+                </div>
+                `;
+                if (window.feedbackPortal) window.feedbackPortal.updateAllTimestamps();
+            } catch (e) {
+                document.getElementById("logs-content").innerHTML = '<p class="text-center text-red-500">Failed to load logs.</p>';
+            }
+        }
+
+        function exportToCSV() {
+            window.location.href = `/api/admin/export-csv?access_token=${token}`;
+        }
+
+        // Analytics & Data Mining Functions
+        function openAnalytics() {
+            document.getElementById("analytics-modal").classList.remove("hidden");
+            calculateAnalytics();
+        }
+
+        function closeAnalytics() {
+            document.getElementById("analytics-modal").classList.add("hidden");
+        }
+
+        function calculateAnalytics() {
+            if (allFeedback.length === 0) return;
+
+            // 1. Sentiment Score (Simple heuristic)
+            let positiveSignals = 0;
+            let totalSignals = 0;
+
+            // 2. Efficiency (Resolution Rate)
+            let resolutionSignals = 0;
+            let resolutionTotal = 0;
+
+            // Metrics counters
+            let highlyActionableFeedback = 0;
+            let anonymousFeedbackCount = 0;
+
+            const ratingValues = { 'Excellent': 5, 'Good': 4, 'Fair': 3, 'Poor': 2, 'Very Poor': 1 };
+            const positiveWords = ['Yes', 'Good', 'Excellent', 'Very Satisfied', 'Very Accessible', 'Very Clear', 'Timely'];
+            const resolutionWords = ['resolved', 'fix', 'solved', 'helpful', 'solution'];
+
+            allFeedback.forEach(f => {
+                // Determine Anonymity
+                if (f.anonymous === 'true' || f.anonymous === true) {
+                    anonymousFeedbackCount++;
+                }
+
+                // Determine Actionability (Lengthy text means more actionable)
+                const wordCount = (f.message || '').split(' ').filter(w => w.length > 0).length;
+                if (wordCount > 15) {
+                    highlyActionableFeedback++;
+                }
+
+                // Ratings (Sentiment)
+                if (f.rating) {
+                    totalSignals++;
+                    if (f.rating === 'Excellent' || f.rating === 'Good') positiveSignals++;
+                }
+
+                // Yes/No questions (Static)
+                for (let i = 0; i < 5; i++) {
+                    const ans = f[`q_${i}`]; // Removed trailing space bug!
+                    if (ans) {
+                        totalSignals++;
+                        if (positiveWords.some(w => ans.includes(w))) positiveSignals++;
+                    }
+                }
+
+                // Dynamic Responses (Sentiment & Efficiency)
+                if (f.responses && f.responses.length > 0) {
+                    f.responses.forEach(r => {
+                        const ans = r.answer || '';
+                        const qInfo = (r.question_text || '').toLowerCase();
+
+                        // Sentiment
+                        totalSignals++;
+                        if (positiveWords.some(w => ans.includes(w))) positiveSignals++;
+
+                        // Efficiency (if question seems related to resolution)
+                        if (resolutionWords.some(w => qInfo.includes(w))) {
+                            resolutionTotal++;
+                            if (positiveWords.some(w => ans.includes(w))) resolutionSignals++;
+                        }
+                    });
+                }
+            });
+
+            const sentimentScore = totalSignals > 0 ? Math.round((positiveSignals / totalSignals) * 100) : 0;
+            document.getElementById("sentiment-value").textContent = `${sentimentScore}%`;
+            document.getElementById("sentiment-bar").style.width = `${sentimentScore}%`;
+
+            // If we found specific resolution questions, use them, otherwise use a simulated fallback heuristic
+            const efficiencyScore = resolutionTotal > 0
+                ? Math.round((resolutionSignals / resolutionTotal) * 100)
+                : (sentimentScore > 0 ? Math.min(100, Math.round(sentimentScore * 1.1)) : 0); // Simulated fallback
+
+            document.getElementById("efficiency-value").textContent = `${efficiencyScore}%`;
+            document.getElementById("efficiency-bar").style.width = `${efficiencyScore}%`;
+
+            // 3. Average Rating
+            const validRatings = allFeedback.filter(f => f.rating && ratingValues[f.rating]);
+            const avgRating = validRatings.length > 0
+                ? (validRatings.reduce((acc, f) => acc + ratingValues[f.rating], 0) / validRatings.length).toFixed(1)
+                : 0.0;
+
+            document.getElementById("avg-rating-value").textContent = avgRating;
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHtml += `<i class="${i <= Math.round(avgRating) ? 'fas' : 'far'} fa-star mr-1"></i>`;
+            }
+            document.getElementById("avg-rating-stars").innerHTML = starsHtml;
+
+            // 4. Actionability & Anonymity
+            const actionabilityScore = Math.round((highlyActionableFeedback / allFeedback.length) * 100);
+            document.getElementById("actionability-value").textContent = `${actionabilityScore}%`;
+            document.getElementById("actionability-bar").style.width = `${actionabilityScore}%`;
+
+            const anonymityScore = Math.round((anonymousFeedbackCount / allFeedback.length) * 100);
+            document.getElementById("anonymity-value").textContent = `${anonymityScore}%`;
+            document.getElementById("anonymity-bar").style.width = `${anonymityScore}%`;
+
+            // 4. Category Distribution
+            const categories = {};
+            allFeedback.forEach(f => categories[f.category] = (categories[f.category] || 0) + 1);
+
+            document.getElementById("category-stats").innerHTML = Object.entries(categories).map(([cat, count]) => {
+                const percent = Math.round((count / allFeedback.length) * 100);
+                return `
+                    <div>
+                        <div class="flex justify-between text-sm mb-1">
+                            <span>${cat}</span>
+                            <span class="font-bold">${percent}% (${count})</span>
+                        </div>
+                        <div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+                            <div class="bg-purple-500 h-1.5 rounded-full" style="width: ${percent}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 5. Concern Analysis (Prioritize items flagged as "Top Concern")
+            const highConcernOffices = {};
+            const commonKeywords = ['slow', 'rude', 'late', 'missing', 'unhelpful', 'dirty', 'broken', 'difficult', 'poor', 'no'];
+            const keywordsFound = {};
+
+            allFeedback.forEach(f => {
+                const { isTopConcern } = getDerivedStatus(f);
+
+                if (isTopConcern) {
+                    // Track by Office
+                    const officeName = window.feedbackPortal ? window.feedbackPortal.getOfficeName(f.office) : (f.office || 'General');
+                    highConcernOffices[officeName] = (highConcernOffices[officeName] || 0) + 1;
+
+                    // Track Keywords in message
+                    if (f.message) {
+                        commonKeywords.forEach(kw => {
+                            if (f.message.toLowerCase().includes(kw)) {
+                                keywordsFound[kw] = (keywordsFound[kw] || 0) + 1;
+                            }
+                        });
+                    }
+                }
+            });
+
+            let topConcernsHtml = '';
+
+            // Show top offices with high concern flags
+            const sortedOffices = Object.entries(highConcernOffices).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            if (sortedOffices.length > 0) {
+                topConcernsHtml += '<p class="text-[10px] font-bold text-gray-400 uppercase mb-2">High Concern Offices</p>';
+                topConcernsHtml += sortedOffices.map(([office, count]) => `
+                    <div class="flex items-center justify-between p-2 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-r-lg mb-2">
+                        <span class="text-sm font-bold text-red-700 dark:text-red-400">${office}</span>
+                        <span class="px-2 py-1 bg-red-600 text-white text-[10px] rounded-full font-bold">${count} Critical Alerts</span>
+                    </div>
+                `).join('');
+            }
+
+            // Then show common issues found in these concerns
+            const sortedKeywords = Object.entries(keywordsFound).sort((a, b) => b[1] - a[1]).slice(0, 3);
+            if (sortedKeywords.length > 0) {
+                topConcernsHtml += '<p class="text-[10px] font-bold text-gray-400 uppercase mt-4 mb-2">Issue Keywords</p>';
+                topConcernsHtml += sortedKeywords.map(([kw, count]) => `
+                    <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg mb-1">
+                        <span class="capitalize text-sm font-medium text-gray-600 dark:text-gray-300 font-bold">${kw}</span>
+                        <span class="text-xs text-gray-400 font-bold">${count} Mentions</span>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById("concern-stats").innerHTML = topConcernsHtml || '<p class="text-center text-gray-400 italic text-sm py-4">No critical concerns identified yet.</p>';
+        }
+
+        function closeReplyModal() { document.getElementById("reply-modal").classList.add("hidden"); }
+        function closeDetailsModal() { document.getElementById("details-modal").classList.add("hidden"); }
+        function closeLogsModal() { document.getElementById("logs-modal").classList.add("hidden"); }
+
+        // === Compose / Message Member Functions ===
+        function openComposeModal() {
+            const deptTitle = document.getElementById("dept-title").textContent.replace(' Panel', '').trim();
+            const adminName = localStorage.getItem("userFullname") || "Admin";
+
+            let signOff = `Best Regards, \n${adminName} \n${deptTitle} `;
+            if (deptTitle.toLowerCase().includes("directorate of ict") || deptTitle.toLowerCase().includes("ict services") || deptTitle.toLowerCase() === "ict") {
+                signOff = `Regards\nDirectorate Of ICT Help Desk`;
+            }
+
+            document.getElementById("compose-subject").value = `Official Notice from ${deptTitle} `;
+            document.getElementById("compose-message").value = `Dear Member, \n\nThis is an official communication from the ${deptTitle}.\n\n\n\n${signOff}`;
+            document.getElementById("compose-email").value = "";
+            document.getElementById("compose-email-error").classList.add("hidden");
+            document.getElementById("compose-modal").classList.remove("hidden");
+        }
+
+        function closeComposeModal() { document.getElementById("compose-modal").classList.add("hidden"); }
+
+        async function sendMessageToMember(e) {
+            e.preventDefault();
+            const btn = document.getElementById("compose-send-btn");
+            const emailErr = document.getElementById("compose-email-error");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Sending...';
+            emailErr.classList.add("hidden");
+
+            const payload = {
+                recipient_email: document.getElementById("compose-email").value.trim(),
+                subject: document.getElementById("compose-subject").value.trim(),
+                message: document.getElementById("compose-message").value.trim()
+            };
+
+            try {
+                const res = await fetch("/api/admin/send-message", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token} `
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    closeComposeModal();
+                    alert(`✅ Message sent successfully to ${payload.recipient_email}. They will see it in their My Feedback page.`);
+                    document.getElementById("compose-form").reset();
+                } else {
+                    const data = await res.json().catch(() => ({}));
+                    emailErr.textContent = data.detail || "Failed to send. Please verify the email and try again.";
+                    emailErr.classList.remove("hidden");
+                }
+            } catch (err) {
+                emailErr.textContent = "Network error. Please check your connection.";
+                emailErr.classList.remove("hidden");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Send Message';
+            }
+        }
+
+        // === Question Management Functions ===
+        function restrictOfficeSelect(deptName) {
+            const select = document.getElementById("new-q-office");
+            if (!select) return;
+
+            console.log("Restricting questions for department:", deptName);
+
+            const mapping = {
+                'Directorate Of ICT': 'ict-services',
+                'Dept of Computing & IT': 'ict-services',
+                'Finance Department': 'finance',
+                'Library Services': 'library',
+                'Admissions Office': 'admissions',
+                'Hostel / Accommodation': 'hostel',
+                'Catering Services': 'catering',
+                'Security Department': 'security',
+                'Transport': 'transport',
+                'Health Unit / Clinic': 'health-unit',
+                'Department of Mathematics': 'dept-math',
+                'Dept of Physical Sciences': 'dept-physical',
+                'Dept of Biological Sciences': 'dept-biological',
+                'Dean, School of Sci & Comp': 'ssc-dean',
+                'Dean of Students Office': 'dean-students'
+            };
+
+            let targetSlug = mapping[deptName];
+
+            // Fallback: try case-insensitive mapping or substring match
+            if (!targetSlug) {
+                const dLow = deptName.toLowerCase();
+                if (dLow.includes('ict') || dLow.includes('computing')) targetSlug = 'ict-services';
+                else if (dLow.includes('finance')) targetSlug = 'finance';
+                else if (dLow.includes('library')) targetSlug = 'library';
+                else if (dLow.includes('admission')) targetSlug = 'admissions';
+                else if (dLow.includes('hostel') || dLow.includes('accommodation')) targetSlug = 'hostel';
+                else if (dLow.includes('catering')) targetSlug = 'catering';
+                else if (dLow.includes('security')) targetSlug = 'security';
+                else if (dLow.includes('math')) targetSlug = 'dept-math';
+                else if (dLow.includes('physical')) targetSlug = 'dept-physical';
+                else if (dLow.includes('biological')) targetSlug = 'dept-biological';
+                else if (dLow.includes('dean') && dLow.includes('students')) targetSlug = 'dean-students';
+            }
+
+            if (targetSlug) {
+                // Found a matching slug for this admin's department
+                window.currentDeptSlug = targetSlug; // Store globally
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value === targetSlug) {
+                        opt.selected = true;
+                        opt.disabled = false;
+                        opt.style.display = 'block';
+                    } else {
+                        opt.disabled = true;
+                        opt.style.display = 'none';
+                    }
+                });
+            } else {
+                console.warn("No direct slug mapping for:", deptName);
+            }
+        }
+
+        function openQuestionModal() {
+            document.getElementById("questions-modal").classList.remove("hidden");
+            loadQuestions();
+        }
+
+        function closeQuestionModal() {
+            document.getElementById("questions-modal").classList.add("hidden");
+        }
+
+        async function loadQuestions() {
+            try {
+                // Now fetching the enhanced admin endpoint for all questions
+                const res = await fetch("/api/admin/questions/all", {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    allQuestions = await res.json();
+                    renderQuestionsList();
+                } else if (res.status === 403) {
+                    // Fallback if endpoint doesn't exist yet but public one does
+                    const resPub = await fetch("/api/questions");
+                    if (resPub.ok) allQuestions = await resPub.json();
+                }
+            } catch (e) {
+                console.error("Error loading questions:", e);
+            }
+        }
+
+        function renderQuestionsList() {
+            const list = document.getElementById("questions-list");
+            if (allQuestions.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 py-6 italic">No active questions found</p>';
+                return;
+            }
+
+            list.innerHTML = allQuestions.map(q => `
+                <div class="bg-white dark:bg-gray-700 p-4 rounded-xl border dark:border-gray-600 shadow-sm flex justify-between items-center group hover:border-orange-300 transition-colors">
+                    <div class="flex-grow">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] bg-orange-100 dark:bg-orange-900/40 text-orange-600 px-2 py-0.5 rounded-full font-bold">
+                                ${q.target_office ? (window.feedbackPortal ? window.feedbackPortal.getOfficeName(q.target_office) : q.target_office) : 'GLOBAL'}
+                            </span>
+                            <span class="text-[10px] text-gray-400 font-medium">Added ${new Date(q.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <p class="font-bold text-gray-800 dark:text-gray-200">${q.text}</p>
+                        <p class="text-xs text-gray-500 mt-1">Options: <span class="italic font-medium">${q.options}</span></p>
+                    </div>
+                    <button onclick="deleteQuestion(${q.id})" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition" title="Delete Question">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function saveNewQuestion(e) {
+            e.preventDefault();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Adding...';
+
+            const payload = {
+                text: document.getElementById("new-q-text").value.trim(),
+                options: document.getElementById("new-q-options").value.trim(),
+                target_office: document.getElementById("new-q-office").value || null,
+                is_active: true
+            };
+
+            try {
+                const res = await fetch("/api/admin/questions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    document.getElementById("add-question-form").reset();
+                    // Re-apply restriction if stored
+                    if (window.currentDeptSlug) {
+                        const select = document.getElementById("new-q-office");
+                        if (select) select.value = window.currentDeptSlug;
+                    }
+                    await loadQuestions();
+                    alert("✅ Question added successfully! It is now visible to users giving feedback for your department.");
+                } else {
+                    alert("Failed to save question.");
+                }
+            } catch (err) {
+                alert("Network error. Could not save question.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Add Question to Users';
+            }
+        }
+
+        async function deleteQuestion(id) {
+            if (!confirm("Are you sure you want to delete this question? Users will no longer see it.")) return;
+
+            try {
+                const res = await fetch(`/api/admin/questions/${id}`, {
+                    method: "DELETE",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    await loadQuestions();
+                } else {
+                    alert("Failed to delete question.");
+                }
+            } catch (err) {
+                alert("Network error.");
+            }
+        }
+
+        // === QR Toolkit Functions ===
+
+        // Maps department name / slug to the feedback page filename
+        const DEPT_FEEDBACK_SLUG_MAP = {
+            // By slug (used by restrictOfficeSelect)
+            'vc-office': 'vc-office-feedback',
+            'dvc-academic': 'dvc-academic-feedback',
+            'dvc-admin': 'dvc-admin-feedback',
+            'registrar-academic': 'registrar-academic-feedback',
+            'registrar-admin': 'registrar-admin-feedback',
+            'council-office': 'council-office-feedback',
+            'legal-services': 'legal-services-feedback',
+            'corp-comm': 'corp-comm-feedback',
+            'admissions': 'admissions-feedback',
+            'academic-registry': 'academic-registry-feedback',
+            'exams-office': 'exams-office-feedback',
+            'timetabling': 'timetabling-feedback',
+            'research-postgrad': 'research-postgrad-feedback',
+            'quality-assurance': 'quality-assurance-feedback',
+            'industrial-attachment': 'industrial-attachment-feedback',
+            'elearning': 'elearning-feedback',
+            'ssc-dean': 'ssc-dean-feedback',
+            'dept-math': 'dept-math-feedback',
+            'dept-ict': 'dept-ict-feedback',
+            'dept-physical': 'dept-physical-feedback',
+            'dept-biological': 'dept-biological-feedback',
+            'set-dean': 'set-dean-feedback',
+            'dept-civil': 'dept-civil-feedback',
+            'dept-elec': 'dept-elec-feedback',
+            'dept-mech': 'dept-mech-feedback',
+            'sbe-dean': 'sbe-dean-feedback',
+            'dept-admin': 'dept-admin-feedback',
+            'dept-accounting': 'dept-accounting-feedback',
+            'dept-economics': 'dept-economics-feedback',
+            'seh-dean': 'seh-dean-feedback',
+            'dept-edu': 'dept-edu-feedback',
+            'dept-social': 'dept-social-feedback',
+            'dept-humanities': 'dept-humanities-feedback',
+            'sanr-dean': 'sanr-dean-feedback',
+            'dept-env': 'dept-env-feedback',
+            'dept-agri': 'dept-agri-feedback',
+            'dean-students': 'dean-students-feedback',
+            'student-affairs': 'student-affairs-feedback',
+            'counselling': 'counselling-feedback',
+            'chaplaincy': 'chaplaincy-feedback',
+            'career-guidance': 'career-guidance-feedback',
+            'games': 'games-feedback',
+            'student-clubs': 'student-clubs-feedback',
+            'finance': 'finance-feedback',
+            'fees-office': 'fees-office-feedback',
+            'accounts-office': 'accounts-office-feedback',
+            'procurement': 'procurement-feedback',
+            'internal-audit': 'internal-audit-feedback',
+            'hr-office': 'hr-office-feedback',
+            'staff-welfare': 'staff-welfare-feedback',
+            'training-dev': 'training-dev-feedback',
+            'library': 'library-feedback',
+            'ict-services': 'ict-services-feedback',
+            'health-unit': 'health-unit-feedback',
+            'hostel': 'hostel-feedback',
+            'catering': 'catering-feedback',
+            'estate': 'estate-feedback',
+            'transport': 'transport-feedback',
+            'security': 'security-feedback',
+            'grounds': 'grounds-feedback',
+            'research-dir': 'research-dir-feedback',
+            'innovation-office': 'innovation-office-feedback',
+            'community-outreach': 'community-outreach-feedback'
+        };
+
+        function getDeptFeedbackUrl() {
+            // Dynamically determine the base URL to ensure it works on any hosting environment
+            // (localhost, root domain, or subdirectory)
+            let basePath = '';
+            const path = window.location.pathname;
+
+            if (path.includes('/src/components/pages/')) {
+                const root = path.substring(0, path.indexOf('/src/components/pages/'));
+                basePath = window.location.origin + root + '/public/departments/';
+            } else if (path.includes('/components/pages/')) {
+                const root = path.substring(0, path.indexOf('/components/pages/'));
+                basePath = window.location.origin + root + '/public/departments/';
+            } else {
+                // Determine root dynamically based on current admin.html location
+                const parts = path.split('/');
+                parts.pop(); // remove current file (admin.html)
+                let rootDir = parts.join('/');
+                // If nested in a 'pages' or 'components' directory structure when built
+                if (rootDir.endsWith('/pages')) rootDir = rootDir.replace('/pages', '');
+                if (rootDir.endsWith('/components')) rootDir = rootDir.replace('/components', '');
+                if (rootDir.endsWith('/src')) rootDir = rootDir.replace('/src', '');
+
+                basePath = window.location.origin + rootDir + '/departments/';
+            }
+
+            // Fallback for Vite dev server which maps /public to /
+            if (window.location.port === '5173' && !path.includes('/src/')) {
+                basePath = window.location.origin + '/departments/';
+            }
+
+            let fileSlug = 'index';
+
+            // Priority 1: Use the slug stored by restrictOfficeSelect() during page init
+            if (window.currentDeptSlug && DEPT_FEEDBACK_SLUG_MAP[window.currentDeptSlug]) {
+                fileSlug = DEPT_FEEDBACK_SLUG_MAP[window.currentDeptSlug];
+            } else {
+                // Priority 2: Derive from the department title on the page
+                const deptTitle = document.getElementById("dept-title")?.textContent?.replace(' Panel', '').trim() || '';
+                if (deptTitle && !['University Wide Panel', 'General Admin Panel', 'Department Admin'].includes(deptTitle)) {
+                    const dLow = deptTitle.toLowerCase();
+                    for (const [slug, file] of Object.entries(DEPT_FEEDBACK_SLUG_MAP)) {
+                        const slugWords = slug.split('-');
+                        if (slugWords.every(word => dLow.includes(word))) {
+                            fileSlug = file;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return `${basePath}${fileSlug}.html`;
+        }
+
+        function openQRModal() {
+            document.getElementById("qr-modal").classList.remove("hidden");
+            // Auto-generate the QR code for this department immediately
+            generateDeptQRCode();
+        }
+
+        function closeQRModal() {
+            document.getElementById("qr-modal").classList.add("hidden");
+        }
+
+        function generateDeptQRCode() {
+            const container = document.getElementById("qr-image-container");
+            const deptLabel = document.getElementById("qr-dept-label");
+            const urlHint = document.getElementById("qr-url-hint");
+
+            const deptName = document.getElementById("dept-title")?.textContent?.replace(' Panel', '').trim() || 'Feedback';
+            const feedbackUrl = getDeptFeedbackUrl();
+
+            // Update labels
+            if (deptLabel) deptLabel.innerHTML = `<i class="fas fa-building mr-1"></i> ${deptName}`;
+            if (urlHint) urlHint.textContent = feedbackUrl;
+
+            // Clear container
+            container.innerHTML = '';
+
+            try {
+                // Generate QR code automatically using the local qrcode.js library
+
+                const qrcode = new QRCode(container, {
+                    text: feedbackUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#be185d",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.M
+                });
+
+                // qrcode.js generates a canvas and an img tag. Wait brief moment for it to render
+                setTimeout(() => {
+                    const canvas = container.querySelector('canvas');
+                    const img = container.querySelector('img');
+
+                    if (img) {
+                        img.id = 'generated-qr-img';
+                        img.className = 'w-full h-full object-contain rounded-lg';
+                        if (canvas) canvas.style.display = 'none';
+                        img.style.display = 'block';
+                    }
+                }, 100);
+
+            } catch (err) {
+                console.error("QR Code generation failed:", err);
+                container.innerHTML = `<p class="text-xs text-red-400">Failed to generate QR automatically.</p>`;
+            }
+        }
+
+        function printQRCode() {
+            const img = document.querySelector("#qr-image-container img");
+            if (!img) {
+                alert("QR code is still loading. Please wait a moment and try again.");
+                return;
+            }
+
+            const deptName = document.getElementById("dept-title")?.textContent?.replace(' Panel', '').trim() || 'Department';
+            const feedbackUrl = getDeptFeedbackUrl();
+
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Feedback QR Poster - ${deptName} | SEKU</title>
+                    <style>
+                        * { margin: 0; padding: 0; box-sizing: border-box; }
+                        body {
+                            font-family: 'Segoe UI', Arial, sans-serif;
+                            background: white;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            min-height: 100vh;
+                            padding: 20px;
+                        }
+                        .poster {
+                            border: 8px solid #be185d;
+                            border-radius: 28px;
+                            padding: 36px 40px;
+                            text-align: center;
+                            max-width: 480px;
+                            width: 100%;
+                        }
+                        .university-logo {
+                            color: #1e3a5f;
+                            font-size: 13px;
+                            font-weight: 800;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                            margin-bottom: 4px;
+                        }
+                        .university-sub {
+                            color: #6b7280;
+                            font-size: 10px;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            margin-bottom: 18px;
+                        }
+                        .divider {
+                            border: none;
+                            border-top: 2px solid #fce7f3;
+                            margin: 14px 0;
+                        }
+                        .heading {
+                            color: #be185d;
+                            font-size: 22px;
+                            font-weight: 900;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                            margin-bottom: 4px;
+                        }
+                        .subheading {
+                            color: #6b7280;
+                            font-size: 13px;
+                            margin-bottom: 20px;
+                        }
+                        .qr-wrap {
+                            background: #fdf2f8;
+                            border-radius: 16px;
+                            padding: 16px;
+                            display: inline-block;
+                            margin-bottom: 20px;
+                        }
+                        .qr-wrap img {
+                            width: 260px;
+                            height: 260px;
+                            display: block;
+                        }
+                        .dept-name {
+                            font-size: 20px;
+                            font-weight: 900;
+                            color: #1e3a5f;
+                            margin-bottom: 6px;
+                        }
+                        .url-label {
+                            font-size: 10px;
+                            color: #9ca3af;
+                            word-break: break-all;
+                            margin-bottom: 18px;
+                        }
+                        .footer-note {
+                            font-size: 11px;
+                            color: #9ca3af;
+                            border-top: 1px solid #f3f4f6;
+                            padding-top: 14px;
+                            margin-top: 4px;
+                        }
+                        @media print {
+                            body { padding: 0; }
+                        }
+                    </style>
+                </head>
+                <body onload="window.print();">
+                    <div class="poster">
+                        <div class="university-logo">South Eastern Kenya University</div>
+                        <div class="university-sub">SEKU &bull; Customer Feedback System</div>
+                        <hr class="divider">
+                        <p class="heading">Scan to Give Feedback</p>
+                        <p class="subheading">Point your phone camera at the QR code below</p>
+                        <div class="qr-wrap">
+                            <img src="${img.src}" alt="Feedback QR Code">
+                        </div>
+                        <div class="dept-name">${deptName}</div>
+                        <div class="url-label">${feedbackUrl}</div>
+                        <div class="footer-note">Your feedback is confidential and helps us improve. &bull; University Quality Assurance</div>
+                    </div>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        function prevPage() { if (currentPage > 1) { currentPage--; renderTable(); } }
+        function nextPage() { if (currentPage < Math.ceil(filteredFeedback.length / itemsPerPage)) { currentPage++; renderTable(); } }
+
+        document.getElementById("search-input").addEventListener("input", applyFilters);
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
+</body>
+
+</html>

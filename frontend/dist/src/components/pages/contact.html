@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - SEKU ICT Feedback System</title>
+    <!-- Tailwind + Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+    <style>
+        /* SEKU Official Theme Colors - Matching Services Page */
+        :root {
+            --seku-green: #15803d;
+            --seku-green-light: #22c55e;
+            --seku-gold: #FACC15;
+            --seku-gold-dark: #e5b815;
+        }
+
+        .section-container {
+            min-height: calc(100vh - 4rem);
+            padding: 1rem 1rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .section-container {
+                padding: 1.5rem 2rem 2rem;
+            }
+        }
+
+        .contact-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.75rem;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(21, 128, 61, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.1);
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -10px rgba(21, 128, 61, 0.2);
+            border-color: var(--seku-gold);
+        }
+
+        .icon-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, rgba(21, 128, 61, 0.1), rgba(250, 204, 21, 0.1));
+            border-radius: 50%;
+            color: var(--seku-green);
+            border: 1px solid rgba(21, 128, 61, 0.2);
+        }
+
+        .list-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, rgba(21, 128, 61, 0.1), rgba(250, 204, 21, 0.1));
+            border-radius: 50%;
+            color: var(--seku-green);
+        }
+
+        /* Email list styling - with clickable links */
+        .email-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .email-list li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(21, 128, 61, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .email-list li:last-child {
+            border-bottom: none;
+        }
+
+        .email-list li:hover {
+            transform: translateX(5px);
+            background: rgba(21, 128, 61, 0.05);
+            padding-left: 0.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .email-list i {
+            color: var(--seku-green);
+            width: 1.5rem;
+        }
+
+        .email-link {
+            color: var(--seku-green);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .email-link:hover {
+            color: var(--seku-gold);
+            text-decoration: underline;
+        }
+
+        /* Extension list styling */
+        .extension-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .extension-list li {
+            padding: 0.6rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(21, 128, 61, 0.1);
+        }
+
+        .extension-list li:last-child {
+            border-bottom: none;
+        }
+
+        .extension-name {
+            font-weight: 700;
+            color: var(--seku-green);
+        }
+
+        .extension-number {
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: 700;
+            background: rgba(21, 128, 61, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            color: var(--seku-green);
+        }
+
+        /* Location card */
+        .location-card {
+            background: linear-gradient(135deg, #fefce8, #ffffff);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            border-left: 4px solid var(--seku-gold);
+            transition: all 0.3s ease;
+        }
+
+        .location-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(21, 128, 61, 0.1);
+        }
+
+        /* Work hours highlight */
+        .work-hours-highlight {
+            background: linear-gradient(135deg, var(--seku-green), var(--seku-green-light));
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .hours-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: #fefce8;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .hours-row:hover {
+            background: #fef9e3;
+            transform: translateX(5px);
+        }
+
+        .hours-label {
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--seku-green);
+        }
+
+        .hours-time {
+            font-weight: 700;
+            color: var(--seku-green-light);
+        }
+
+        .hours-closed {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        /* Social links */
+        .social-link {
+            color: #6b7280;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--seku-gold);
+            transform: translateY(-3px);
+        }
+
+        /* Phone link styling */
+        .phone-link {
+            color: var(--seku-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .phone-link:hover {
+            color: var(--seku-gold);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-800">
+
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <div class="content-wrapper">
+        <section class="section-container bg-gradient-to-br from-green-50 to-yellow-50">
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+
+                <h1
+                    class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center text-green-700 mb-6 sm:mb-8 tracking-tight">
+                    Contact Us
+                </h1>
+
+                <!-- two main blocks -->
+                <div class="space-y-8 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8">
+
+                    <!-- LEFT CARD: GET IN TOUCH -->
+                    <div class="contact-card">
+                        <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                            <span class="icon-circle mr-3"><i class="fas fa-paper-plane"></i></span>
+                            Get in touch
+                        </h2>
+                        <div class="space-y-5">
+
+                            <!-- Email block - Clickable emails that open Gmail -->
+                            <div class="flex items-start">
+                                <div class="icon-circle mr-3 flex-shrink-0">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-green-700 text-base sm:text-lg mb-2">
+                                        Email</h3>
+                                    <ul class="email-list">
+                                        <li>
+                                            <i class="fas fa-envelope"></i>
+                                            <a href="mailto:ict@seku.ac.ke?subject=ICT Support Request&body=Hello ICT Team,%0A%0AI would like to inquire about...%0A%0ARegards"
+                                                class="email-link" target="_blank">ict@seku.ac.ke</a>
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-envelope"></i>
+                                            <a href="mailto:ictsupport@seku.ac.ke?subject=ICT Support Request&body=Hello ICT Support,%0A%0AI need assistance with...%0A%0ARegards"
+                                                class="email-link" target="_blank">ictsupport@seku.ac.ke</a>
+                                        </li>
+                                        <li>
+                                            <i class="fas fa-envelope"></i>
+                                            <a href="mailto:director-ict@seku.ac.ke?subject=ICT Directorate Inquiry&body=Dear Director ICT,%0A%0AI would like to...%0A%0ARegards"
+                                                class="email-link" target="_blank">director-ict@seku.ac.ke</a>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Work Hours block -->
+                            <div class="flex items-start">
+                                <div class="icon-circle mr-3 flex-shrink-0">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-green-700 text-base sm:text-lg mb-2">
+                                        Work Hours</h3>
+                                    <div class="work-hours-highlight mb-2">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        Monday - Friday: 8:00 AM - 5:00 PM
+                                    </div>
+                                    <p class="text-gray-600 text-sm mt-2">
+                                        <i class="fas fa-info-circle text-green-600"></i> Closed on weekends and public
+                                        holidays
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- social / quick links -->
+                        <div class="mt-8 pt-4 border-t border-gray-200">
+                            <p class="text-sm font-medium text-gray-500 mb-3">Follow us</p>
+                            <div class="flex space-x-5">
+                                <a href="https://twitter.com/sekukenya" target="_blank"
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
+                                        class="fab fa-twitter"></i></a>
+                                <a href="https://www.facebook.com/sekukenya" target="_blank"
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
+                                        class="fab fa-facebook"></i></a>
+                                <a href="https://www.instagram.com/sekukenya/" target="_blank"
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="https://www.youtube.com/@SouthEasternKenyaUniversity" target="_blank"
+                                    class="social-link text-gray-500 hover:text-yellow-500 text-xl transition"><i
+                                        class="fab fa-youtube"></i></a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT SIDE: Multiple Cards -->
+                    <div class="space-y-6">
+                        <!-- Physical Addresses -->
+                        <div class="contact-card">
+                            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                                <span class="icon-circle mr-3"><i class="fas fa-map-marker-alt"></i></span>
+                                Physical Locations
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="location-card">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <i class="fas fa-building text-yellow-500 text-xl"></i>
+                                        <h3 class="font-bold text-gray-800 text-lg">Central Administration Block</h3>
+                                    </div>
+                                    <p class="text-gray-600 pl-9">Ground Floor</p>
+                                </div>
+
+                                <div class="location-card">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <i class="fas fa-laptop-house text-green-600 text-xl"></i>
+                                        <h3 class="font-bold text-gray-800 text-lg">Tuition Block II</h3>
+                                    </div>
+                                    <p class="text-gray-600 pl-9">Ground Floor</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Phone Extensions with clickable phone link -->
+                        <div class="contact-card">
+                            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                                <span class="icon-circle mr-3"><i class="fas fa-phone-alt"></i></span>
+                                Telephone Extensions
+                            </h2>
+                            <ul class="extension-list">
+                                <li>
+                                    <span class="extension-name">Tuition Block II</span>
+                                    <span class="extension-number">254, 256</span>
+                                </li>
+                                <li>
+                                    <span class="extension-name">Central Admin Block</span>
+                                    <span class="extension-number">255, 259</span>
+                                </li>
+                                <li>
+                                    <span class="extension-name">ICT Director's Office</span>
+                                    <span class="extension-number">226</span>
+                                </li>
+                            </ul>
+
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <div class="flex items-center gap-2 text-sm text-gray-600">
+                                    <i class="fas fa-phone-alt text-green-600"></i>
+                                    <span>Main Line: <a href="tel:+254748605997" class="phone-link">+254 748 60 59
+                                            97</a></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Office Hours Summary -->
+                        <div class="contact-card">
+                            <h2 class="text-2xl sm:text-3xl font-bold mb-6 text-green-700 flex items-center">
+                                <span class="icon-circle mr-3"><i class="fas fa-calendar-alt"></i></span>
+                                Office Hours
+                            </h2>
+                            <div class="space-y-3">
+                                <div class="hours-row">
+                                    <span class="hours-label">
+                                        <i class="fas fa-calendar-week text-green-600"></i>
+                                        Monday – Friday
+                                    </span>
+                                    <span class="hours-time">8:00 AM – 5:00 PM</span>
+                                </div>
+                                <div class="hours-row" style="background: #f9fafb;">
+                                    <span class="hours-label">
+                                        <i class="fas fa-calendar-day text-gray-500"></i>
+                                        Saturday
+                                    </span>
+                                    <span class="hours-closed"><i class="fas fa-times-circle"></i> Closed</span>
+                                </div>
+                                <div class="hours-row" style="background: #f9fafb;">
+                                    <span class="hours-label">
+                                        <i class="fas fa-calendar-day text-gray-500"></i>
+                                        Sunday
+                                    </span>
+                                    <span class="hours-closed"><i class="fas fa-times-circle"></i> Closed</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 pt-4 border-t border-gray-200">
+                                <div class="flex items-start gap-2 text-xs text-gray-500">
+                                    <i class="fas fa-envelope-open-text text-green-600 mt-0.5"></i>
+                                    <span>After hours / emergencies: <a
+                                            href="mailto:ictsupport@seku.ac.ke?subject=Emergency ICT Support&body=Hello ICT Support,%0A%0AThis is an emergency request. Please assist with...%0A%0ARegards"
+                                            class="email-link" target="_blank"><strong
+                                                class="text-green-700">ictsupport@seku.ac.ke</strong></a> (24/7
+                                        response)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- bottom unified note with clickable email -->
+                <div class="mt-8 text-center text-sm text-gray-500 max-w-2xl mx-auto border-t border-gray-200 pt-6">
+                    <p class="flex items-center justify-center gap-2 flex-wrap">
+                        <i class="fas fa-circle-check text-green-600 text-base"></i>
+                        <span>For urgent ICT support, please contact us during office hours or email
+                            <a href="mailto:ictsupport@seku.ac.ke?subject=Urgent ICT Support&body=Hello ICT Support,%0A%0AThis is an urgent request. Please assist with...%0A%0ARegards"
+                                class="email-link" target="_blank"><strong>ictsupport@seku.ac.ke</strong></a>
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
+</body>
+
+</html>

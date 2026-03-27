@@ -3,12 +3,12 @@ from sqlalchemy.orm import Session, selectinload
 from sqlalchemy.exc import SQLAlchemyError
 from models import Feedback, User, Department, ActivityLog, Question, QuestionResponse
 from schemas import (
-    FeedbackCreate, FeedbackOut, UserCreate, UserOut, 
+    FeedbackCreate, FeedbackOut, UserCreate, UserOut, UserUpdate, 
     LoginRequest, Token, FeedbackTrackRequest,
     QuestionCreate, QuestionOut, QuestionResponseCreate, FeedbackCreateExtended,
     FeedbackOutExtended, ForgotPasswordRequest, ResetPasswordRequest
 )
-from auth import authenticate_user, create_access_token, get_current_user, get_password_hash
+from auth import authenticate_user, create_access_token, get_current_user, get_password_hash, verify_password
 from database import get_db
 from datetime import datetime
 from typing import List, Optional
@@ -24,21 +24,14 @@ def user_id_for_log(user) -> str:
     if not user:
         return "Unknown"
     return user.email or user.username or f"ID:{user.id}"
-
-# Simple HTML sanitizer to prevent XSS
 def sanitize_html(text: str) -> str:
     if not text:
         return text
-    # Strip script tags and other dangerous elements
     text = re.sub(r'<script.*?>.*?</script>', '', text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r'<.*?>', '', text) # Remove all HTML tags for safety
     return text.strip()
-
-# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Dependency Helper for Background Notifications
 def notify_admins_task(feedback_id: int):
     """Background task to send email notifications to admins without delaying the user."""
     from database import SessionLocal
@@ -76,68 +69,10 @@ def notify_admins_task(feedback_id: int):
 
 router = APIRouter()
 
-# [Register] Register Route
-@router.post("/register", response_model=UserOut)
-def register_user(user: UserCreate, db: Session = Depends(get_db), current_user: Optional[User] = Depends(get_current_user)):
-    try:
-        logger.info(f"Registration attempt for email: {user.email}")
-        
-        # Check if user exists
-        db_user = db.query(User).filter(User.email == user.email).first()
-        if db_user:
-            logger.warning(f"Email already registered: {user.email}")
-            raise HTTPException(status_code=400, detail="Email already registered")
-        
-        # Prevent unauthorized admin registration
-        user_count = db.query(User).count()
-        is_first_user = user_count == 0
-        
-        assigned_role = user.role
-        if not is_first_user:
-            # Only existing admins can create other admins
-            if assigned_role == "admin":
-                if not current_user or current_user.role != "admin":
-                    logger.warning(f"Unauthorized admin registration attempt by {user.email}")
-                    assigned_role = "student" # Default to lowest role
-        else:
-            assigned_role = "admin" # First user is always admin
-        
-        logger.info(f"User registration: {user.email}, Target Role: {user.role}, Assigned Role: {assigned_role}")
-
-        # Hash password
-        hashed_password = get_password_hash(user.password)
-        
-        # Create new user
-        new_user = User(
-            fullname=user.fullname,
-            email=user.email,
-            hashed_password=hashed_password,
-            role=assigned_role,
-            department_id=user.department_id
-        )
-        
-        db.add(new_user)
-        db.commit()
-        db.refresh(new_user)
-        
-        logger.info(f"User registered successfully: {user.email} with role {assigned_role}")
-        return new_user
-        
-    except SQLAlchemyError as e:
-        logger.error(f"Database error in register: {str(e)}")
-        db.rollback()
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-    except Exception as e:
-        logger.error(f"Unexpected error in register: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
-
-# [User] Login Route
 @router.post("/login", response_model=Token)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     try:
         logger.info(f"Login attempt for {request.email or request.username}")
-        
-        # Authenticate user
         user = authenticate_user(
             db, 
             email=request.email, 
@@ -147,8 +82,6 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         if not user:
             logger.warning(f"Invalid credentials for {request.email or request.username}")
             raise HTTPException(status_code=400, detail="Invalid credentials")
-
-        # Create access token
         access_token = create_access_token(data={"sub": user.email or user.username})
         
         logger.info(f"User logged in successfully: {user.email or user.username} with role {user.role}")
@@ -169,65 +102,21 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
         logger.error(f"Unexpected error in login: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-# [Auth] Forgot Password Route
-@router.post("/forgot-password")
-def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
-    from auth import create_reset_token
-    from email_service import email_service
-    
-    logger.info(f"Forgot password attempt for {request.email}")
-    user = db.query(User).filter(User.email == request.email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-    
-    token = create_reset_token(user.email)
-    success = email_service.send_password_reset(user.email, token)
-    if not success:
-        raise HTTPException(status_code=500, detail="Failed to send reset email.")
-        
-    return {"message": "Password reset email sent."}
-
-# [Auth] Reset Password Route
-@router.post("/reset-password")
-def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
-    from auth import verify_reset_token, get_password_hash
-    
-    try:
-        email = verify_reset_token(request.token)
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found.")
-            
-        user.hashed_password = get_password_hash(request.new_password)
-        db.commit()
-        return {"message": "Password updated successfully."}
-    except Exception as e:
-        print(f"[ERROR] Error: {e}")
-        db.rollback()
-        raise e
-
-# [Feedback] Submit Feedback Route
 @router.post("/submit-feedback", response_model=FeedbackOut)
 def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: BackgroundTasks, 
                     db: Session = Depends(get_db), 
                     current_user: User = Depends(get_current_user)):
     try:
-        # Convert to dict and sanitize inputs
         feedback_dict = feedback.dict()
         feedback_dict['message'] = sanitize_html(feedback_dict.get('message', ''))
         feedback_dict['name'] = sanitize_html(feedback_dict.get('name', ''))
         
         dynamic_responses: List[dict] = feedback_dict.pop('dynamic_responses', [])
-        
-        # If user is authenticated, use their email
         if current_user:
             feedback_dict['email'] = current_user.email
             feedback_dict['name'] = feedback_dict.get('name') or current_user.fullname
-        
-        # If department_id is not provided, try to find it by office name
         if not feedback_dict.get('department_id') and feedback_dict.get('office'):
             office_val = feedback_dict['office'].lower()
-            # Mapping frontend slugs to DB names
             slug_map = {
                 'vc-office': "Vice Chancellor's Office",
                 'dvc-academic': "Deputy Vice Chancellor (Academic)",
@@ -294,11 +183,9 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
                 'community-outreach': "Community Outreach"
             }
             dept_name = slug_map.get(office_val, office_val)
-            # Handle different apostrophes (straight vs curly)
             # Check if dept_name is not None or empty before attempting replace
             if dept_name:
                 dept_name_variants = [dept_name]
-                # Replace possible curly apostrophes from frontend with straight ones for DB matching
                 # Hex 2019 is curly ’, 0027 is straight '
                 if "'" in dept_name:
                     dept_name_variants.append(dept_name.replace("'", "\u2019"))
@@ -316,27 +203,19 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
                 logger.info(f"Mapped office '{office_val}' to department '{dept.name}' (ID: {dept.id})")
             else:
                 logger.warning(f"Could not map office '{office_val}' to any department. Dept name searched: '{dept_name}'")
-
-        # Set default values for status fields
         feedback_dict['is_read'] = False
         feedback_dict['read_at'] = None
         feedback_dict['replied_at'] = None
         feedback_dict['reply_message'] = None
-        
-        # Generate a unique tracking ID
         import secrets
         import string
         alphabet = string.ascii_uppercase + string.digits
         tracking_id = ''.join(secrets.choice(alphabet) for _ in range(10))
         feedback_dict['tracking_id'] = f"REF-{tracking_id}"
-        
-        # Filter feedback_dict to only include keys that exist in the Feedback model
         allowed_keys = {c.key for c in Feedback.__table__.columns}
         filtered_feedback_dict = {k: v for k, v in feedback_dict.items() if k in allowed_keys}
         
         db_feedback = Feedback(**filtered_feedback_dict)
-        
-        # MIRROR: Populate legacy columns q_0 through q_4 from dynamic responses 
         # for easier viewing in the main feedback table
         for i, resp in enumerate(dynamic_responses[:5]):
             field_name = f'q_{i}'
@@ -347,12 +226,9 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
 
         db.commit()
         db.refresh(db_feedback)
-
-        # Save all dynamic responses (the full detailed set)
         for resp in dynamic_responses:
             q_id = resp.get('question_id')
             if q_id:
-                # [Safety Cache] Verify ID exists in questions table to avoid IntegrityError (1452)
                 exists = db.query(Question.id).filter(Question.id == q_id).first()
                 if not exists:
                     q_id = None
@@ -369,8 +245,6 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
             db.commit()
         
         logger.info(f"Feedback submitted: ID {db_feedback.id}, Tracking ID {db_feedback.tracking_id}, Dept ID {db_feedback.department_id}")
-
-        # Trigger notification in background to speed up response for the user
         if db_feedback.department_id:
             background_tasks.add_task(notify_admins_task, db_feedback.id)
             logger.info(f"Background notification task scheduled for feedback ID: {db_feedback.id}")
@@ -385,8 +259,6 @@ def submit_feedback(feedback: FeedbackCreateExtended, background_tasks: Backgrou
         print(f"[ERROR] DATABASE ERROR: {error_msg}")
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {error_msg[:100]}")
-
-# [Admin] Admin Route - View All Feedback
 @router.get("/admin/feedback", response_model=List[FeedbackOutExtended])
 def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
@@ -413,8 +285,6 @@ def get_all_feedback(db: Session = Depends(get_db), current_user: User = Depends
     except SQLAlchemyError as e:
         logger.error(f"Database error in get_all_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
-
-# [Admin] Mark feedback as read
 @router.post("/admin/feedback/{feedback_id}/read")
 def mark_feedback_as_read(
     feedback_id: int, 
@@ -434,8 +304,6 @@ def mark_feedback_as_read(
 
         feedback.is_read = True
         feedback.read_at = datetime.now()
-        
-        # Log action
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -452,8 +320,6 @@ def mark_feedback_as_read(
         logger.error(f"Database error in mark_as_read: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
-
-# [Admin] Mark feedback as answered
 @router.post("/admin/feedback/{feedback_id}/answered")
 def mark_feedback_as_answered(
     feedback_id: int, 
@@ -472,8 +338,6 @@ def mark_feedback_as_answered(
              raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
         feedback.replied_at = datetime.now()
-        
-        # Log action
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -490,8 +354,6 @@ def mark_feedback_as_answered(
         logger.error(f"Database error in mark_as_answered: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
-
-# [Admin] Send Reply Route
 @router.post("/send-reply")
 def send_reply(
     request: dict,
@@ -509,8 +371,6 @@ def send_reply(
 
         if not message or not feedback_id:
             raise HTTPException(status_code=400, detail="Missing required fields: message and feedback_id")
-
-        # Update feedback with reply info
         feedback = db.query(Feedback).filter(Feedback.id == feedback_id).first()
         if not feedback:
             raise HTTPException(status_code=404, detail="Feedback not found")
@@ -522,8 +382,6 @@ def send_reply(
         feedback.reply_message = message
         feedback.is_read = True
         feedback.read_at = datetime.now()
-        
-        # Log action
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -534,8 +392,6 @@ def send_reply(
         db.commit()
         
         logger.info(f"Reply sent to feedback {feedback_id} by admin {user_id_for_log(current_user)}")
-        
-        # Send email notification if user has an email
         if feedback.email:
             try:
                 email_sent = email_service.send_feedback_reply(
@@ -557,8 +413,6 @@ def send_reply(
         logger.error(f"Database error in send_reply: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
-
-# [Admin] Admin -> Member: Send proactive message to registered user
 @router.post("/admin/send-message")
 def send_admin_message_to_member(
     request: dict,
@@ -575,13 +429,9 @@ def send_admin_message_to_member(
 
         if not recipient_email or not message:
             raise HTTPException(status_code=400, detail="recipient_email and message are required")
-
-        # Verify the recipient is a registered member
         recipient = db.query(User).filter(User.email == recipient_email).first()
         if not recipient:
             raise HTTPException(status_code=404, detail=f"No registered member found with email: {recipient_email}")
-
-        # Create a feedback record as the "admin message" so it appears in My Feedback
         import secrets, string
         alphabet = string.ascii_uppercase + string.digits
         tracking_id = "MSG-" + ''.join(secrets.choice(alphabet) for _ in range(8))
@@ -597,11 +447,9 @@ def send_admin_message_to_member(
             department_id=current_user.department_id,
             is_read=False,
             reply_message=message,
-            replied_at=datetime.now(),   # Mark as already answered since admin composed it
+            replied_at=datetime.now(),
         )
         db.add(new_msg)
-
-        # Log the action
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -618,8 +466,6 @@ def send_admin_message_to_member(
         logger.error(f"Database error in send_admin_message: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
-
-# [User] User Route - View Own Feedback
 @router.get("/user/feedback", response_model=List[FeedbackOutExtended])
 def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
@@ -634,8 +480,6 @@ def get_user_feedback(db: Session = Depends(get_db), current_user: User = Depend
     except SQLAlchemyError as e:
         logger.error(f"Database error in get_user_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
-
-# [User] Anonymous Route - Track Feedback by Email or Tracking ID
 @router.post("/feedback/track", response_model=List[FeedbackOutExtended])
 def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db)):
     try:
@@ -656,8 +500,6 @@ def track_feedback(request: FeedbackTrackRequest, db: Session = Depends(get_db))
     except SQLAlchemyError as e:
         logger.error(f"Database error in track_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
-
-# [User] Get single feedback
 @router.get("/user/feedback/{feedback_id}", response_model=FeedbackOut)
 def get_single_user_feedback(
     feedback_id: int, 
@@ -679,8 +521,6 @@ def get_single_user_feedback(
     except SQLAlchemyError as e:
         logger.error(f"Database error in get_single_user_feedback: {str(e)}")
         raise HTTPException(status_code=500, detail="Database error")
-
-# [User] Mark feedback as read (user)
 @router.post("/user/feedback/{feedback_id}/read")
 def mark_user_feedback_as_read(
     feedback_id: int, 
@@ -710,13 +550,9 @@ def mark_user_feedback_as_read(
         logger.error(f"Database error in mark_user_feedback_as_read: {str(e)}")
         db.rollback()
         raise HTTPException(status_code=500, detail="Database error")
-
-# [System] Get Departments List
 @router.get("/departments")
 def get_departments(db: Session = Depends(get_db)):
     return db.query(Department).all()
-
-# [Admin] Activity Logs
 @router.get("/admin/activity-logs")
 def get_activity_logs(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
@@ -727,8 +563,45 @@ def get_activity_logs(db: Session = Depends(get_db), current_user: User = Depend
         query = query.filter(ActivityLog.department_id == current_user.department_id)
     
     return query.order_by(ActivityLog.timestamp.desc()).limit(50).all()
-
-# [Admin] Export CSV
+@router.put("/user/profile", response_model=UserOut)
+def update_profile(user_update: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    db_user = db.query(User).filter(User.id == current_user.id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_update.fullname:
+        db_user.fullname = user_update.fullname
+    
+    if user_update.username:
+        existing_user = db.query(User).filter(User.username == user_update.username, User.id != current_user.id).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already taken")
+        db_user.username = user_update.username
+        
+    if user_update.new_password:
+        if not user_update.current_password:
+            raise HTTPException(status_code=400, detail="Current password is required to set a new password")
+        
+        if not verify_password(user_update.current_password, db_user.hashed_password):
+            raise HTTPException(status_code=400, detail="Incorrect current password")
+            
+        db_user.hashed_password = get_password_hash(user_update.new_password)
+        
+    db.commit()
+    db.refresh(db_user)
+    log = ActivityLog(
+        user_id=current_user.id,
+        department_id=current_user.department_id,
+        action="update_profile",
+        details="Updated user profile details"
+    )
+    db.add(log)
+    db.commit()
+    
+    return db_user
 @router.get("/admin/export-csv")
 def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     if not current_user or current_user.role != "admin":
@@ -742,14 +615,10 @@ def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depe
         query = query.filter(Feedback.department_id == current_user.department_id)
     
     feedback = query.all()
-    
-    # Enhanced header
     writer.writerow(["ID", "Tracking ID", "Name", "Email", "Category", "Office", "Message", "Rating", "Detailed Responses", "Created At", "Status"])
     
     for f in feedback:
         status = "Replied" if f.replied_at else ("Read" if f.is_read else "Unread")
-        
-        # Format detailed responses as a single string for CSV
         resp_summary = ""
         if hasattr(f, 'responses') and f.responses:
             resp_list: List[str] = []
@@ -778,13 +647,10 @@ def export_feedback_csv(db: Session = Depends(get_db), current_user: User = Depe
         media_type="text/csv",
         headers={"Content-Disposition": f"attachment; filename=feedback_dept_{current_user.department_id}.csv"}
     )
-
-# [Admin] Question Management Routes
 @router.get("/questions", response_model=List[QuestionOut])
 def get_questions(office: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(Question).filter(Question.is_active == True)
     if office:
-        # Filter by specific office or global (target_office is null)
         query = query.filter((Question.target_office == office) | (Question.target_office == None) | (Question.target_office == ''))
     return query.all()
 
@@ -814,12 +680,8 @@ def get_admin_target_office(user: User, db: Session):
         'Dean, School of Sci & Comp': 'ssc-dean',
         'Dean of Students Office': 'dean-students'
     }
-    
-    # Try direct mapping
     if dept.name in mapping:
         return mapping[dept.name]
-    
-    # Try fuzzy mapping
     d_low = dept.name.lower()
     if 'ict' in d_low or 'computing' in d_low: return 'ict-services'
     if 'finance' in d_low: return 'finance'
@@ -844,7 +706,6 @@ def get_all_questions_admin(db: Session = Depends(get_db), current_user: User = 
     
     query = db.query(Question).filter(Question.is_active == True)
     if target_office:
-        # Dept admin only sees their questions + global ones? 
         # Actually, instructions imply they should manage THEIR department's questions.
         query = query.filter(Question.target_office == target_office)
     
@@ -856,8 +717,6 @@ def add_question(question: QuestionCreate, db: Session = Depends(get_db), curren
         raise HTTPException(status_code=403, detail="Admins only")
     
     target_office = get_admin_target_office(current_user, db)
-    
-    # Enforce target_office if user is a department admin
     db_data = question.dict()
     if target_office:
         db_data['target_office'] = target_office
@@ -882,13 +741,9 @@ def delete_question(question_id: int, db: Session = Depends(get_db), current_use
     db_question = query.first()
     if not db_question:
         raise HTTPException(status_code=404, detail="Question not found or access denied")
-    
-    # Soft delete by marking inactive
     db_question.is_active = False
     db.commit()
     return {"message": "Question deleted successfully"}
-
-# [User] Get Current User Info
 @router.get("/user/me")
 def get_user_profile(current_user: User = Depends(get_current_user)):
     if not current_user:

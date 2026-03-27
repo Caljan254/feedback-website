@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEKU ICT Service Charter</title>
+    <link rel="icon" type="image/x-icon" href="../../../favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <!-- jsPDF + autoTable for reliable PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .section-container {
+            min-height: calc(100vh - 4rem);
+            padding: 1rem 1rem 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .section-container {
+                padding: 1.5rem 2rem 2rem;
+            }
+        }
+
+        th {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #065f46;
+            font-weight: 700;
+        }
+
+        .dark th {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        .table-row-hover:hover {
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .dark .table-row-hover:hover {
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        /* PDF-specific styles hidden on screen */
+        /* PDF charter is built dynamically - no static hidden div needed */
+
+        .download-btn {
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(5, 150, 105, 0.4);
+        }
+
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <div class="content-wrapper">
+        <section
+            class="section-container bg-gradient-to-br from-green-50 to-blue-50 dark:from-gray-800 dark:to-gray-900">
+            <div class="max-w-6xl mx-auto px-4 py-8 sm:py-12">
+
+                <!-- Header with SEKU Logo -->
+                <div class="text-center mb-10">
+                    <div class="flex justify-center mb-6">
+                        <img src="../../../uploads/logo.png" alt="South Eastern Kenya University Logo"
+                            class="h-28 w-auto object-contain drop-shadow-md" onerror="this.style.display='none'" />
+                    </div>
+                    <h1
+                        class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-green-800 dark:text-green-400 mb-2 tracking-tight">
+                        SOUTH EASTERN KENYA UNIVERSITY
+                    </h1>
+                    <div class="w-32 h-1 bg-gradient-to-r from-green-600 to-yellow-400 mx-auto mb-4 rounded-full"></div>
+                    <h2
+                        class="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6 flex items-center justify-center gap-3">
+                        <i class="fas fa-file-contract text-green-600"></i>
+                        ICT Service Charter
+                    </h2>
+
+                    <div
+                        class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl p-6 sm:p-8 max-w-4xl mx-auto border-t-4 border-green-500">
+                        <p class="text-gray-700 dark:text-gray-300 text-lg sm:text-xl leading-relaxed">
+                            This Service Charter outlines the ICT services provided, the requirements for accessing
+                            them,
+                            applicable charges, and expected timelines. It serves as a commitment to efficient,
+                            reliable,
+                            and user-focused ICT support.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Charter Table -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700 mb-10">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse" id="charter-table">
+                            <thead>
+                                <tr>
+                                    <th class="p-4 border-b border-gray-200 dark:border-gray-700 w-16 text-center">#
+                                    </th>
+                                    <th class="p-4 border-b border-gray-200 dark:border-gray-700">Service</th>
+                                    <th class="p-4 border-b border-gray-200 dark:border-gray-700">Requirements</th>
+                                    <th class="p-4 border-b border-gray-200 dark:border-gray-700 text-center">Charges
+                                    </th>
+                                    <th class="p-4 border-b border-gray-200 dark:border-gray-700">Timelines</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 dark:text-gray-300" id="charter-tbody">
+                                <!-- Rows filled dynamically (and also statically as fallback) -->
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">1</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">ICT Helpdesk Support
+                                    </td>
+                                    <td class="p-4">Call, written request, helpdesk ticket, email, or walk-in</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 48 hours
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">2</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Network/Email
+                                        Restoration</td>
+                                    <td class="p-4">Written request, call, or system detection</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 24 hours
+                                    </td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">3</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">ICT Training
+                                        (Students &amp; Staff)</td>
+                                    <td class="p-4">Written request, identification of training needs</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 2 weeks</td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">4</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Security Breach
+                                        Resolution</td>
+                                    <td class="p-4">Detection via monitoring system</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 48 hours
+                                    </td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">5</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">New User Account
+                                        Creation (Email/ERP)</td>
+                                    <td class="p-4">Written request</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 24 hours
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">6</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Password Reset</td>
+                                    <td class="p-4">Call or helpdesk ticket</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 24 hours
+                                    </td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">7</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">ICT Equipment
+                                        Maintenance &amp; Repairs</td>
+                                    <td class="p-4">Maintenance schedule, warranty status</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 4 weeks</td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">8</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Escalation of
+                                        Equipment Faults</td>
+                                    <td class="p-4">Diagnosis report, request for parts/quotation</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Per
+                                            quotation</span></td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 7 days</td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">9</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Mini Website
+                                        Development</td>
+                                    <td class="p-4">Written request, content, and specifications</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 1 month</td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">10</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Project
+                                        Implementation</td>
+                                    <td class="p-4">Requirements, proposal/plan, procurement procedure</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> 1 year before
+                                        tender award</td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">11</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">ICT Equipment
+                                        Specifications</td>
+                                    <td class="p-4">Written request</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 48 hours
+                                    </td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">12</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Response to ICT
+                                        Queries</td>
+                                    <td class="p-4">Written request, email, or call</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 24 hours
+                                    </td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">13</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Computer Lab Services
+                                    </td>
+                                    <td class="p-4">Written request</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Working days</td>
+                                </tr>
+                                <tr
+                                    class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition bg-gray-50 dark:bg-gray-800/50">
+                                    <td class="p-4 text-center font-medium">14</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">Website Updates</td>
+                                    <td class="p-4">Written request or email</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 24 hours
+                                    </td>
+                                </tr>
+                                <tr class="table-row-hover border-b border-gray-100 dark:border-gray-700 transition">
+                                    <td class="p-4 text-center font-medium">15</td>
+                                    <td class="p-4 font-semibold text-gray-800 dark:text-gray-200">New Website Design
+                                    </td>
+                                    <td class="p-4">Written request or email</td>
+                                    <td class="p-4 text-center"><span
+                                            class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-bold">Nil</span>
+                                    </td>
+                                    <td class="p-4"><i class="fas fa-clock text-green-500 mr-1"></i> Within 1 month</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Download Button -->
+                <div class="text-center no-print">
+                    <button onclick="downloadCharterPDF()" id="download-btn"
+                        class="download-btn inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-600 to-green-800 text-white font-bold rounded-full shadow-lg hover:from-green-700 hover:to-green-900">
+                        <i class="fas fa-download mr-3 text-xl"></i>
+                        Download Service Charter (PDF)
+                    </button>
+
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <div id="footer-placeholder"></div>
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                spacer.style.height = header.offsetHeight + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') setTimeout(adjustHeaderSpacer, 50);
+        });
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => adjustHeaderSpacer());
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) { observer.observe(header); clearInterval(checkHeaderInterval); }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+        document.addEventListener('DOMContentLoaded', () => { adjustHeaderSpacer(); });
+
+        // ─── PDF Download using jsPDF + autoTable ────────────────────────────────
+        function downloadCharterPDF() {
+            const btn = document.getElementById('download-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3 text-xl"></i> Generating PDF...';
+            btn.disabled = true;
+
+            const printDate = new Date().toLocaleDateString('en-KE', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            // Helper: load image as base64 for jsPDF
+            function loadImageAsBase64(src, cb) {
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function () {
+                    const c = document.createElement('canvas');
+                    c.width = img.naturalWidth || img.width;
+                    c.height = img.naturalHeight || img.height;
+                    c.getContext('2d').drawImage(img, 0, 0);
+                    cb(c.toDataURL('image/png'), c.width, c.height);
+                };
+                img.onerror = function () { cb(null, 0, 0); };
+                // Try multiple paths in case of different server configs
+                img.src = src;
+            }
+
+            function buildPDF(logoDataUrl, imgW, imgH) {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+                const pageW = doc.internal.pageSize.getWidth();
+                const marginL = 14;
+                const marginR = 14;
+                const usableW = pageW - marginL - marginR;
+                let curY = 14;
+
+                // ── Logo ──────────────────────────────────────────────────
+                if (logoDataUrl) {
+                    const maxLogoH = 22;
+                    const ratio = imgW / imgH;
+                    const logoH = maxLogoH;
+                    const logoW = logoH * ratio;
+                    const logoX = (pageW - logoW) / 2;
+                    doc.addImage(logoDataUrl, 'PNG', logoX, curY, logoW, logoH);
+                    curY += logoH + 4;
+                }
+
+                // ── University name ───────────────────────────────────────
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(13);
+                doc.setTextColor(6, 95, 70); // dark green
+                doc.text('SOUTH EASTERN KENYA UNIVERSITY', pageW / 2, curY, { align: 'center' });
+                curY += 6;
+
+                doc.setFontSize(9);
+                doc.setTextColor(5, 150, 105);
+                doc.text('DIRECTORATE OF INFORMATION AND COMMUNICATION TECHNOLOGY', pageW / 2, curY, { align: 'center' });
+                curY += 6;
+
+                // ── Title ─────────────────────────────────────────────────
+                doc.setFontSize(12);
+                doc.setTextColor(31, 41, 55);
+                doc.text('ICT Service Charter', pageW / 2, curY, { align: 'center' });
+                curY += 5;
+
+                // ── Divider line ──────────────────────────────────────────
+                doc.setDrawColor(5, 150, 105);
+                doc.setLineWidth(0.8);
+                doc.line(marginL, curY, pageW - marginR, curY);
+                curY += 4;
+
+                // ── Print date ────────────────────────────────────────────
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(107, 114, 128);
+                doc.text(`Printed: ${printDate}`, pageW / 2, curY, { align: 'center' });
+                curY += 6;
+
+                // ── Intro paragraph ───────────────────────────────────────
+                doc.setFontSize(9);
+                doc.setTextColor(55, 65, 81);
+                const intro = 'This Service Charter outlines the ICT services provided, the requirements for accessing them, applicable charges, and expected timelines. It serves as a commitment to efficient, reliable, and user-focused ICT support.';
+                const introLines = doc.splitTextToSize(intro, usableW);
+                doc.text(introLines, marginL, curY);
+                curY += introLines.length * 4.5 + 4;
+
+                // ── Table data ────────────────────────────────────────────
+                const rows = [
+                    [1, 'ICT Helpdesk Support', 'Call, written request, helpdesk ticket, email, or walk-in', 'Nil', 'Within 48 hours'],
+                    [2, 'Network/Email Restoration', 'Written request, call, or system detection', 'Nil', 'Within 24 hours'],
+                    [3, 'ICT Training (Students & Staff)', 'Written request, identification of training needs', 'Nil', 'Within 2 weeks'],
+                    [4, 'Security Breach Resolution', 'Detection via monitoring system', 'Nil', 'Within 48 hours'],
+                    [5, 'New User Account Creation (Email/ERP)', 'Written request', 'Nil', 'Within 24 hours'],
+                    [6, 'Password Reset', 'Call or helpdesk ticket', 'Nil', 'Within 24 hours'],
+                    [7, 'ICT Equipment Maintenance & Repairs', 'Maintenance schedule, warranty status', 'Nil', 'Within 4 weeks'],
+                    [8, 'Escalation of Equipment Faults', 'Diagnosis report, request for parts/quotation', 'Per quotation', 'Within 7 days'],
+                    [9, 'Mini Website Development', 'Written request, content, and specifications', 'Nil', 'Within 1 month'],
+                    [10, 'Project Implementation', 'Requirements, proposal/plan, procurement procedure', 'Nil', '1 year before tender award'],
+                    [11, 'ICT Equipment Specifications', 'Written request', 'Nil', 'Within 48 hours'],
+                    [12, 'Response to ICT Queries', 'Written request, email, or call', 'Nil', 'Within 24 hours'],
+                    [13, 'Computer Lab Services', 'Written request', 'Nil', 'Working days'],
+                    [14, 'Website Updates', 'Written request or email', 'Nil', 'Within 24 hours'],
+                    [15, 'New Website Design', 'Written request or email', 'Nil', 'Within 1 month'],
+                ];
+
+                doc.autoTable({
+                    startY: curY,
+                    head: [['#', 'Service', 'Requirements', 'Charges', 'Timelines']],
+                    body: rows,
+                    theme: 'grid',
+                    margin: { left: marginL, right: marginR },
+                    headStyles: {
+                        fillColor: [6, 95, 70],
+                        textColor: [255, 255, 255],
+                        fontStyle: 'bold',
+                        fontSize: 9,
+                        halign: 'center',
+                    },
+                    bodyStyles: {
+                        fontSize: 8.5,
+                        textColor: [31, 41, 55],
+                        cellPadding: 3,
+                    },
+                    alternateRowStyles: {
+                        fillColor: [240, 253, 244],
+                    },
+                    columnStyles: {
+                        0: { halign: 'center', cellWidth: 10, fontStyle: 'bold' },
+                        1: { cellWidth: 46, fontStyle: 'bold' },
+                        2: { cellWidth: 60 },
+                        3: { halign: 'center', cellWidth: 24, textColor: [6, 95, 70], fontStyle: 'bold' },
+                        4: { cellWidth: 38 },
+                    },
+                });
+
+                // ── Footer ────────────────────────────────────────────────
+                const finalY = doc.lastAutoTable.finalY + 8;
+                doc.setDrawColor(16, 185, 129);
+                doc.setLineWidth(0.5);
+                doc.line(marginL, finalY, pageW - marginR, finalY);
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(107, 114, 128);
+                doc.text(
+                    '\u00A9 South Eastern Kenya University — Directorate of ICT — ictsupport@seku.ac.ke — +254 748 60 59 97',
+                    pageW / 2, finalY + 5, { align: 'center' }
+                );
+                doc.text('This is an official SEKU ICT Service Charter document.', pageW / 2, finalY + 10, { align: 'center' });
+
+                doc.save('SEKU-ICT-Service-Charter.pdf');
+
+                btn.innerHTML = '<i class="fas fa-check mr-3 text-xl"></i> Downloaded!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-download mr-3 text-xl"></i> Download Service Charter (PDF)';
+                    btn.disabled = false;
+                }, 2500);
+            }
+
+            // Try to load the SEKU logo from multiple known paths
+            const logoPaths = [
+                '../../dist/uploads/logo.png',
+                '/uploads/logo.png',
+                '/dist/uploads/logo.png',
+            ];
+            let tried = 0;
+            function tryNextLogo() {
+                if (tried >= logoPaths.length) {
+                    buildPDF(null, 0, 0);
+                    return;
+                }
+                loadImageAsBase64(logoPaths[tried++], (b64, w, h) => {
+                    if (b64) {
+                        buildPDF(b64, w, h);
+                    } else {
+                        tryNextLogo();
+                    }
+                });
+            }
+            tryNextLogo();
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>South Eastern Kenya University (SEKU) Feedback System</title>
+    <link rel="icon" type="image/x-icon" href="../../../favicon.ico">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" />
+    <style>
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 9999;
+            max-width: 90%;
+            opacity: 0;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .notification.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .notification.success {
+            background-color: #10B981;
+            color: white;
+        }
+
+        .notification.error {
+            background-color: #EF4444;
+            color: white;
+        }
+
+        .notification.info {
+            background-color: #3B82F6;
+            color: white;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <!-- Header placeholder -->
+    <div id="header-placeholder"></div>
+    <div id="header-dynamic-spacer"></div>
+
+    <main class="flex-grow flex items-center justify-center min-h-[70vh] px-4 pt-2 pb-4">
+        <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <h2 class="text-3xl font-bold mb-6 text-green-700 dark:text-green-400 text-center">
+                Log In to Your Account
+            </h2>
+
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="text-sm">Email or Username</label>
+                    <input id="login-id" type="text" required placeholder="e.g. user@email.com or library1"
+                        class="form-input w-full px-4 py-3 border rounded-md dark:bg-gray-700" />
+                </div>
+                <div>
+                    <label class="text-sm">Password</label>
+                    <input id="password" type="password" required minlength="6"
+                        class="form-input w-full px-4 py-3 border rounded-md dark:bg-gray-700" />
+                </div>
+                <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-md">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Log In
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-gray-700 dark:text-gray-300">
+                    Don't have an account?
+                    <a href="signup.html" class="text-green-600 hover:underline">Sign Up Now</a>
+                </p>
+                <p class="mt-2">
+                    <a href="forgot-password.html" class="text-sm text-blue-600 hover:underline">Forgot Password?</a>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="../../js/load-components.js"></script>
+    <script src="../../js/feedback-portal.js"></script>
+    <script>
+        // Use global showNotification if available, otherwise fallback
+        function showNotification(message, type = 'success', duration = 3000) {
+            if (window.feedbackPortal) {
+                window.feedbackPortal.showNotification(message, type, duration);
+            } else {
+                // Fallback implementation
+                const container = document.getElementById("notification-container") || (() => {
+                    const div = document.createElement('div');
+                    div.id = 'notification-container';
+                    div.className = 'fixed inset-0 z-50 flex items-center justify-center pointer-events-none';
+                    document.body.appendChild(div);
+                    return div;
+                })();
+                const note = document.createElement('div');
+                note.className = `notification ${type}`;
+                note.innerHTML = message;
+                container.appendChild(note);
+                setTimeout(() => note.classList.add('show'), 10);
+                setTimeout(() => {
+                    note.classList.remove('show');
+                    setTimeout(() => note.remove(), 300);
+                }, duration);
+            }
+        }
+
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const loginId = document.getElementById("login-id").value;
+            const password = document.getElementById("password").value;
+
+            const loginData = {};
+            if (loginId.includes('@')) {
+                loginData.email = loginId;
+            } else {
+                loginData.username = loginId;
+            }
+            loginData.password = password;
+
+            try {
+                showNotification('Logging in...', 'info', 0);
+                const res = await fetch("/api/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", "Accept": "application/json" },
+                    body: JSON.stringify(loginData)
+                });
+
+                // Remove loading notification
+                document.querySelector('.notification')?.remove();
+
+                if (res.ok) {
+                    const data = await res.json();
+                    localStorage.setItem("token", data.access_token);
+                    localStorage.setItem("userEmail", data.email || "");
+                    localStorage.setItem("username", data.username || "");
+                    localStorage.setItem("deptId", data.department_id || "");
+                    if (data.fullname) localStorage.setItem("userFullname", data.fullname);
+                    if (data.role) localStorage.setItem("userRole", data.role);
+
+                    showNotification(" Login successful!", "success");
+                    const role = (data.role || "").toLowerCase();
+                    setTimeout(() => {
+                        if (data.role === "admin") {
+                            window.location.href = "admin.html";
+                        } else {
+                            window.location.href = "home.html";
+                        }
+                    }, 1500);
+                } else {
+                    let errorMessage = 'Login failed';
+                    try {
+                        const error = await res.json();
+                        errorMessage = error.detail || error.message || errorMessage;
+                    } catch { }
+                    showNotification(`❌ ${errorMessage}`, "error");
+                }
+            } catch (err) {
+                console.error(err);
+                showNotification("⚠️ Could not connect to server. Please check your connection.", "error");
+            }
+        });
+    </script>
+    <script>
+        function adjustHeaderSpacer() {
+            const header = document.querySelector('header');
+            const spacer = document.getElementById('header-dynamic-spacer');
+            if (header && spacer) {
+                const height = header.offsetHeight;
+                spacer.style.height = height + 'px';
+            }
+        }
+        window.addEventListener('load', adjustHeaderSpacer);
+        window.addEventListener('resize', adjustHeaderSpacer);
+        window.addEventListener('componentLoaded', (e) => {
+            if (e.detail.id === 'header-placeholder') {
+                setTimeout(adjustHeaderSpacer, 50);
+            }
+        });
+
+        if (window.ResizeObserver) {
+            const observer = new ResizeObserver(() => {
+                adjustHeaderSpacer();
+            });
+            const checkHeaderInterval = setInterval(() => {
+                const header = document.querySelector('header');
+                if (header) {
+                    observer.observe(header);
+                    clearInterval(checkHeaderInterval);
+                }
+            }, 100);
+            setTimeout(() => clearInterval(checkHeaderInterval), 5000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            adjustHeaderSpacer();
+        });
+    </script>
+</body>
+
+</html>
