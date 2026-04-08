@@ -3,8 +3,8 @@
 class FeedbackPortal {
     constructor() {
         // --- DEPLOYMENT CONNECTION URL ---
-        // CONNECTED TO RENDER BACKEND
         this.apiBaseUrl = "https://seku-feedback-backend.onrender.com/api"; 
+
 
         
         window.feedbackPortal = this;

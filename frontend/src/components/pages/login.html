@@ -107,7 +107,9 @@
             }
         }
 
-        const apiBaseUrl = window.feedbackPortal ? window.feedbackPortal.apiBaseUrl : "/api";
+        // HARDCODED CONNECTION FOR TESTING
+        const apiBaseUrl = "https://seku-feedback-backend.onrender.com/api";
+
 
         document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
