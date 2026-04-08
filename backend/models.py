@@ -1,7 +1,11 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+def get_kenya_time():
+    # Kenya is UTC+3. This returns a naive datetime object set to Kenya time.
+    return datetime.now(timezone(timedelta(hours=3))).replace(tzinfo=None)
 
 class Department(Base):
     __tablename__ = "departments"
@@ -24,7 +28,8 @@ class User(Base):
     hashed_password = Column(String(200))
     role = Column(String(20))  # student, staff, visitor, admin
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=get_kenya_time)
+
 
     department = relationship("Department", back_populates="users")
 
@@ -42,7 +47,7 @@ class Feedback(Base):
     anonymous = Column(String(5), default="false")  # 'true' or 'false'
     tracking_id = Column(String(20), unique=True, index=True, nullable=True)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=True)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=get_kenya_time)
     rating = Column(String(50), nullable=True)
     
     # Dynamic question responses
@@ -71,7 +76,7 @@ class Question(Base):
     options = Column(String(200), default="Yes,No") # Composed of comma-separated options
     target_office = Column(String(100), nullable=True) # If null, it's global. If 'management', it's for all management offices.
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now)
+    created_at = Column(DateTime, default=get_kenya_time)
 
     responses = relationship("QuestionResponse", back_populates="question")
 
@@ -101,7 +106,7 @@ class ActivityLog(Base):
     department_id = Column(Integer, ForeignKey("departments.id"))
     action = Column(String(100))  # e.g., 'read_message', 'reply_message'
     details = Column(Text, nullable=True)
-    timestamp = Column(DateTime, default=datetime.now)
+    timestamp = Column(DateTime, default=get_kenya_time)
 
 
 class ServiceCharter(Base):
@@ -116,6 +121,6 @@ class ServiceCharter(Base):
     charges = Column(String(100), default="Nil")
     timelines = Column(String(100), nullable=False)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now)
-    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    created_at = Column(DateTime, default=get_kenya_time)
+    updated_at = Column(DateTime, default=get_kenya_time, onupdate=datetime.now)
 

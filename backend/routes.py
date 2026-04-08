@@ -10,7 +10,12 @@ from schemas import (
 )
 from auth import authenticate_user, create_access_token, get_current_user, get_password_hash, verify_password
 from database import get_db
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
+
+def get_kenya_time():
+    # Kenya is UTC+3. This returns a naive datetime object set to Kenya time.
+    return datetime.now(timezone(timedelta(hours=3))).replace(tzinfo=None)
+
 from typing import List, Optional
 import logging
 import re
@@ -303,7 +308,7 @@ def mark_feedback_as_read(
              raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
         feedback.is_read = True
-        feedback.read_at = datetime.now()
+        feedback.read_at = get_kenya_time()
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -337,7 +342,7 @@ def mark_feedback_as_answered(
         if current_user.department_id and feedback.department_id != current_user.department_id:
              raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
-        feedback.replied_at = datetime.now()
+        feedback.replied_at = get_kenya_time()
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -378,10 +383,10 @@ def send_reply(
         if current_user.department_id and feedback.department_id != current_user.department_id:
              raise HTTPException(status_code=403, detail="Forbidden - Not your department")
 
-        feedback.replied_at = datetime.now()
+        feedback.replied_at = get_kenya_time()
         feedback.reply_message = message
         feedback.is_read = True
-        feedback.read_at = datetime.now()
+        feedback.read_at = get_kenya_time()
         log = ActivityLog(
             user_id=current_user.id,
             department_id=current_user.department_id,
@@ -447,7 +452,7 @@ def send_admin_message_to_member(
             department_id=current_user.department_id,
             is_read=False,
             reply_message=message,
-            replied_at=datetime.now(),
+            replied_at=get_kenya_time(),
         )
         db.add(new_msg)
         log = ActivityLog(
@@ -540,7 +545,7 @@ def mark_user_feedback_as_read(
             raise HTTPException(status_code=404, detail="Feedback not found")
         
         feedback.is_read = True
-        feedback.read_at = datetime.now()
+        feedback.read_at = get_kenya_time()
         db.commit()
         
         logger.info(f"Feedback {feedback_id} marked as read by user {current_user.email}")
