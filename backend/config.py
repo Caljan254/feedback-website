@@ -24,10 +24,14 @@ class Config:
     if raw_database_url and raw_database_url.startswith("postgres://"):
         raw_database_url = raw_database_url.replace("postgres://", "postgresql://", 1)
     
-    SQLALCHEMY_DATABASE_URI = raw_database_url or f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-
+    # If on Render and using localhost (meaning no remote DB is set), fallback to SQLite for testing
+    if not raw_database_url and (DB_HOST == 'localhost' or os.getenv('RENDER')):
+        SQLALCHEMY_DATABASE_URI = "sqlite:///./feedback.db"
+    else:
+        SQLALCHEMY_DATABASE_URI = raw_database_url or f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
     
     # JWT
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
