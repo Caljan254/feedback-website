@@ -1194,3 +1194,15 @@ function goBack() { window.feedbackPortal?.goBack(); }
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = FeedbackPortal;
 }
+
+// Start the portal
+document.addEventListener('DOMContentLoaded', () => {
+    if (!window.feedbackPortal) {
+        window.feedbackPortal = new FeedbackPortal();
+    }
+});
+
+// Immediately instantiate for scripts that need it before DOMContentLoaded
+if (typeof window !== 'undefined' && !window.feedbackPortal) {
+    window.feedbackPortal = new FeedbackPortal();
+}
