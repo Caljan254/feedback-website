@@ -15,12 +15,17 @@ class Config:
     
     # Preference is given to a full DATABASE_URL if provided
     # Handle Render's postgres:// prefix by converting to postgresql://
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
-    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
-        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+    raw_database_url = os.getenv('DATABASE_URL')
     
-    if not SQLALCHEMY_DATABASE_URI:
-        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+    # If DATABASE_URL is literally "${...}" (not expanded), ignore it
+    if raw_database_url and "${" in raw_database_url:
+        raw_database_url = None
+        
+    if raw_database_url and raw_database_url.startswith("postgres://"):
+        raw_database_url = raw_database_url.replace("postgres://", "postgresql://", 1)
+    
+    SQLALCHEMY_DATABASE_URI = raw_database_url or f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
