@@ -25,64 +25,24 @@ except Exception as e:
 
 app = FastAPI(title="Feedback Portal API")
 
-# Security Headers Middleware
+# Request logger for debugging
 @app.middleware("http")
-async def add_security_headers(request, call_next):
+async def log_requests(request, call_next):
+    logger.info(f"Incoming request: {request.method} {request.url}")
     response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "SAMEORIGIN"
-    response.headers["X-XSS-Protection"] = "1; mode=block"
-    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    # Relaxed connect-src and img-src for production
-    response.headers["Content-Security-Policy"] = (
-        "default-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-        "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-        "img-src 'self' data: https:; "
-        "connect-src 'self' https: http:;"
-    )
-    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    logger.info(f"Response status: {response.status_code}")
     return response
 
-# CORS Middleware - Configure for your frontend
-origins = [
-    "http://localhost:5501",
-    "http://127.0.0.1:5501",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://seku-feedback-frontend.onrender.com",
-    "https://seku-feedback-frontend.onrender.com/",
-    "http://localhost:5173",
-    "https://ict.seku.ac.ke",
-
-
-    "https://www.ict.seku.ac.ke",
-    "http://ict.seku.ac.ke",
-]
-
-# Add FRONTEND_URL from config if not already present
-if Config.FRONTEND_URL:
-    orig = Config.FRONTEND_URL.rstrip('/')
-    if orig not in origins: origins.append(orig)
-    if "https://" in orig: origins.append(orig.replace("https://", "http://"))
-    if "www." not in orig: origins.append(orig.replace("://", "://www."))
-
-# Automatically add Render URL if running on Render
-render_url = os.getenv("RENDER_EXTERNAL_URL")
-if render_url:
-    render_url = render_url.rstrip('/')
-    if render_url not in origins: origins.append(render_url)
-
-
+# Standard CORS Middleware (Ordered first)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # TEMPORARY: Allow all for testing
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"], 
+    expose_headers=["*"],
 )
+
 
 
 # Include all routes under /api
