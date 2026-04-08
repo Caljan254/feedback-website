@@ -19,7 +19,7 @@ def sanitize_html(text: str) -> str:
         return text
     # Strip script tags and other dangerous elements
     text = re.sub(r'<script.*?>.*?</script>', '', text, flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r'<.*?>', '', text) # Remove all HTML tags for safety
+    text = re.sub(r'<.*?>', '', text) 
     return text.strip()
 
 # Configuration
@@ -252,7 +252,7 @@ def submit_feedback():
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """, (
         name, email, category, office, rating, message, anonymous, datetime.now(),
-        False, None, None, None  # Default values for status fields
+        False, None, None, None  
     ))
     db.commit()
     

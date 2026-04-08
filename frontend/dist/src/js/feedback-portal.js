@@ -2,11 +2,6 @@
 
 class FeedbackPortal {
     constructor() {
-        // --- DEPLOYMENT CONNECTION URLS ---
-        // Replace "/api" with your PRODUCTION BACKEND URL (e.g., "https://ict.seku.ac.ke/api")
-        // This connects your frontend to your backend API.
-        this.apiBaseUrl = "/api"; 
-        
         window.feedbackPortal = this;
         this.init();
     }
@@ -117,7 +112,7 @@ class FeedbackPortal {
         if (!questionsContainer) return;
 
         try {
-            const res = await fetch(`${this.apiBaseUrl}/questions?office=${officeId}`);
+            const res = await fetch(`/api/questions?office=${officeId}`);
             const questions = await res.json();
             
             if (questions.length === 0) {
@@ -731,7 +726,7 @@ class FeedbackPortal {
                 headers["Authorization"] = `Bearer ${token}`;
             }
 
-            const res = await fetch(`${this.apiBaseUrl}/submit-feedback`, {
+            const res = await fetch("/api/submit-feedback", {
                 method: "POST",
                 headers: headers,
                 body: JSON.stringify(finalData)

@@ -107,6 +107,8 @@
             }
         }
 
+        const apiBaseUrl = window.feedbackPortal ? window.feedbackPortal.apiBaseUrl : "/api";
+
         document.getElementById("loginForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             const loginId = document.getElementById("login-id").value;
@@ -122,7 +124,7 @@
 
             try {
                 showNotification('Logging in...', 'info', 0);
-                const res = await fetch("/api/login", {
+                const res = await fetch(`${apiBaseUrl}/login`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json", "Accept": "application/json" },
                     body: JSON.stringify(loginData)

@@ -297,7 +297,7 @@
 
         <!-- Page Title -->
         <div class="text-center mb-8">
-            <h1 id="page-welcome-title" class="text-3xl sm:text-4xl font-bold text-green-700 mb-4 uppercase">Welcome To Directorate Of ICT Customer Feedback</h1>
+            <h1 id="page-welcome-title" class="text-3xl sm:text-4xl font-bold text-green-700 mb-4 uppercase">Welcome To SEKU Customer Feedback System</h1>
             <div class="w-24 h-1 bg-gradient-to-r from-green-700 to-yellow-500 mx-auto mb-4 rounded-full"></div>
             <p class="text-gray-600 max-w-2xl mx-auto">Rate us and share your experience with us please on our services.
                 Your feedback is very important to us and will help us improve our services.
@@ -468,7 +468,7 @@
 
             <div class="mt-6">
                 <button id="continue-to-user-info" class="btn-seku w-full text-center justify-center flex items-center gap-2"
-                    onclick="showUserInfoForm()">Continue</button>
+                    @click="showUserInfoForm(selectedOffice ? selectedOffice.name : 'ICT')">Continue</button>
             </div>
         </section>
 
@@ -716,19 +716,20 @@
             // Show extra info
             document.getElementById('extra-info-container').classList.remove('hidden');
             
-            // Reset Title
-            document.getElementById('page-welcome-title').textContent = 'Welcome To Directorate Of ICT Customer Feedback';
+            // Reset Title to generic welcome
+            document.getElementById('page-welcome-title').textContent = 'Welcome To SEKU Customer Feedback System';
         }
 
-        function showUserInfoForm() {
+        function showUserInfoForm(officeName) {
             document.getElementById('office-section').classList.add('hidden');
             document.getElementById('user-info-section').classList.remove('hidden');
             
             // Hide extra info
             document.getElementById('extra-info-container').classList.add('hidden');
             
-            // Update Title
-            document.getElementById('page-welcome-title').textContent = 'ICT CUSTOMER FEEDBACK';
+            // Update Title based on selected office
+            const displayOffice = officeName || 'ICT';
+            document.getElementById('page-welcome-title').textContent = displayOffice.toUpperCase() + ' CUSTOMER FEEDBACK';
         }
     </script>
 </body>

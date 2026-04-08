@@ -700,6 +700,9 @@
         let filteredFeedback = [];
         let currentPage = 1;
         const itemsPerPage = 5;
+        
+        // Centralized API configuration
+        const apiBaseUrl = window.feedbackPortal ? window.feedbackPortal.apiBaseUrl : "/api";
 
         // Helper functions
         function escapeHtml(text) {
@@ -939,7 +942,7 @@
                 console.log('Fetching user feedback from API...');
 
                 // Use the new user-specific endpoint
-                const response = await fetch('/api/user/feedback', {
+                const response = await fetch(`${apiBaseUrl}/user/feedback`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -1055,7 +1058,7 @@
                 const payload = isTrackingId ? { tracking_id: inputValue } : { email: inputValue };
 
                 console.log('Tracking guest feedback for:', inputValue);
-                const response = await fetch('/api/feedback/track', {
+                const response = await fetch(`${apiBaseUrl}/feedback/track`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

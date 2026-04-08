@@ -42,26 +42,38 @@
                 Track Service Tickets
             </h1>
             
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl max-w-2xl mx-auto border-t-4 border-yellow-400">
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-3xl shadow-xl max-w-2xl mx-auto border-t-4 border-green-500">
                 <h2 class="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white mb-4">
-                    ICT Service Support Tracking is coming soon!
+                    Track Your Service Request
                 </h2>
-                <p class="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed">
-                    This portal will allow you to track the progress of your technical assistance requests and ICT infrastructure support tickets.
+                <p class="text-gray-600 dark:text-gray-400 text-sm mb-6">
+                    Enter the Reference Number you received when submitting your request to check its status.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="/src/components/pages/home.html" class="px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition">
-                        Back to Home
-                    </a>
-                    <a href="/src/components/pages/services.html" class="px-8 py-3 border-2 border-green-600 text-green-600 font-bold rounded-xl hover:bg-green-50 transition">
-                        Explore Our Services
-                    </a>
+
+                <form id="track-ticket-form" class="space-y-4">
+                    <div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                <i class="fas fa-barcode"></i>
+                            </div>
+                            <input type="text" id="tracking-id-input" placeholder="e.g. REF-ABC123XYZ" required 
+                                class="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-green-500 outline-none transition uppercase uppercase-placeholder">
+                        </div>
+                    </div>
+                    <button type="submit" id="track-submit-btn" class="w-full px-8 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition shadow flex items-center justify-center">
+                        <i class="fas fa-search mr-2"></i> Track Ticket
+                    </button>
+                    <div class="w-full flex justify-center mt-4">
+                        <a href="/src/components/pages/home.html" class="text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 font-medium text-sm transition">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to Home
+                        </a>
+                    </div>
+                </form>
+                
+                <div id="tracking-result" class="hidden mt-8 text-left border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <!-- Results populated here -->
                 </div>
             </div>
-            
-            <p class="text-gray-500 mt-12 text-sm font-medium uppercase tracking-widest">
-                Our team is working hard to launch this soon
-            </p>
         </div>
     </div>
 
@@ -84,6 +96,130 @@
         window.addEventListener('componentLoaded', () => adjustHeaderSpacer());
         document.addEventListener('DOMContentLoaded', () => {
             adjustHeaderSpacer();
+            // Track Ticket Logic
+            const trackForm = document.getElementById('track-ticket-form');
+            if (trackForm) {
+                trackForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const input = document.getElementById('tracking-id-input').value.trim().toUpperCase();
+                    if (!input) return;
+
+                    const btn = document.getElementById('track-submit-btn');
+                    const originalBtnContent = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Searching...';
+                    btn.disabled = true;
+
+                    const resultDiv = document.getElementById('tracking-result');
+                    resultDiv.classList.add('hidden');
+                    
+                    try {
+                        const res = await fetch('/api/feedback/track', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ tracking_id: input })
+                        });
+
+                        if (!res.ok) {
+                            throw new Error('Could not find tracking info');
+                        }
+
+                        const data = await res.json();
+                        
+                        btn.innerHTML = originalBtnContent;
+                        btn.disabled = false;
+                        resultDiv.classList.remove('hidden');
+
+                        if (data.length === 0) {
+                            resultDiv.innerHTML = `
+                                <div class="p-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl flex items-start">
+                                    <i class="fas fa-exclamation-circle mt-1 mr-3 text-lg"></i>
+                                    <div>
+                                        <h4 class="font-bold mb-1">Ticket Not Found</h4>
+                                        <p class="text-sm">We could not find any service request with the reference number <strong>${input}</strong>. Please check and try again.</p>
+                                    </div>
+                                </div>
+                            `;
+                            return;
+                        }
+
+                        const ticket = data[0]; // Assuming one ticket per REF
+                        const isSolved = ticket.replied_at !== null;
+                        const statusColor = isSolved ? 'green' : (ticket.is_read ? 'blue' : 'yellow');
+                        const statusIcon = isSolved ? 'fa-check-circle' : (ticket.is_read ? 'fa-eye' : 'fa-clock');
+                        const statusText = isSolved ? 'Solved' : (ticket.is_read ? 'In Progress' : 'Pending');
+
+                        let html = `
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">Request Status</h3>
+                            
+                            <div class="p-5 border border-gray-200 dark:border-gray-700 rounded-xl mb-4 bg-gray-50 dark:bg-gray-800/50">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div>
+                                        <p class="text-xs text-gray-500 font-medium uppercase min-w-[max-content]">Reference</p>
+                                        <p class="font-bold font-mono text-gray-800 dark:text-white text-lg">${ticket.tracking_id}</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-${statusColor}-100 text-${statusColor}-800 dark:bg-${statusColor}-900/30 dark:text-${statusColor}-400">
+                                        <i class="fas ${statusIcon} mr-1.5"></i> ${statusText}
+                                    </span>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <p class="text-xs text-gray-500 font-medium uppercase">Department</p>
+                                        <p class="font-medium text-gray-800 dark:text-white">${ticket.office || 'General'}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-gray-500 font-medium uppercase">Submitted On</p>
+                                        <p class="font-medium text-gray-800 dark:text-white">${new Date(ticket.created_at).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <p class="text-xs text-gray-500 font-medium uppercase mb-1">Your Request / Message</p>
+                                    <p class="text-sm text-gray-700 dark:text-gray-300 italic bg-white dark:bg-gray-700 p-3 rounded-lg border border-gray-100 dark:border-gray-600">"${ticket.message}"</p>
+                                </div>
+                            </div>
+                        `;
+
+                        if (isSolved && ticket.reply_message) {
+                            html += `
+                                <div class="p-5 border border-green-200 dark:border-green-900/30 rounded-xl bg-green-50 dark:bg-green-900/10">
+                                    <h4 class="text-sm font-bold text-green-800 dark:text-green-400 mb-2 flex items-center">
+                                        <i class="fas fa-comment-dots mr-2"></i> Resolution / Response
+                                    </h4>
+                                    <p class="text-gray-700 dark:text-gray-300 whitespace-pre-wrap text-sm">${ticket.reply_message}</p>
+                                    <p class="text-xs text-gray-500 mt-3 pt-3 border-t border-green-200/50 dark:border-green-800/30">
+                                        Replied on: ${new Date(ticket.replied_at).toLocaleString()}
+                                    </p>
+                                </div>
+                            `;
+                        } else if (ticket.is_read) {
+                            html += `
+                                <div class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-xl text-sm border border-blue-100 dark:border-blue-800/30 flex items-start">
+                                    <i class="fas fa-info-circle mt-0.5 mr-2"></i>
+                                    <p>Your request is currently being reviewed and worked on by the team.</p>
+                                </div>
+                            `;
+                        } else {
+                            html += `
+                                <div class="p-4 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-300 rounded-xl text-sm border border-yellow-100 dark:border-yellow-800/30 flex items-start">
+                                    <i class="fas fa-hourglass-half mt-0.5 mr-2"></i>
+                                    <p>Your request has been received and is waiting to be processed by the team.</p>
+                                </div>
+                            `;
+                        }
+                        
+                        resultDiv.innerHTML = html;
+
+                    } catch (error) {
+                        btn.innerHTML = originalBtnContent;
+                        btn.disabled = false;
+                        resultDiv.classList.remove('hidden');
+                        resultDiv.innerHTML = `<div class="text-red-500 p-4 bg-red-50 rounded-xl">Error tracking ticket: ${error.message}</div>`;
+                    }
+                });
+            }
+
             // Scroll Reveal Logic
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {

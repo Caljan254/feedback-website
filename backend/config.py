@@ -12,12 +12,16 @@ class Config:
     DB_PORT = os.getenv('DB_PORT', '3306')
     DB_NAME = os.getenv('DB_NAME', 'feedback_db')
 
-    # Construct the full URI
+    
     # Preference is given to a full DATABASE_URL if provided
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'DATABASE_URL', 
-        f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-    )
+    # Handle Render's postgres:// prefix by converting to postgresql://
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
+    if SQLALCHEMY_DATABASE_URI and SQLALCHEMY_DATABASE_URI.startswith("postgres://"):
+        SQLALCHEMY_DATABASE_URI = SQLALCHEMY_DATABASE_URI.replace("postgres://", "postgresql://", 1)
+    
+    if not SQLALCHEMY_DATABASE_URI:
+        SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # JWT
@@ -30,5 +34,6 @@ class Config:
     SMTP_USERNAME = os.getenv('SMTP_USERNAME', '')
     SMTP_PASSWORD = os.getenv('SMTP_PASSWORD', '')
     
-    # Frontend
-    FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+   
+    # Update this to your PRODUCTION FRONTEND URL (e.g., https://ict.seku.ac.ke)
+    FRONTEND_URL = os.getenv('FRONTEND_URL', 'https://ict.seku.ac.ke')
