@@ -45,8 +45,10 @@ origins = [
     "http://127.0.0.1:5501",
     "http://localhost:5500",
     "http://127.0.0.1:5500",
+    "https://seku-feedback-frontend.onrender.com",
     "http://localhost:5173", # Vite dev
     "https://ict.seku.ac.ke",
+
     "https://www.ict.seku.ac.ke",
     "http://ict.seku.ac.ke",
 ]

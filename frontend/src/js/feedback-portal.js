@@ -2,10 +2,10 @@
 
 class FeedbackPortal {
     constructor() {
-        // --- DEPLOYMENT CONNECTION URLS ---
-        // Replace "/api" with your PRODUCTION BACKEND URL (e.g., "https://ict.seku.ac.ke/api")
-        // This connects your frontend to your backend API.
-        this.apiBaseUrl = "/api"; 
+        // --- DEPLOYMENT CONNECTION URL ---
+        // CONNECTED TO RENDER BACKEND: https://seku-feedback-backend.onrender.com
+        this.apiBaseUrl = "https://seku-feedback-backend.onrender.com/api"; 
+
         
         window.feedbackPortal = this;
         this.init();
