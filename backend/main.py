@@ -77,12 +77,13 @@ if render_url:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"], # TEMPORARY: Allow all for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"], # For better communication
+    expose_headers=["*"], 
 )
+
 
 # Include all routes under /api
 app.include_router(router, prefix="/api")
